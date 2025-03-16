@@ -6,7 +6,7 @@
 public interface IPasswordGenerator
 {
     /// <summary>
-    /// Generate password with <paramref name="length"/> with characters from <paramref name="alphabet"/>
+    /// Generate password with <paramref name="length"/>
     /// </summary>
-    string GeneratePassword(IAlphabet alphabet, int length);
+    string GeneratePassword(int length);
 }
