@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +19,7 @@ public class SeaMonkeyPasswordChecker : IPasswordChecker
         var uppers = Math.Min(CountOfUppers(password), 3);
         var numbers = Math.Min(CountOfNumbers(password), 3);
         var chars = Math.Min(CountOfCharacters(password), 3);
-        var rating = (length * 10) - 20 + (numbers * 10) + (chars * 15) + (uppers * 10);
+        var rating = 10 * length - 20 + 10 * numbers + 15 * chars + 10 * uppers;
 
         var strength = rating switch
         {

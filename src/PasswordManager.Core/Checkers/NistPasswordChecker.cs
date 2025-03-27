@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,7 +31,7 @@ public class NistPasswordChecker : IPasswordChecker
         var oneAndHalfBitSymbols = Math.Max(password.Length - oneBitSymbols - 8, 0);
         var twoBitSymbols = Math.Max(password.Length - oneBitSymbols - oneAndHalfBitSymbols - 1, 0);
 
-        entropy += (1 * oneBitSymbols) + (1.5 * oneAndHalfBitSymbols) + (2 * twoBitSymbols);
+        entropy += 1 * oneBitSymbols + 1.5 * oneAndHalfBitSymbols + 2 * twoBitSymbols;
 
         if (HasLowerLetters(password) && HasUpperLetters(password) && (HasNumbers(password) || HasCharacters(password)))
         {

@@ -1,4 +1,4 @@
-﻿namespace PasswordManager.Abstractions;
+namespace PasswordManager.Abstractions;
 
 /// <summary>
 /// Factory for master key
@@ -11,5 +11,5 @@ public interface IMasterKeyFactory
     /// <remarks>
     /// The output key is 256 bits in size.
     /// </remarks>
-    public byte[] CreateMasterKey(string masterPassword);
+    byte[] CreateMasterKey(string masterPassword);
 }

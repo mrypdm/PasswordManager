@@ -23,7 +23,7 @@ public class PwnedPasswordCheckerTests
         var checker = new PwnedPasswordChecker();
 
         // act
-        var result = await checker.CheckPasswordAsync("qwerty123", default);
+        await checker.CheckPasswordAsync("qwerty123", default);
 
         // assert
         httpTest.ShouldHaveCalled("https://api.pwnedpasswords.com/range/5CEC1").Times(1);
