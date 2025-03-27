@@ -20,14 +20,13 @@ public class SeaMonkeyPasswordChecker : IPasswordChecker
         var numbers = Math.Min(CountOfNumbers(password), 3);
         var chars = Math.Min(CountOfCharacters(password), 3);
         var rating = (length * 10) - 20 + (numbers * 10) + (chars * 15) + (uppers * 10);
-        rating = Math.Max(Math.Min(rating, 100), 0);
 
         var strength = rating switch
         {
-            < 20 => PasswordStrength.VeryLow,
-            < 40 => PasswordStrength.Low,
-            < 60 => PasswordStrength.Medium,
-            < 80 => PasswordStrength.High,
+            < 50 => PasswordStrength.VeryLow,
+            < 70 => PasswordStrength.Low,
+            < 100 => PasswordStrength.Medium,
+            < 130 => PasswordStrength.High,
             _ => PasswordStrength.VeryHigh
         };
 
