@@ -20,6 +20,12 @@ public class NistPasswordChecker : IPasswordChecker
             return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.VeryLow, 0));
         }
 
+        // first symbol                             +4.0
+        // next 7 symbols                           +2.0
+        // next 12 symbols                          +1.5
+        // next symbols                             +1.0
+        // if has lower and uppercase letters           
+        //   and if has non-alphabetical symbols    +6.0
         var entropy = 4.0;
         var oneBitSymbols = Math.Max(password.Length - 20, 0);
         var oneAndHalfBitSymbols = Math.Max(password.Length - oneBitSymbols - 8, 0);
