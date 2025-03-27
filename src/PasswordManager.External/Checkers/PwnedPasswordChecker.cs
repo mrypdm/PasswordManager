@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Flurl.Http;
 
 using PasswordManager.Abstractions;
+using PasswordManager.External.Exceptions;
 
 namespace PasswordManager.External.Checkers;
 
@@ -21,11 +23,25 @@ public class PwnedPasswordChecker : IPasswordChecker
     public async Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)
     {
         var hash = Convert.ToHexString(SHA1.HashData(Encoding.UTF8.GetBytes(password)));
-        var result = await GetCompomisedHashes(hash[..5], token);
 
-        return result.Contains(hash[5..], StringComparison.OrdinalIgnoreCase)
-            ? new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow, 0)
-            : new PasswordCheckStatus(PasswordCompromisation.NotCompromised, PasswordStrength.Unknown, -1);
+        try
+        {
+            var result = await GetCompomisedHashes(hash[..5], token);
+
+            return result.Contains(hash[5..], StringComparison.OrdinalIgnoreCase)
+                ? new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow, 0)
+                : new PasswordCheckStatus(PasswordCompromisation.NotCompromised, PasswordStrength.Unknown, -1);
+        }
+        catch (FlurlHttpException e)
+        {
+            if (e.StatusCode >= (int)HttpStatusCode.InternalServerError)
+            {
+                // Server side error. We can't do anything about it.
+                return new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Unknown, -1);
+            }
+
+            throw new PwnedRequestException($"Error occured in HTTP request to {e.Call.Request.Url}", e);
+        }
     }
 
     /// <summary>
