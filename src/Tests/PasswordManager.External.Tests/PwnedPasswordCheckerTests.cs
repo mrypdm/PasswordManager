@@ -67,7 +67,7 @@ public class PwnedPasswordCheckerTests
     }
 
     [Test]
-    [Category("Integration")]
+    [Ignore("This test makes requests to the real service, which may have consequences, so the test is disabled by default.")]
     public async Task CheckCompromisedPassword()
     {
         // arrange
