@@ -2,10 +2,9 @@ using System;
 using System.Threading.Tasks;
 
 using PasswordManager.Abstractions;
-using PasswordManager.Core;
 using PasswordManager.Core.Checkers;
 
-namespace PasswordManager.Checkers.Tests;
+namespace PasswordManager.Core.Tests;
 
 /// <summary>
 /// Tests for <see cref="EntropyPasswordChecker"/>
@@ -26,9 +25,12 @@ public class EntropyPasswordCheckerTests
         var result = await checker.CheckPasswordAsync(password, default);
 
         // assert
-        Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
-        Assert.That(result.Strength, Is.EqualTo(strength));
-        Assert.That(result.Score, Is.EqualTo(score).Within(0.1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
+            Assert.That(result.Strength, Is.EqualTo(strength));
+            Assert.That(result.Score, Is.EqualTo(score).Within(0.1));
+        });
     }
 
     [Test]
@@ -49,9 +51,12 @@ public class EntropyPasswordCheckerTests
         var result = await checker.CheckPasswordAsync(password, default);
 
         // assert
-        Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
-        Assert.That(result.Strength, Is.EqualTo(strength));
-        Assert.That(score, Is.EqualTo(result.Score).Within(0.1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
+            Assert.That(result.Strength, Is.EqualTo(strength));
+            Assert.That(score, Is.EqualTo(result.Score).Within(0.1));
+        });
     }
 
     [Test]
