@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,6 +15,8 @@ public class EntropyPasswordChecker(IAlphabet alphabet) : IPasswordChecker
     /// <inheritdoc/>
     public Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)
     {
+        ValidatePasswordCharacters(password);
+
         var entropy = Math.Log2(alphabet.GetCharacters().Count) * password.Length;
         var strength = entropy switch
         {
@@ -24,6 +27,14 @@ public class EntropyPasswordChecker(IAlphabet alphabet) : IPasswordChecker
             _ => PasswordStrength.VeryHigh,
         };
 
-        return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, strength));
+        return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, strength, entropy));
+    }
+
+    private void ValidatePasswordCharacters(string password)
+    {
+        if (password.ToHashSet().Except(alphabet.GetCharacters()).Any())
+        {
+            throw new InvalidOperationException("Password contains characters, which does not exist in alphabet");
+        }
     }
 }

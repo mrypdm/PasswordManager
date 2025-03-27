@@ -46,7 +46,7 @@ public class Alphabet : IAlphabet
     /// <summary>
     /// Append <see cref="Numbers"/> to alphabet
     /// </summary>
-    public Alphabet WithNumbersLetters()
+    public Alphabet WithNumbers()
     {
         _alphabetBuilder.Append(Numbers);
         return this;

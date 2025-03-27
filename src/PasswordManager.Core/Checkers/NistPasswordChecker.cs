@@ -17,7 +17,7 @@ public class NistPasswordChecker : IPasswordChecker
     {
         if (password.Length == 0)
         {
-            return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Low));
+            return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.VeryLow, 0));
         }
 
         var entropy = 4.0;
@@ -41,7 +41,7 @@ public class NistPasswordChecker : IPasswordChecker
             _ => PasswordStrength.VeryHigh,
         };
 
-        return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, strength));
+        return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, strength, entropy));
     }
 
     private static bool HasLowerLetters(string password)

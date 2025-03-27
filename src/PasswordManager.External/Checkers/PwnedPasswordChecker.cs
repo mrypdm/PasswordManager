@@ -24,8 +24,8 @@ public class PwnedPasswordChecker : IPasswordChecker
         var result = await GetCompomisedHashes(hash[..5], token);
 
         return result.Contains(hash[5..], StringComparison.OrdinalIgnoreCase)
-            ? new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow)
-            : new PasswordCheckStatus(PasswordCompromisation.NotCompromised, PasswordStrength.Unknown);
+            ? new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow, 0)
+            : new PasswordCheckStatus(PasswordCompromisation.NotCompromised, PasswordStrength.Unknown, -1);
     }
 
     /// <summary>
