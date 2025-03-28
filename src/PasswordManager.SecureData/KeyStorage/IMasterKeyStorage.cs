@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace PasswordManager.SecureData;
+namespace PasswordManager.SecureData.KeyStorage;
 
 /// <summary>
 /// Initializer for Master Key storage

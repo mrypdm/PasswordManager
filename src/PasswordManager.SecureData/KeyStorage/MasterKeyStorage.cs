@@ -3,7 +3,7 @@ using System.Runtime.Caching;
 using System.Security.Cryptography;
 using PasswordManager.Abstractions;
 
-namespace PasswordManager.SecureData;
+namespace PasswordManager.SecureData.KeyStorage;
 
 /// <summary>
 /// Storage for master key
