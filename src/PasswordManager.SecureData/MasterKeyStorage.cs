@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Runtime.Caching;
 using System.Security.Cryptography;
+using PasswordManager.Abstractions;
 
 namespace PasswordManager.SecureData;
 
