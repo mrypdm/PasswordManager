@@ -1,4 +1,4 @@
-using System;
+using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Validators;
 
 namespace PasswordManager.Aes;
@@ -13,10 +13,14 @@ public class AesKeyValidator : IKeyValidator
     /// </summary>
     public void Validate(byte[] key)
     {
-        ArgumentNullException.ThrowIfNull(key);
+        if (key is null)
+        {
+            throw new KeyValidationException("Key is null");
+        }
+
         if (key.Length != AesConstants.KeySize)
         {
-            throw new ArgumentException($"Key size is not valid. Must be {AesConstants.KeySize} but was {key.Length}");
+            throw new KeyValidationException($"Key size must be {AesConstants.KeySize} but was {key.Length}");
         }
     }
 }
