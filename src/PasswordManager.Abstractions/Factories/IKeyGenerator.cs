@@ -3,7 +3,7 @@ namespace PasswordManager.Abstractions.Factories;
 /// <summary>
 /// Factory for master key
 /// </summary>
-public interface IMasterKeyFactory
+public interface IKeyGenerator
 {
     /// <summary>
     /// Create master key by master password
