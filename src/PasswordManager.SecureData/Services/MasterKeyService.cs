@@ -13,21 +13,21 @@ namespace PasswordManager.SecureData.Services;
 
 /// <inheritdoc />
 public class MasterKeyService(
-    ISecureItemsRepository secureItemsRepository,
-    IKeyGenerator masterKeyFactory,
+    IMasterKeyDataRepository masterKeyDataRepository,
+    IKeyGenerator masterKeyGenerator,
     IKeyValidator keyValidator,
     ICrypto crypto) : IMasterKeyService
 {
     /// <inheritdoc />
     public async Task<byte[]> CreateMasterKeyAsync(string masterPassword, CancellationToken token)
     {
-        var masterKey = masterKeyFactory.CreateMasterKey(masterPassword);
+        var masterKey = masterKeyGenerator.Generate(masterPassword);
 
         try
         {
             await ValidateKeyAsync(masterKey, token);
         }
-        catch (MasterKeyNotInitializedException)
+        catch (MasterKeyDataNotExistsException)
         {
             await InitMasterKeyData(masterKey, token);
         }
@@ -44,14 +44,13 @@ public class MasterKeyService(
             Salt = encryptedData.Salt,
             Data = encryptedData.Data
         };
-        await secureItemsRepository.AddItemAsync(masterKeyData, token);
+        await masterKeyDataRepository.SetMasterKeyDataAsync(masterKeyData, token);
     }
 
     private async Task ValidateKeyAsync(byte[] masterKey, CancellationToken token)
     {
         keyValidator.Validate(masterKey);
-        var masterKeyData = await secureItemsRepository.GetItemByIdAsync(id: 1, token)
-            ?? throw new MasterKeyNotInitializedException();
+        var masterKeyData = await masterKeyDataRepository.GetMasterKeyDataAsync(token);
         var decryptedData = crypto.Decrypt(masterKeyData, masterKey);
         if (!masterKey.SequenceEqual(decryptedData))
         {

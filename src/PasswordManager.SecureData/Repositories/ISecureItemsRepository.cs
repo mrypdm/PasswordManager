@@ -15,11 +15,6 @@ public interface ISecureItemsRepository
     Task AddAccountAsync(AccountData data, CancellationToken token);
 
     /// <summary>
-    /// Add new secure item to repository
-    /// </summary>
-    Task AddItemAsync(EncryptedDataDbModel item, CancellationToken token);
-
-    /// <summary>
     /// Delete secure item from repository
     /// </summary>
     Task DeleteItemAsync(EncryptedDataDbModel item, CancellationToken token);
@@ -33,11 +28,6 @@ public interface ISecureItemsRepository
     /// Get secure item from repository by name
     /// </summary>
     Task<EncryptedDataDbModel> GetItemByNameAsync(string accountName, CancellationToken token);
-
-    /// <summary>
-    /// Get secure item from repository by id
-    /// </summary>
-    Task<EncryptedDataDbModel> GetItemByIdAsync(int id, CancellationToken token);
 
     /// <summary>
     /// Get secure item and decrypt it

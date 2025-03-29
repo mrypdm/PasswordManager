@@ -8,7 +8,7 @@ namespace PasswordManager.Aes;
 public class AesKeyGenerator(byte[] salt, int iterations) : IKeyGenerator
 {
     /// <inheritdoc />
-    public byte[] CreateMasterKey(string masterPassword)
+    public byte[] Generate(string masterPassword)
     {
         return Rfc2898DeriveBytes.Pbkdf2(Encoding.ASCII.GetBytes(masterPassword), salt, iterations,
             HashAlgorithmName.SHA256, AesConstants.KeySize);

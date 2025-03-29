@@ -26,13 +26,7 @@ public class SecureItemsRepository(SecureDbContext context, ICrypto crypto, IMas
             Data = encryptedData.Data,
         };
 
-        await AddItemAsync(secureItem, token);
-    }
-
-    /// <inheritdoc />
-    public async Task AddItemAsync(EncryptedDataDbModel item, CancellationToken token)
-    {
-        await context.SecureItems.AddAsync(item, token);
+        await context.SecureItems.AddAsync(secureItem, token);
         await context.SaveChangesAsync(token);
     }
 
@@ -61,12 +55,6 @@ public class SecureItemsRepository(SecureDbContext context, ICrypto crypto, IMas
     public async Task<EncryptedDataDbModel> GetItemByNameAsync(string accountName, CancellationToken token)
     {
         return await GetItemInternalAsync(accountName, withTrack: false, token);
-    }
-
-    /// <inheritdoc />
-    public async Task<EncryptedDataDbModel> GetItemByIdAsync(int id, CancellationToken token)
-    {
-        return await context.SecureItems.SingleOrDefaultAsync(m => m.Id == id, token);
     }
 
     /// <inheritdoc />
