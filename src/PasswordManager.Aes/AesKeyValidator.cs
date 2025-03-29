@@ -1,5 +1,5 @@
 using System;
-using PasswordManager.Core.Validators;
+using PasswordManager.Abstractions.Validators;
 
 namespace PasswordManager.Aes;
 

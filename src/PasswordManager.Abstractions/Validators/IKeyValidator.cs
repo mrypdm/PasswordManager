@@ -1,4 +1,4 @@
-namespace PasswordManager.Core.Validators;
+namespace PasswordManager.Abstractions.Validators;
 
 /// <summary>
 /// Validator of encryption keys
