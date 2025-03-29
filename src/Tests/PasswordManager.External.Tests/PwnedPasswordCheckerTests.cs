@@ -13,7 +13,7 @@ namespace PasswordManager.External.Tests;
 public class PwnedPasswordCheckerTests
 {
     [Test]
-    public async Task CheckHttpRequestIsMade()
+    public async Task CheckPwned_HttpRequestIsMade()
     {
         // arrange
         var httpTest = new HttpTest();
@@ -29,7 +29,7 @@ public class PwnedPasswordCheckerTests
     }
 
     [Test]
-    public async Task CheckHandleServerErrors()
+    public async Task CheckPwned_HandleServerErrors()
     {
         // arrange
         var httpTest = new HttpTest();
@@ -51,7 +51,7 @@ public class PwnedPasswordCheckerTests
     }
 
     [Test]
-    public void CheckNotServerErrorThrows()
+    public void CheckPwned_NotServerErrorThrows()
     {
         // arrange
         var httpTest = new HttpTest();
@@ -67,7 +67,7 @@ public class PwnedPasswordCheckerTests
 
     [Test]
     [Ignore("This test makes requests to the real service, which may have consequences, so the test is disabled by default.")]
-    public async Task CheckCompromisedPassword()
+    public async Task CheckPwned_CompromisedPassword_ShoudReturnCompomisedResult()
     {
         // arrange
         var checker = new PwnedPasswordChecker();

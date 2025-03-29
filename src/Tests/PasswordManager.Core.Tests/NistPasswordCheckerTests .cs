@@ -16,7 +16,7 @@ public class NistPasswordCheckerTests
     [TestCase("Rhfcjxyst:erbL;ekbb912", PasswordStrength.Medium, 44)]
     [TestCase("Shrek", PasswordStrength.VeryLow, 12)]
     [TestCase("ShrekISlon768", PasswordStrength.Low, 31.5)]
-    public async Task CommonTest(string password, PasswordStrength strength, double score)
+    public async Task CheckNist(string password, PasswordStrength strength, double score)
     {
         // arrange
         var checker = new NistPasswordChecker();

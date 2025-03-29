@@ -16,7 +16,7 @@ public class SeaMonkeyPasswordCheckerTests
     [TestCase("Rhfcjxyst:erbL;ekbb912", PasswordStrength.High, 110)]
     [TestCase("Shrek", PasswordStrength.VeryLow, 40)]
     [TestCase("ShrekISlon768", PasswordStrength.Medium, 90)]
-    public async Task CommonTest(string password, PasswordStrength strength, double score)
+    public async Task CheckSeaMonkey(string password, PasswordStrength strength, double score)
     {
         // arrange
         var checker = new SeaMonkeyPasswordChecker();
