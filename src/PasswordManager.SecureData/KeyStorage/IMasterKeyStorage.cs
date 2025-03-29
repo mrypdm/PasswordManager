@@ -22,4 +22,9 @@ public interface IMasterKeyStorage
     /// Change current lifetime of master key
     /// </summary>
     void ChangeLifetime(TimeSpan keyLifeTime);
+
+    /// <summary>
+    /// Clear key from storage
+    /// </summary>
+    void ClearKey();
 }
