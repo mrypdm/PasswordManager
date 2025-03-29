@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -6,8 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Flurl.Http;
-
-using PasswordManager.Abstractions;
+using PasswordManager.Abstractions.Checkers;
+using PasswordManager.Abstractions.Models;
 using PasswordManager.External.Exceptions;
 
 namespace PasswordManager.External.Checkers;

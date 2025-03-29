@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
-
-using PasswordManager.Abstractions;
+using PasswordManager.Abstractions.Models;
 using PasswordManager.Core.Checkers;
 
 namespace PasswordManager.Core.Tests;

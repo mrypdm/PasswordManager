@@ -1,9 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Security.Cryptography;
-
 using PasswordManager.Abstractions;
+using PasswordManager.Abstractions.Generators;
 
-namespace PasswordManager.Core;
+namespace PasswordManager.Core.Generators;
 
 /// <inheritdoc />
 public class PasswordGenerator(IAlphabet alphabet) : IPasswordGenerator

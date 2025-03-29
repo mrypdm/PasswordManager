@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-
-using PasswordManager.Abstractions;
+using PasswordManager.Abstractions.Checkers;
+using PasswordManager.Abstractions.Models;
 using PasswordManager.Core.Internal;
 
 namespace PasswordManager.Core.Checkers;

@@ -1,7 +1,7 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
-
-using PasswordManager.Abstractions;
+using PasswordManager.Abstractions.Checkers;
+using PasswordManager.Abstractions.Models;
 
 namespace PasswordManager.External.Checkers;
 

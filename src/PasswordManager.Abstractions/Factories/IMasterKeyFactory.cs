@@ -1,4 +1,4 @@
-namespace PasswordManager.Abstractions;
+namespace PasswordManager.Abstractions.Factories;
 
 /// <summary>
 /// Factory for master key

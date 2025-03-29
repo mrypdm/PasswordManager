@@ -1,7 +1,8 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
+using PasswordManager.Abstractions.Models;
 
-namespace PasswordManager.Abstractions;
+namespace PasswordManager.Abstractions.Checkers;
 
 /// <summary>
 /// Checker for password strength

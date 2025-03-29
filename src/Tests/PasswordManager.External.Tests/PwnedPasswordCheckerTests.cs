@@ -1,8 +1,7 @@
 using System.Threading.Tasks;
 
 using Flurl.Http.Testing;
-
-using PasswordManager.Abstractions;
+using PasswordManager.Abstractions.Models;
 using PasswordManager.External.Checkers;
 using PasswordManager.External.Exceptions;
 

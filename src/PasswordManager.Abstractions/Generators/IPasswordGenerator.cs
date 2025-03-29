@@ -1,4 +1,4 @@
-﻿namespace PasswordManager.Abstractions;
+namespace PasswordManager.Abstractions.Generators;
 
 /// <summary>
 /// Password generator

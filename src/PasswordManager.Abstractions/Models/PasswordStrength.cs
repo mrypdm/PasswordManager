@@ -1,4 +1,4 @@
-﻿namespace PasswordManager.Abstractions;
+namespace PasswordManager.Abstractions.Models;
 
 /// <summary>
 /// Strength of password

@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace PasswordManager.Abstractions;
+namespace PasswordManager.Abstractions.Crypto;
 
 /// <summary>
 /// Provider for crypto transforms
