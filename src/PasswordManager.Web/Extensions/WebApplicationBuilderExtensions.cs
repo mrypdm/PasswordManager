@@ -20,6 +20,7 @@ using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.SecureData.Repositories;
 using PasswordManager.SecureData.Services;
 using PasswordManager.UserSettings;
+using PasswordManager.Web.Extensions;
 using PasswordManager.Web.Options;
 
 namespace PasswordManager.Web.Extensions;
@@ -43,12 +44,26 @@ public static class WebApplicationBuilderExtensions
     }
 
     /// <summary>
+    /// Add connection options to web application
+    /// </summary>
+    public static WebApplicationBuilder AddConnectionOptions(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .Configure<ConnectionOptions>(builder.Configuration.GetSection("ConnectionOptions"));
+        return builder;
+    }
+
+    /// <summary>
     /// Add AES crypto to web application
     /// </summary>
     public static WebApplicationBuilder AddAesCrypto(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddScoped<IKeyGenerator, AesKeyGenerator>()
+            .AddScoped<IKeyGenerator>(services =>
+            {
+                var userOptions = services.GetRequiredService<IWritableOptions<UserOptions>>();
+                return new AesKeyGenerator(userOptions.Value.MasterKeySaltBytes, userOptions.Value.MasterKeyIterations);
+            })
             .AddScoped<IKeyValidator, AesKeyValidator>()
             .AddScoped<ICrypto, AesCrypto>();
         return builder;
@@ -103,6 +118,14 @@ public static class WebApplicationBuilderExtensions
                 opt.LoginPath = "/login";
                 opt.LogoutPath = opt.LoginPath;
                 opt.AccessDeniedPath = "/error";
+                opt.Events.OnValidatePrincipal = context =>
+                {
+                    if (!context.ValidatePrincipal())
+                    {
+                        context.RejectPrincipal();
+                    }
+                    return Task.CompletedTask;
+                };
             });
         return builder;
     }
