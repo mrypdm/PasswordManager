@@ -3,7 +3,7 @@ namespace PasswordManager.SecureData.Models;
 /// <summary>
 /// Account data
 /// </summary>
-public class AccountData
+public sealed class AccountData
 {
     /// <summary>
     /// Name of account

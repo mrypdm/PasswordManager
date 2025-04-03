@@ -7,7 +7,7 @@ namespace PasswordManager.SecureData.Contexts;
 /// <summary>
 /// DB context for secure items
 /// </summary>
-public class SecureDbContext(DbContextOptions options) : DbContext(options)
+public sealed class SecureDbContext(DbContextOptions options) : DbContext(options)
 {
     /// <summary>
     /// Secure items

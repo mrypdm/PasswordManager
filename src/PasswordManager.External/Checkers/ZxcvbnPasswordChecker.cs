@@ -8,7 +8,7 @@ namespace PasswordManager.External.Checkers;
 /// <summary>
 /// Password checker by Zxcvbn method
 /// </summary>
-public class ZxcvbnPasswordChecker : IPasswordChecker
+public sealed class ZxcvbnPasswordChecker : IPasswordChecker
 {
     /// <inheritdoc/>
     public Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)

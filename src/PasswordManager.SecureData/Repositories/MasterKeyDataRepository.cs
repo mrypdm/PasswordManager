@@ -8,7 +8,7 @@ using PasswordManager.SecureData.Models;
 namespace PasswordManager.SecureData.Repositories;
 
 /// <inheritdoc />
-public class MasterKeyDataRepository(SecureDbContext context) : IMasterKeyDataRepository
+public sealed class MasterKeyDataRepository(SecureDbContext context) : IMasterKeyDataRepository
 {
     /// <inheritdoc />
     public async Task SetMasterKeyDataAsync(EncryptedDataDbModel data, CancellationToken token)

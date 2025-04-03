@@ -15,7 +15,7 @@ namespace PasswordManager.External.Checkers;
 /// <summary>
 /// Сheck password compromise with haveibeenpwned
 /// </summary>
-public class PwnedPasswordChecker : IPasswordChecker
+public sealed class PwnedPasswordChecker : IPasswordChecker
 {
     public const string UrlPrefix = "https://api.pwnedpasswords.com/range";
 

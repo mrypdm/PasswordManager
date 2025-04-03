@@ -9,7 +9,7 @@ namespace PasswordManager.Aes;
 /// <summary>
 /// Crypt with <see cref="Aes"/>
 /// </summary>
-public class AesCrypto : ICrypto
+public sealed class AesCrypto : ICrypto
 {
     private readonly AesSaltGenerator saltGenerator = new();
     private readonly AesKeyValidator keyValidator = new();

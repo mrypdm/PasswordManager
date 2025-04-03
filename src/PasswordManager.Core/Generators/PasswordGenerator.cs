@@ -6,7 +6,7 @@ using PasswordManager.Abstractions.Generators;
 namespace PasswordManager.Core.Generators;
 
 /// <inheritdoc />
-public class PasswordGenerator(IAlphabet alphabet) : IPasswordGenerator
+public sealed class PasswordGenerator(IAlphabet alphabet) : IPasswordGenerator
 {
     /// <inheritdoc />
     public string GeneratePassword(int length)

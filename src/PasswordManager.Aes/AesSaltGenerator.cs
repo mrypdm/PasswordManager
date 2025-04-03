@@ -4,7 +4,7 @@ using PasswordManager.Abstractions.Generators;
 namespace PasswordManager.Aes;
 
 /// <inheritdoc />
-public class AesSaltGenerator : ISaltGenerator
+public sealed class AesSaltGenerator : ISaltGenerator
 {
     /// <inheritdoc />
     public byte[] Generate()

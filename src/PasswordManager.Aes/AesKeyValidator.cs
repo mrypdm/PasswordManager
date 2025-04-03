@@ -6,7 +6,7 @@ namespace PasswordManager.Aes;
 /// <summary>
 /// Validator for AES keys
 /// </summary>
-public class AesKeyValidator : IKeyValidator
+public sealed class AesKeyValidator : IKeyValidator
 {
     /// <summary>
     /// Validate AES key

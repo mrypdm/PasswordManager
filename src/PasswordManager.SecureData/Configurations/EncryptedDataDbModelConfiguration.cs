@@ -7,7 +7,7 @@ namespace PasswordManager.SecureData.Configurations;
 /// <summary>
 /// Configuration for <see cref="EncryptedDataDbModel"/>
 /// </summary>
-public class EncryptedDataDbModelConfiguration : IEntityTypeConfiguration<EncryptedDataDbModel>
+public sealed class EncryptedDataDbModelConfiguration : IEntityTypeConfiguration<EncryptedDataDbModel>
 {
     /// <inheritdoc />
     public void Configure(EntityTypeBuilder<EncryptedDataDbModel> builder)

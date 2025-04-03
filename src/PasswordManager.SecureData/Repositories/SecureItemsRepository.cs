@@ -11,7 +11,7 @@ using PasswordManager.SecureData.Models;
 namespace PasswordManager.SecureData.Repositories;
 
 /// <inheritdoc />
-public class SecureItemsRepository(SecureDbContext context, ICrypto crypto, IMasterKeyStorage masterKeyStorage)
+public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypto, IMasterKeyStorage masterKeyStorage)
     : ISecureItemsRepository
 {
     /// <inheritdoc />

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -7,7 +7,7 @@ using PasswordManager.Abstractions;
 namespace PasswordManager.Core;
 
 /// <inheritdoc />
-public class Alphabet : IAlphabet
+public sealed class Alphabet : IAlphabet
 {
     public const string LowerLetters = "qwertyuiopasdfghjklzxcvbnm";
 

@@ -5,7 +5,7 @@ namespace PasswordManager.SecureData.Models;
 /// <summary>
 /// Encrypted item
 /// </summary>
-public class EncryptedDataDbModel : EncryptedData
+public sealed class EncryptedDataDbModel : EncryptedData
 {
     /// <summary>
     /// ID of item

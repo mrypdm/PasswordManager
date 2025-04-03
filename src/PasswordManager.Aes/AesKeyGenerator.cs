@@ -6,7 +6,7 @@ using PasswordManager.Abstractions.Factories;
 namespace PasswordManager.Aes;
 
 /// <inheritdoc />
-public class AesKeyGenerator(byte[] salt, int iterations) : IKeyGenerator
+public sealed class AesKeyGenerator(byte[] salt, int iterations) : IKeyGenerator
 {
     private readonly byte[] _salt = salt ?? throw new ArgumentNullException(nameof(salt));
 

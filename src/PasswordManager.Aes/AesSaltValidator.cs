@@ -4,7 +4,7 @@ using PasswordManager.Abstractions.Validators;
 namespace PasswordManager.Aes;
 
 /// <inheritdoc />
-public class AesSaltValidator : ISaltValidator
+public sealed class AesSaltValidator : ISaltValidator
 {
     /// <inheritdoc />
     public void Validate(byte[] salt)

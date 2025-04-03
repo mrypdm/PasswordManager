@@ -12,7 +12,7 @@ using PasswordManager.SecureData.Repositories;
 namespace PasswordManager.SecureData.Services;
 
 /// <inheritdoc />
-public class MasterKeyService(
+public sealed class MasterKeyService(
     IMasterKeyDataRepository masterKeyDataRepository,
     IKeyGenerator masterKeyGenerator,
     IKeyValidator keyValidator,

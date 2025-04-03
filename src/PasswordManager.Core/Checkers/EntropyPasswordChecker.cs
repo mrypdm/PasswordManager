@@ -12,7 +12,7 @@ namespace PasswordManager.Core.Checkers;
 /// <summary>
 /// Password checker by Entropy method
 /// </summary>
-public class EntropyPasswordChecker(IAlphabet alphabet) : IPasswordChecker
+public sealed class EntropyPasswordChecker(IAlphabet alphabet) : IPasswordChecker
 {
     /// <inheritdoc/>
     public Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)

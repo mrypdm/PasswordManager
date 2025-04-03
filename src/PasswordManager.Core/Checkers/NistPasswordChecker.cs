@@ -10,7 +10,7 @@ namespace PasswordManager.Core.Checkers;
 /// <summary>
 /// Password checker by NIST method
 /// </summary>
-public class NistPasswordChecker : IPasswordChecker
+public sealed class NistPasswordChecker : IPasswordChecker
 {
     /// <inheritdoc/>
     public Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)

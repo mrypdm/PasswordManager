@@ -10,7 +10,7 @@ namespace PasswordManager.Core.Checkers;
 /// <summary>
 /// Password checker by SeaMonkey method
 /// </summary>
-public class SeaMonkeyPasswordChecker : IPasswordChecker
+public sealed class SeaMonkeyPasswordChecker : IPasswordChecker
 {
     /// <inheritdoc/>
     public Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)
