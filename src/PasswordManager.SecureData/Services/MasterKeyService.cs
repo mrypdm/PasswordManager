@@ -6,6 +6,7 @@ using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Exceptions;
+using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.SecureData.Models;
 using PasswordManager.SecureData.Repositories;
 
@@ -14,12 +15,14 @@ namespace PasswordManager.SecureData.Services;
 /// <inheritdoc />
 public sealed class MasterKeyService(
     IMasterKeyDataRepository masterKeyDataRepository,
+    IMasterKeyStorage masterKeyStorage,
     IKeyGenerator masterKeyGenerator,
     IKeyValidator keyValidator,
     ICrypto crypto) : IMasterKeyService
 {
     /// <inheritdoc />
-    public async Task<byte[]> CreateMasterKeyAsync(string masterPassword, CancellationToken token)
+    public async Task InitMasterKeyAsync(string masterPassword, TimeSpan sessionTimeout,
+        CancellationToken token)
     {
         var masterKey = masterKeyGenerator.Generate(masterPassword);
 
@@ -32,7 +35,7 @@ public sealed class MasterKeyService(
             await InitMasterKeyData(masterKey, token);
         }
 
-        return masterKey;
+        masterKeyStorage.InitStorage(masterKey, sessionTimeout);
     }
 
     private async Task InitMasterKeyData(byte[] masterKey, CancellationToken token)
