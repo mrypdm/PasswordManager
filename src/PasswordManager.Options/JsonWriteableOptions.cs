@@ -14,7 +14,7 @@ public sealed class JsonWriteableOptions<TOptions> : IWritableOptions<TOptions> 
 {
     private readonly string _settingsFilePath;
 
-    public JsonWriteableOptions(TOptions settings, string settingsFilePath)
+    internal JsonWriteableOptions(TOptions settings, string settingsFilePath)
     {
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentException.ThrowIfNullOrWhiteSpace(settingsFilePath);
@@ -42,7 +42,7 @@ public sealed class JsonWriteableOptions<TOptions> : IWritableOptions<TOptions> 
 /// </summary>
 public static class JsonWriteableOptions
 {
-    public static readonly JsonSerializerOptions JsonOptions = new()
+    internal static readonly JsonSerializerOptions JsonOptions = new()
     {
         AllowTrailingCommas = true,
         ReadCommentHandling = JsonCommentHandling.Skip,
