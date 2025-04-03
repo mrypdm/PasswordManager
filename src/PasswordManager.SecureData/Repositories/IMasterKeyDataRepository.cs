@@ -21,4 +21,9 @@ public interface IMasterKeyDataRepository
     /// </summary>
     /// <exception cref="MasterKeyDataNotExistsException">If master key data does not exist</exception>
     Task<EncryptedDataDbModel> GetMasterKeyDataAsync(CancellationToken token);
+
+    /// <summary>
+    /// Delete master key data and all items in repository
+    /// </summary>
+    Task DeleteMasterKeyData(CancellationToken token);
 }

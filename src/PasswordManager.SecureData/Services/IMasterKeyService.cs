@@ -16,4 +16,14 @@ public interface IMasterKeyService
     /// </summary>
     /// <exception cref="InvalidMasterKeyException">If master password is invalid</exception>
     Task InitMasterKeyAsync(string masterPassword, TimeSpan sessionTimeout, CancellationToken token);
+
+    /// <summary>
+    /// Clear master key
+    /// </summary>
+    Task ClearMasterKeyAsync(CancellationToken token);
+
+    /// <summary>
+    /// Clear master key data
+    /// </summary>
+    Task ClearMasterKeyDataAsync(CancellationToken token);
 }

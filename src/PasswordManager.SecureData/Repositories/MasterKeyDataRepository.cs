@@ -28,4 +28,10 @@ public sealed class MasterKeyDataRepository(SecureDbContext context) : IMasterKe
         return await context.SecureItems.SingleOrDefaultAsync(m => m.Id == 1, token)
             ?? throw new MasterKeyDataNotExistsException();
     }
+
+    /// <inheritdoc />
+    public async Task DeleteMasterKeyData(CancellationToken token)
+    {
+        await context.SecureItems.ExecuteDeleteAsync(token);
+    }
 }

@@ -20,15 +20,23 @@ public static class CookieExtensions
     public const string IpAddressClaim = "IpAddress";
 
     /// <summary>
-    /// Authenticate with cookie
+    /// Sign in with cookie
     /// </summary>
-    public static async Task AuthenticateAsync(this HttpContext context, ConnectionOptions connectionOptions)
+    public static async Task SignInWithCookieAsync(this HttpContext context, ConnectionOptions connectionOptions)
     {
         var ip = GetUserIpAddress(context, connectionOptions.IsProxyUsed)
             ?? throw new InvalidOperationException("Cannot determine IP of user");
         var identity = new ClaimsIdentity([new(IpAddressClaim, ip)], CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+    }
+
+    /// <summary>
+    /// Sign out with cookie
+    /// </summary>
+    public static async Task SignOutWithCookieAsync(this HttpContext context)
+    {
+        await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
 
     /// <summary>

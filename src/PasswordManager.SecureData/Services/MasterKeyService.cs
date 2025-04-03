@@ -38,6 +38,20 @@ public sealed class MasterKeyService(
         masterKeyStorage.InitStorage(masterKey, sessionTimeout);
     }
 
+    /// <inheritdoc />
+    public Task ClearMasterKeyAsync(CancellationToken token)
+    {
+        masterKeyStorage.ClearKey();
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public async Task ClearMasterKeyDataAsync(CancellationToken token)
+    {
+        await ClearMasterKeyAsync(token);
+        await masterKeyDataRepository.DeleteMasterKeyData(token);
+    }
+
     private async Task InitMasterKeyData(byte[] masterKey, CancellationToken token)
     {
         var encryptedData = crypto.Encrypt(masterKey, masterKey);
@@ -60,4 +74,5 @@ public sealed class MasterKeyService(
             throw new InvalidMasterKeyException();
         }
     }
+
 }
