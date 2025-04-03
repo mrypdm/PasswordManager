@@ -36,6 +36,12 @@ public sealed class MasterKeyStorage : IMasterKeyStorage, IDisposable
     }
 
     /// <inheritdoc />
+    public bool IsInitialized()
+    {
+        return MasterKey is not null;
+    }
+
+    /// <inheritdoc />
     public void Dispose()
     {
         _cache.Dispose();

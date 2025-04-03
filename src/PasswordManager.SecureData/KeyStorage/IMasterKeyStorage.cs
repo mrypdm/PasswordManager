@@ -27,4 +27,9 @@ public interface IMasterKeyStorage
     /// Clear key from storage
     /// </summary>
     void ClearKey();
+
+    /// <summary>
+    /// Check if storage is initialized
+    /// </summary>
+    bool IsInitialized();
 }
