@@ -15,7 +15,7 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     : ISecureItemsRepository
 {
     /// <inheritdoc />
-    public async Task AddAccountAsync(AccountData data, CancellationToken token)
+    public async Task<int> AddAccountAsync(AccountData data, CancellationToken token)
     {
         var encryptedData = crypto.EncryptJson(data, masterKeyStorage.MasterKey);
 
@@ -28,6 +28,8 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
 
         await context.SecureItems.AddAsync(secureItem, token);
         await context.SaveChangesAsync(token);
+
+        return secureItem.Id;
     }
 
     /// <inheritdoc />
@@ -37,34 +39,20 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     }
 
     /// <inheritdoc />
-    public async Task UpdateAccountAsync(AccountData oldValue, AccountData newValue, CancellationToken token)
+    public async Task<EncryptedDataDbModel[]> GetItemsByNameAsync(string accountName, CancellationToken token)
     {
-        var secureData = await GetItemInternalAsync(oldValue.Name, withTrack: true, token);
-
-        var encryptedData = crypto.EncryptJson(newValue, masterKeyStorage.MasterKey);
-
-        secureData.Name = newValue.Name;
-        secureData.Salt = encryptedData.Salt;
-        secureData.Data = encryptedData.Data;
-
-        context.SecureItems.Update(secureData);
-        await context.SaveChangesAsync(token);
+        return await GetItemsInternalAsync(accountName, withTrack: false, token);
     }
 
     /// <inheritdoc />
-    public async Task<EncryptedDataDbModel> GetItemByNameAsync(string accountName, CancellationToken token)
+    public async Task<AccountData[]> GetAccountsByNameAsync(string accountName, CancellationToken token)
     {
-        return await GetItemInternalAsync(accountName, withTrack: false, token);
+        var secureData = await GetItemsInternalAsync(accountName, withTrack: false, token);
+        return [.. secureData.Select(m => crypto.DecryptJson<AccountData>(m, masterKeyStorage.MasterKey))];
     }
 
-    /// <inheritdoc />
-    public async Task<AccountData> GetAccountByNameAsync(string accountName, CancellationToken token)
-    {
-        var secureData = await GetItemInternalAsync(accountName, withTrack: false, token);
-        return crypto.DecryptJson<AccountData>(secureData, masterKeyStorage.MasterKey);
-    }
-
-    private async Task<EncryptedDataDbModel> GetItemInternalAsync(string accountName, bool withTrack, CancellationToken token)
+    private async Task<EncryptedDataDbModel[]> GetItemsInternalAsync(string accountName, bool withTrack,
+        CancellationToken token)
     {
         var query = context.SecureItems as IQueryable<EncryptedDataDbModel>;
 
@@ -73,7 +61,7 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
             query = query.AsNoTracking();
         }
 
-        return await query.SingleOrDefaultAsync(m => m.Name == accountName, token)
+        return await query.Where(m => m.Name == accountName).ToArrayAsync(token)
             ?? throw new KeyNotFoundException($"Cannot find data with name '{accountName}'");
     }
 }

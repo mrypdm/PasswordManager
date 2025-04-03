@@ -10,9 +10,9 @@ namespace PasswordManager.SecureData.Repositories;
 public interface ISecureItemsRepository
 {
     /// <summary>
-    /// Add new account data to repository
+    /// Add new account data to repository and return its ID
     /// </summary>
-    Task AddAccountAsync(AccountData data, CancellationToken token);
+    Task<int> AddAccountAsync(AccountData data, CancellationToken token);
 
     /// <summary>
     /// Delete secure item from repository
@@ -20,17 +20,12 @@ public interface ISecureItemsRepository
     Task DeleteItemAsync(EncryptedDataDbModel item, CancellationToken token);
 
     /// <summary>
-    /// Update secure item from <paramref name="oldValue"/> to <paramref name="newValue"/>
-    /// </summary>
-    Task UpdateAccountAsync(AccountData oldValue, AccountData newValue, CancellationToken token);
-
-    /// <summary>
     /// Get secure item from repository by name
     /// </summary>
-    Task<EncryptedDataDbModel> GetItemByNameAsync(string accountName, CancellationToken token);
+    Task<EncryptedDataDbModel[]> GetItemsByNameAsync(string accountName, CancellationToken token);
 
     /// <summary>
     /// Get secure item and decrypt it
     /// </summary>
-    Task<AccountData> GetAccountByNameAsync(string accountName, CancellationToken token);
+    Task<AccountData[]> GetAccountsByNameAsync(string accountName, CancellationToken token);
 }
