@@ -12,7 +12,7 @@ namespace PasswordManager.Options;
 /// </summary>
 public sealed class JsonWriteableOptions<TOptions> : IWritableOptions<TOptions> where TOptions : class, new()
 {
-    private readonly string _settingsFilePath;
+    private readonly string _filePath;
 
     internal JsonWriteableOptions(TOptions settings, string settingsFilePath)
     {
@@ -20,7 +20,7 @@ public sealed class JsonWriteableOptions<TOptions> : IWritableOptions<TOptions> 
         ArgumentException.ThrowIfNullOrWhiteSpace(settingsFilePath);
 
         Value = settings;
-        _settingsFilePath = settingsFilePath;
+        _filePath = settingsFilePath;
     }
 
     /// <inheritdoc />
@@ -31,9 +31,7 @@ public sealed class JsonWriteableOptions<TOptions> : IWritableOptions<TOptions> 
     {
         ArgumentNullException.ThrowIfNull(updateAction);
         updateAction(Value);
-
-        using var fileStream = File.Open(_settingsFilePath, FileMode.Create, FileAccess.Write, FileShare.Read);
-        await JsonSerializer.SerializeAsync(fileStream, Value, JsonWriteableOptions.JsonOptions, token);
+        await Value.DumpToDiskAsync(_filePath, token);
     }
 }
 
@@ -56,8 +54,21 @@ public static class JsonWriteableOptions
         CancellationToken token)
         where TOptions : class, new()
     {
-        var settings = await ReadSettingsFromFile<TOptions>(settingsFilePath, token) ?? new();
+        var settings = await ReadSettingsFromFile<TOptions>(settingsFilePath, token);
+        if (settings is null)
+        {
+            settings = new();
+            await settings.DumpToDiskAsync(settingsFilePath, token);
+        }
+
         return new JsonWriteableOptions<TOptions>(settings, settingsFilePath);
+    }
+
+    internal static async Task DumpToDiskAsync<TOptions>(this TOptions options, string path,
+        CancellationToken token)
+    {
+        using var fileStream = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.Read);
+        await JsonSerializer.SerializeAsync(fileStream, options, JsonOptions, token);
     }
 
     private static async Task<TOptions> ReadSettingsFromFile<TOptions>(string settingsFilePath,

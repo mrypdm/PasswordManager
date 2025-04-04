@@ -18,11 +18,24 @@ public class JsonWriteableOptionsTests
     public async Task WithoutFile_CreatesNew()
     {
         // arrange
+        using var file = new TempFile("not-exist");
+
         // act
-        var settings = await JsonWriteableOptions.CreateAsync<ExampleOptions>("not-exists", default);
+        var settings = await JsonWriteableOptions.CreateAsync<ExampleOptions>(file.FilePath, default);
 
         // assert
-        Assert.That(settings.Value.Number, Is.EqualTo(DefaultNumber));
+        var content = file.Read().Replace("\r\n", "\n");
+        Assert.Multiple(() =>
+        {
+            Assert.That(settings.Value.Number, Is.EqualTo(DefaultNumber));
+            Assert.That(file.Exists, Is.True);
+            Assert.That(content, Is.EqualTo(
+                $$"""
+                {
+                  "Number": {{DefaultNumber}}
+                }
+                """));
+        });
     }
 
     [Test]

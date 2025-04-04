@@ -6,9 +6,11 @@ namespace PasswordManager.Options.Tests;
 /// <summary>
 /// Temporary file which be deleted after dispose
 /// </summary>
-public sealed class TempFile : IDisposable
+public sealed class TempFile(string path = null) : IDisposable
 {
-    public string FilePath { get; } = Path.GetTempFileName();
+    public string FilePath { get; } = path ?? Path.GetTempFileName();
+
+    public bool Exists => Path.Exists(FilePath);
 
     public void Write(string content)
     {
