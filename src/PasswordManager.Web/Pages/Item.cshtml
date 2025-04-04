@@ -1,0 +1,100 @@
+@page
+@model PasswordManager.Web.Pages.ItemModel
+@{
+
+    ViewData["Title"] = Model.AccountDataModel?.Name ?? "New Item";
+}
+
+<form method="post" enctype="multipart/form-data">
+    <input
+    asp-for="AccountDataModel.Id"
+    value="@(Model.AccountDataModel.Id)"
+    type="hidden" />
+
+    <input
+    asp-for="AccountDataModel.Name"
+    value="@(Model.AccountDataModel.Name ?? "")"
+    placeholder="Name"
+    type="text"
+    class="input-form" />
+    <br /><br />
+
+    <input
+    asp-for="AccountDataModel.Login"
+    value="@(Model.AccountDataModel.Login ?? "")"
+    placeholder="Login"
+    type="text"
+    class="input-form" />
+    <br /><br />
+
+    <input
+    id="password-box"
+    asp-for="AccountDataModel.Password"
+    value="@(Model.AccountDataModel.Password ?? "")"
+    placeholder="Password"
+    class="input-form"
+    type="password" />
+    <input type="checkbox" onclick="showPassword('password-box')" />
+    <input type="button" value="Verify" onclick="verifyPassword('password-box')" />
+
+    <br/><br/>
+    <input type="submit" value="@(Model.AccountDataModel.Id == -1 ? "Add" : "Update")" />
+</form><br/><br/>
+
+<div>
+    <h2>Password generator</h2>
+
+    <div class="row">
+        <div class="column">
+            <label for="password-generator-length">Password length</label>
+        </div>
+        <div class="column">
+            <input type="number" id="password-generator-length" value="16" style="width: 100%">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="column">
+            <label for="password-generator-use-lower-letters">Use lower letters (e.g. abc)</label>
+        </div>
+        <div class="column">
+            <input type="checkbox" id="password-generator-use-lower-letters" checked>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="column">
+            <label for="password-generator-use-upper-letters">Use upper letters (e.g. ABC)</label>
+        </div>
+        <div class="column">
+            <input type="checkbox" id="password-generator-use-upper-letters" checked>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="column">
+            <label for="password-generator-use-numbers">Use numbers (e.g. 012)</label>
+        </div>
+        <div class="column">
+            <input type="checkbox" id="password-generator-use-numbers" checked>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="column">
+            <label for="password-generator-specific-characters">Use specific characters (e.g. !?#)</label>
+        </div>
+        <div class="column">
+            <input type="text" id="password-generator-specific-characters" style="width: 100%"
+                   value="`~!@@#$%^&*+-/.,\\{}[]();:?<>&quot;'_">
+        </div>
+    </div>
+
+    <br />
+
+    <input type="button" value="Generate" onclick="generatePassword()" />
+    <input type="button" value="Copy" onclick="copyToClipboard('password-generator-result')" /><br /><br />
+    <input type="password" id="password-generator-result" class="input-form" readonly>
+    <input type="checkbox" onclick="showPassword('password-generator-result')" /><br />
+    <p id="password-generator-verify-result" />
+</div>

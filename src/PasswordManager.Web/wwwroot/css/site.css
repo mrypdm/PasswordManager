@@ -24,3 +24,14 @@ body {
 .input-form {
     width: 50%;
 }
+
+.column {
+    float: left;
+    width: 35%;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
