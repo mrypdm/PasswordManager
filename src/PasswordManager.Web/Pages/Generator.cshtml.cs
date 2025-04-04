@@ -7,6 +7,9 @@ namespace PasswordManager.Web.Pages;
 /// </summary>
 public class GeneratorModel : PageModel
 {
+    /// <summary>
+    /// Get generator page
+    /// </summary>
     public void OnGet()
     {
     }

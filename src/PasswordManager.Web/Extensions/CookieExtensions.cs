@@ -17,7 +17,7 @@ namespace PasswordManager.Web.Extensions;
 /// </summary>
 public static class CookieExtensions
 {
-    public const string IpAddressClaim = "IpAddress";
+    private const string IpAddressClaim = "IpAddress";
 
     /// <summary>
     /// Sign in with cookie

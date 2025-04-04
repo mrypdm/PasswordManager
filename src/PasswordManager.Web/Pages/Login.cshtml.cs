@@ -23,8 +23,14 @@ public class LoginModel(
     IOptions<ConnectionOptions> connectionOptions,
     ILogger<LoginModel> logger) : PageModel
 {
+    /// <summary>
+    /// Message for alert
+    /// </summary>
     public string AlertMessage { get; private set; }
 
+    /// <summary>
+    /// Get login page
+    /// </summary>
     public void OnGet()
     {
     }

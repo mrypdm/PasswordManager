@@ -10,8 +10,16 @@ namespace PasswordManager.Web.Pages;
 [Authorize]
 public class ItemModel : PageModel
 {
+    /// <summary>
+    /// Id of account
+    /// </summary>
     public int AccountId { get; private set; }
 
+    /// <summary>
+    /// Get account page
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public ActionResult OnGet([FromQuery] int? id)
     {
         if (!ModelState.IsValid)
