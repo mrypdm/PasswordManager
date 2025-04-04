@@ -66,7 +66,7 @@ public static class CookieExtensions
 
     private static bool ValidateIpAddress(ClaimsPrincipal principal, string ip)
     {
-        return principal.Claims.SingleOrDefault(m => m.ValueType == IpAddressClaim)?.Value == ip;
+        return principal.Claims.SingleOrDefault(m => m.Type == IpAddressClaim)?.Value == ip;
     }
 
     private static string GetUserIpAddress(HttpContext context, bool withProxy)

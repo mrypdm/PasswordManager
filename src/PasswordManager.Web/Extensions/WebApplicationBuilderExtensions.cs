@@ -101,7 +101,7 @@ public static class WebApplicationBuilderExtensions
             .AddDbContext<SecureDbContext>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("SecureDb")))
             .AddSingleton<IMasterKeyStorage, MasterKeyStorage>()
             .AddScoped<ISecureItemsRepository, SecureItemsRepository>()
-            .AddScoped<IMasterKeyDataRepository, IMasterKeyDataRepository>()
+            .AddScoped<IMasterKeyDataRepository, MasterKeyDataRepository>()
             .AddScoped<IMasterKeyService, MasterKeyService>();
         return builder;
     }
@@ -127,6 +127,7 @@ public static class WebApplicationBuilderExtensions
                     return Task.CompletedTask;
                 };
             });
+        builder.Services.AddAuthorization(opt => opt.FallbackPolicy = opt.DefaultPolicy);
         return builder;
     }
 

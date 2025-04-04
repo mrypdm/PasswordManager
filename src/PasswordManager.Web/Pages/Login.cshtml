@@ -5,7 +5,10 @@
 }
 
 <form method="post" enctype="multipart/form-data">
-    <input asp name="masterPassword" type="password" placeholder="Master password" class="input-form" />
+    <input id="password-box" asp name="masterPassword" type="password" placeholder="Master password" class="input-form" />
+    <input type="checkbox" onclick="showPassword()" />
+    <br/>
+    <br/>
     <input type="submit" value="Login" />
 </form>
 

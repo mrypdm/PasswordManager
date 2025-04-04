@@ -14,7 +14,7 @@
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-page="/index">Password Manager</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -23,9 +23,14 @@
                             <a class="nav-link text-dark" asp-area="" asp-page="/index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/login">
-                                @(User.Identity?.IsAuthenticated == true ? "Sign Out" : "Sign In")
-                            </a>
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <a class="nav-link text-dark" asp-area="" asp-page="/logout">Sign Out</a>
+                            }
+                            else
+                            {
+                                <a class="nav-link text-dark" asp-area="" asp-page="/login">Sign In</a>
+                            }
                         </li>
                     </ul>
                 </div>

@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
@@ -15,6 +16,7 @@ namespace PasswordManager.Web.Pages;
 /// <summary>
 /// Page for Login and Logout
 /// </summary>
+[AllowAnonymous]
 public class LoginModel(
     IMasterKeyService masterKeyService,
     IWritableOptions<UserOptions> userOptions,
@@ -23,16 +25,8 @@ public class LoginModel(
 {
     public string AlertMessage { get; private set; }
 
-    /// <summary>
-    /// Sing out user
-    /// </summary>
-    public async Task OnGetAsync(CancellationToken token)
+    public void OnGet()
     {
-        if (User.Identity?.IsAuthenticated == true)
-        {
-            await masterKeyService.ClearMasterKeyAsync(token);
-            await HttpContext.SignOutWithCookieAsync();
-        }
     }
 
     /// <summary>
