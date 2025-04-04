@@ -1,44 +1,46 @@
 @page
 @model PasswordManager.Web.Pages.ItemModel
 @{
-
-    ViewData["Title"] = Model.AccountDataModel?.Name ?? "New Item";
+    ViewData["Title"] = "New Item";
 }
 
-<form method="post" enctype="multipart/form-data">
-    <input
-    asp-for="AccountDataModel.Id"
-    value="@(Model.AccountDataModel.Id)"
-    type="hidden" />
+<div>
+    <div class="row">
+        <div class="column">
+            <label for="account-data-name">Account name</label>
+        </div>
+        <div class="column">
+            <input id="account-data-name" placeholder="Account name" type="text" />
+        </div>
+    </div>
 
-    <input
-    asp-for="AccountDataModel.Name"
-    value="@(Model.AccountDataModel.Name ?? "")"
-    placeholder="Name"
-    type="text"
-    class="input-form" />
-    <br /><br />
+    <div class="row">
+        <div class="column">
+            <label for="account-data-login">Login</label>
+        </div>
+        <div class="column">
+            <input id="account-data-login" placeholder="Login" type="text" />
+            <input type="button" value="Copy" onclick="copyToClipboard('account-data-login')" />
+        </div>
+    </div>
 
-    <input
-    asp-for="AccountDataModel.Login"
-    value="@(Model.AccountDataModel.Login ?? "")"
-    placeholder="Login"
-    type="text"
-    class="input-form" />
-    <br /><br />
+    <div class="row">
+        <div class="column">
+            <label for="account-data-password">Password</label>
+        </div>
+        <div class="column">
+            <input id="account-data-password" placeholder="Password" type="password" />
+            <input type="checkbox" onclick="showPassword('account-data-password')" />
+            <input type="button" value="Copy" onclick="copyToClipboard('account-data-password')" />
+            <input type="button" value="Verify" onclick="verifyPassword('account-data-password')" />
+        </div>
+    </div>
 
-    <input
-    id="password-box"
-    asp-for="AccountDataModel.Password"
-    value="@(Model.AccountDataModel.Password ?? "")"
-    placeholder="Password"
-    class="input-form"
-    type="password" />
-    <input type="checkbox" onclick="showPassword('password-box')" />
-    <input type="button" value="Verify" onclick="verifyPassword('password-box')" />
-
-    <br/><br/>
-    <input type="submit" value="@(Model.AccountDataModel.Id == -1 ? "Add" : "Update")" />
-</form><br/><br/>
+    <input type="button" value="@(Model.AccountId == -1 ? "Add" : "Update")" onclick="postAccountData(@(Model.AccountId))" />
+</div>
 
 @await Html.PartialAsync("Shared/_PasswordGenerator.cshtml")
+
+<script>
+    onload = async () => { await getAccountData(@(Model.AccountId)); };
+</script>
