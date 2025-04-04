@@ -16,7 +16,7 @@ async function getAccountData(accountId) {
     } catch (e) {
         if (e.message == 404)
         {
-            location.replace("/item");
+            location.replace("/account");
         }
     }
 }
@@ -34,7 +34,7 @@ async function postAccountData(accountId) {
 
     if (accountId === -1) {
         let result = await send_json("api/account", "POST", data, true);
-        location.replace(`/item?id=${result.id}`);
+        location.replace(`/account?id=${result.id}`);
     } else {
         await send_json(`api/account/${accountId}`, "PUT", data, false);
         location.reload();

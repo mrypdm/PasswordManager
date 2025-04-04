@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace PasswordManager.Web.Pages;
 
 /// <summary>
-/// Page for item
+/// Page for account
 /// </summary>
 [Authorize]
-public class ItemModel : PageModel
+public class AccountModel : PageModel
 {
     /// <summary>
     /// Id of account
@@ -18,13 +18,11 @@ public class ItemModel : PageModel
     /// <summary>
     /// Get account page
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
     public ActionResult OnGet([FromQuery] int? id)
     {
         if (!ModelState.IsValid)
         {
-            return Redirect("/item");
+            return Redirect("/account");
         }
 
         AccountId = id ?? -1;
