@@ -13,7 +13,7 @@ public sealed class MasterKeyDataRepository(SecureDbContext context) : IMasterKe
     /// <inheritdoc />
     public async Task SetMasterKeyDataAsync(EncryptedDataDbModel data, CancellationToken token)
     {
-        if (await GetMasterKeyDataAsync(token) is not null)
+        if (await GetMasterKeyDataInternalAsync(token) is not null)
         {
             throw new MasterKeyDataExistsException();
         }
@@ -25,7 +25,7 @@ public sealed class MasterKeyDataRepository(SecureDbContext context) : IMasterKe
     /// <inheritdoc />
     public async Task<EncryptedDataDbModel> GetMasterKeyDataAsync(CancellationToken token)
     {
-        return await context.SecureItems.SingleOrDefaultAsync(m => m.Id == 1, token)
+        return await GetMasterKeyDataInternalAsync(token)
             ?? throw new MasterKeyDataNotExistsException();
     }
 
@@ -33,5 +33,10 @@ public sealed class MasterKeyDataRepository(SecureDbContext context) : IMasterKe
     public async Task DeleteMasterKeyData(CancellationToken token)
     {
         await context.SecureItems.ExecuteDeleteAsync(token);
+    }
+
+    private Task<EncryptedDataDbModel> GetMasterKeyDataInternalAsync(CancellationToken token)
+    {
+        return context.SecureItems.SingleOrDefaultAsync(m => m.Id == 1, token);
     }
 }

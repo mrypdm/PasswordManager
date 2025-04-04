@@ -39,16 +39,16 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     }
 
     /// <inheritdoc />
-    public async Task<EncryptedDataDbModel[]> GetItemsByNameAsync(string accountName, CancellationToken token)
+    public async Task<EncryptedDataDbModel> GetItemByIdAsync(int id, CancellationToken token)
     {
-        return await GetItemsInternalAsync(accountName, withTrack: false, token);
+        return await context.SecureItems.SingleOrDefaultAsync(m => m.Id == id, token);
     }
 
     /// <inheritdoc />
-    public async Task<AccountData[]> GetAccountsByNameAsync(string accountName, CancellationToken token)
+    public async Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token)
     {
-        var secureData = await GetItemsInternalAsync(accountName, withTrack: false, token);
-        return [.. secureData.Select(m => crypto.DecryptJson<AccountData>(m, masterKeyStorage.MasterKey))];
+        var item = await GetItemByIdAsync(id, token);
+        return crypto.DecryptJson<AccountData>(item, masterKeyStorage.MasterKey);
     }
 
     private async Task<EncryptedDataDbModel[]> GetItemsInternalAsync(string accountName, bool withTrack,

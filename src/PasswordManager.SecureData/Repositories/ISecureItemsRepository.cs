@@ -20,12 +20,12 @@ public interface ISecureItemsRepository
     Task DeleteItemAsync(EncryptedDataDbModel item, CancellationToken token);
 
     /// <summary>
-    /// Get secure item from repository by name
+    /// Get item from repository by id
     /// </summary>
-    Task<EncryptedDataDbModel[]> GetItemsByNameAsync(string accountName, CancellationToken token);
+    Task<EncryptedDataDbModel> GetItemByIdAsync(int id, CancellationToken token);
 
     /// <summary>
-    /// Get secure item and decrypt it
+    /// Get account data from repository by id
     /// </summary>
-    Task<AccountData[]> GetAccountsByNameAsync(string accountName, CancellationToken token);
+    Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token);
 }
