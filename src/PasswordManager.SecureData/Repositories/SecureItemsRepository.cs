@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.SecureData.Contexts;
+using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.SecureData.Models;
 
@@ -33,35 +32,24 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     }
 
     /// <inheritdoc />
-    public async Task DeleteItemAsync(EncryptedDataDbModel item, CancellationToken token)
+    public async Task UpdateAccountAsync(int id, AccountData data, CancellationToken token)
     {
-        await context.SecureItems.Where(m => m.Id == item.Id).ExecuteDeleteAsync(token);
-    }
+        var secureItem = await context.SecureItems.SingleOrDefaultAsync(m => m.Id == id, token)
+            ?? throw new ItemNotExistsException($"Item with id={id} not exists");
 
-    /// <inheritdoc />
-    public async Task<EncryptedDataDbModel> GetItemByIdAsync(int id, CancellationToken token)
-    {
-        return await context.SecureItems.SingleOrDefaultAsync(m => m.Id == id, token);
+        var encryptedData = crypto.EncryptJson(data, masterKeyStorage.MasterKey);
+        secureItem.Name = data.Name;
+        secureItem.Salt = encryptedData.Salt;
+        secureItem.Data = encryptedData.Data;
+
+        context.Update(secureItem);
+        await context.SaveChangesAsync(token);
     }
 
     /// <inheritdoc />
     public async Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token)
     {
-        var item = await GetItemByIdAsync(id, token);
+        var item = await context.SecureItems.AsNoTracking().SingleOrDefaultAsync(m => m.Id == id, token);
         return crypto.DecryptJson<AccountData>(item, masterKeyStorage.MasterKey);
-    }
-
-    private async Task<EncryptedDataDbModel[]> GetItemsInternalAsync(string accountName, bool withTrack,
-        CancellationToken token)
-    {
-        var query = context.SecureItems as IQueryable<EncryptedDataDbModel>;
-
-        if (!withTrack)
-        {
-            query = query.AsNoTracking();
-        }
-
-        return await query.Where(m => m.Name == accountName).ToArrayAsync(token)
-            ?? throw new KeyNotFoundException($"Cannot find data with name '{accountName}'");
     }
 }

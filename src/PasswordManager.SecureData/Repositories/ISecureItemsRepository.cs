@@ -15,14 +15,9 @@ public interface ISecureItemsRepository
     Task<int> AddAccountAsync(AccountData data, CancellationToken token);
 
     /// <summary>
-    /// Delete secure item from repository
+    /// Updates item with <paramref name="id"/> with new <paramref name="data"/>
     /// </summary>
-    Task DeleteItemAsync(EncryptedDataDbModel item, CancellationToken token);
-
-    /// <summary>
-    /// Get item from repository by id
-    /// </summary>
-    Task<EncryptedDataDbModel> GetItemByIdAsync(int id, CancellationToken token);
+    Task UpdateAccountAsync(int id, AccountData data, CancellationToken token);
 
     /// <summary>
     /// Get account data from repository by id
