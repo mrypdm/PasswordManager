@@ -77,7 +77,6 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services
             .AddScoped<IPasswordCheckerFactory, EntropyPasswordCheckerFactory>()
-            .AddScoped<IPasswordChecker, NistPasswordChecker>()
             .AddScoped<IPasswordChecker, SeaMonkeyPasswordChecker>()
             .AddScoped<IPasswordChecker, ZxcvbnPasswordChecker>()
             .AddScoped<IPasswordChecker, PwnedPasswordChecker>();
