@@ -49,7 +49,8 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     /// <inheritdoc />
     public async Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token)
     {
-        var item = await context.SecureItems.AsNoTracking().SingleOrDefaultAsync(m => m.Id == id, token);
+        var item = await context.SecureItems.AsNoTracking().SingleOrDefaultAsync(m => m.Id == id, token)
+            ?? throw new ItemNotExistsException($"Item with id={id} not exists");
         return crypto.DecryptJson<AccountData>(item, masterKeyStorage.MasterKey);
     }
 }
