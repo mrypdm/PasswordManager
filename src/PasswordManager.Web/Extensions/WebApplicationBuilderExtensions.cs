@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -75,6 +76,7 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddPasswordCheckers(this WebApplicationBuilder builder)
     {
         builder.Services
+            .AddScoped<IPasswordCheckerFactory, EntropyPasswordCheckerFactory>()
             .AddScoped<IPasswordChecker, NistPasswordChecker>()
             .AddScoped<IPasswordChecker, SeaMonkeyPasswordChecker>()
             .AddScoped<IPasswordChecker, ZxcvbnPasswordChecker>()
@@ -137,7 +139,12 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddRazorPages(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddRouting(opt => opt.LowercaseUrls = true)
+            .ConfigureHttpJsonOptions(opt => opt.SerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+            .AddRouting(opt => opt.LowercaseUrls = true);
+        builder.Services
+            .AddControllers()
+            .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+        builder.Services
             .AddRazorPages();
         return builder;
     }

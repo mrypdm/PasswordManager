@@ -23,6 +23,7 @@ application
     .UseAuthentication()
     .UseAuthorization();
 application.MapRazorPages();
+application.MapControllers();
 
 await application.MigrateDatabaseAsync(application.Lifetime.ApplicationStopping);
 
