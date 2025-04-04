@@ -11,6 +11,7 @@ var builder = await WebApplication
     .AddSecureDb()
     .AddCookieAuthentication()
     .AddRazorPages()
+    .AddSwagger()
     .AddUserOptionsAsync();
 
 var application = builder.Build();
@@ -19,10 +20,14 @@ application
     .UseHttpsRedirection()
     .UseStaticFiles()
     .UseRouting()
+    .UseSwagger()
+    .UseSwaggerUI()
     .UseAuthentication()
     .UseAuthorization();
+
 application.MapRazorPages();
 application.MapControllers();
+application.MapSwagger();
 
 await application.MigrateDatabaseAsync(application.Lifetime.ApplicationStopping);
 

@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -145,6 +147,21 @@ public static class WebApplicationBuilderExtensions
             .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         builder.Services
             .AddRazorPages();
+        return builder;
+    }
+
+    /// <summary>
+    /// Add connection options to web application
+    /// </summary>
+    public static WebApplicationBuilder AddSwagger(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .AddEndpointsApiExplorer()
+            .AddSwaggerGen(opt =>
+            {
+                opt.IncludeXmlComments(
+                    Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+            });
         return builder;
     }
 }
