@@ -15,7 +15,6 @@ var builder = await WebApplication
 
 var application = builder.Build();
 application
-    .UseExceptionHandler("/error")
     .UseHsts()
     .UseHttpsRedirection()
     .UseStaticFiles()
