@@ -33,7 +33,7 @@ public class UserSettingsController(
     /// </summary>
     [HttpPatch]
     [Route("session-timeout")]
-    public async Task<IActionResult> ChangeSessionTimeoutAsync(ChangeSessionTimeoutRequest request,
+    public async Task<IActionResult> ChangeSessionTimeoutAsync([FromBody] ChangeSessionTimeoutRequest request,
         CancellationToken token)
     {
         if (!request.Validate(out var error))
@@ -50,7 +50,7 @@ public class UserSettingsController(
     /// </summary>
     [HttpPatch]
     [Route("master-key")]
-    public async Task<IActionResult> ChangeSessionTimeoutAsync(ChangeMasterKeySettingsRequest request,
+    public async Task<IActionResult> ChangeSessionTimeoutAsync([FromBody] ChangeMasterKeySettingsRequest request,
         CancellationToken token)
     {
         if (!request.Validate(out var error))
