@@ -39,9 +39,9 @@ async function updateMasterKeySettings() {
 
     let data = {
         "MasterPassword": passwordBox.value,
-        "NewMasterPassword": newPasswordBox.value,
-        "Salt": saltBox.value,
-        "Iterations": iterationsBox.value
+        "NewMasterPassword": newPasswordBox.value == "" ? null : newPasswordBox.value,
+        "Salt": saltBox.value == "" ? null : saltBox.value,
+        "Iterations": iterationsBox.value == "" ? null : iterationsBox.value
     };
 
     try {
