@@ -22,6 +22,7 @@
     <input type="button" value="@(Model.AccountId == -1 ? "Add" : "Update")" onclick="postAccountData(@(Model.AccountId))" />
 </div>
 
+<h2>Password generator</h2>
 @await Html.PartialAsync("Shared/PasswordGenerator.cshtml")
 
 <script>
