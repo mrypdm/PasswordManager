@@ -14,6 +14,7 @@ namespace PasswordManager.Web.Controllers;
 /// Controller for use settings
 /// </summary>
 [Route("api/settings")]
+[ValidateAntiForgeryToken]
 public class UserSettingsController(
     IWritableOptions<UserOptions> userOptions,
     IKeyGeneratorFactory keyGeneratorFactory,

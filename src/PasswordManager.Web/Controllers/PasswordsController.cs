@@ -15,6 +15,7 @@ namespace PasswordManager.Web.Controllers;
 /// Controller for password manipulations
 /// </summary>
 [Route("api/password")]
+[ValidateAntiForgeryToken]
 public class PasswordsController(
     IEnumerable<IPasswordChecker> passwordCheckers,
     IPasswordCheckerFactory passwordCheckerFactory,

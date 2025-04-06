@@ -8,12 +8,9 @@ async function logon(redirect) {
     let data = {
         "MasterPassword": passwordBox.value,
     }
-    let headers = {
-        "X-CSRF-TOKEN": $('input[name="__RequestVerificationToken"]').val()
-    }
 
     try {
-        await send("api/logon", "POST", data, headers);
+        await send("api/logon", "POST", data, getCsrfTokenHeader());
         location.replace(redirect)
     } catch (response) {
         let text = await response.text()
@@ -33,7 +30,7 @@ async function getAccountData(accountId) {
     let passwordBox = document.getElementById("account-data-password");
 
     try {
-        let response = await send(`api/account/${accountId}`, "POST");
+        let response = await send(`api/account/${accountId}`, "POST", null, getCsrfTokenHeader());
         response = await response.json();
         nameBox.value = response.name;
         loginBox.value = response.login;
@@ -59,11 +56,11 @@ async function postAccountData(accountId) {
     }
 
     if (accountId === -1) {
-        let result = await send("api/account", "POST", data);
+        let result = await send("api/account", "POST", data, getCsrfTokenHeader());
         response = await response.json();
         location.replace(`/account?id=${result.id}`);
     } else {
-        await send(`api/account/${accountId}`, "PUT", data);
+        await send(`api/account/${accountId}`, "PUT", data, getCsrfTokenHeader());
         location.reload();
     }
 }
@@ -73,7 +70,7 @@ async function verifyPassword(passwordBoxId) {
     let data = {
         "Password": passwordBox.value
     };
-    let response = await send("api/password/verify", "POST", data);
+    let response = await send("api/password/verify", "POST", data, getCsrfTokenHeader());
     response = await response.json();
     alert(buildCheckStatus(response));
 }
@@ -96,7 +93,7 @@ async function generatePassword()
         "SpecialSymbols": useCharactersBox.value
     }
 
-    let response = await send("api/password/generate", "POST", data);
+    let response = await send("api/password/generate", "POST", data, getCsrfTokenHeader());
     response = await response.json();
     passwordBox.value = response.password;
     passwordVerifyResult.innerHTML = buildCheckStatus(response.checkStatus)
@@ -121,4 +118,10 @@ function copyToClipboard(boxId) {
 function buildCheckStatus(checkStatus) {
     let isCompomised = checkStatus.isCompomised ? " " : " not";
     return`Password is${isCompomised} compomised and password strength is ${checkStatus.strength}`
+}
+
+function getCsrfTokenHeader() {
+    return {
+        "X-CSRF-TOKEN": $('input[name="__RequestVerificationToken"]').val()
+    }
 }

@@ -14,6 +14,7 @@ namespace PasswordManager.Web.Controllers;
 /// </summary>
 /// <param name="secureItemsRepository"></param>
 [Route("api/account")]
+[ValidateAntiForgeryToken]
 public class AccountsController(ISecureItemsRepository secureItemsRepository) : Controller
 {
     /// <summary>
