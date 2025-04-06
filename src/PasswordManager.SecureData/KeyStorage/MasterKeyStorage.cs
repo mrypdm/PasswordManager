@@ -66,7 +66,7 @@ public sealed class MasterKeyStorage(IKeyValidator keyValidator) : IMasterKeySto
         }
     }
 
-    private void ValidateTimeout(TimeSpan timeout)
+    private static void ValidateTimeout(TimeSpan timeout)
     {
         if (timeout <= TimeSpan.Zero)
         {
