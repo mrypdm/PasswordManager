@@ -12,7 +12,7 @@ public interface IMasterKeyStorage
     /// <summary>
     /// Current master key
     /// </summary>
-    /// <exception cref="StorageIsNotInitializedException">If storage not initialzied</exception>
+    /// <exception cref="StorageNotInitializedException">If storage not initialzied</exception>
     byte[] MasterKey { get; }
 
     /// <summary>
@@ -31,7 +31,7 @@ public interface IMasterKeyStorage
     /// Change current timeout of master key
     /// </summary>
     /// <exception cref="ArgumentException">If <paramref name="timeout"/> is invalid</exception>
-    /// <exception cref="StorageIsNotInitializedException">If storage is not initialized</exception>
+    /// <exception cref="StorageNotInitializedException">If storage is not initialized</exception>
     void ChangeTimeout(TimeSpan timeout);
 
     /// <summary>

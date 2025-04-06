@@ -39,7 +39,7 @@ public interface IMasterKeyService
     /// Change timeout of master key
     /// </summary>
     /// <exception cref="ArgumentException">If <paramref name="sessionTimeout"/> is invalid</exception>
-    /// <exception cref="StorageIsNotInitializedException">If storage is not initialized</exception>
+    /// <exception cref="StorageNotInitializedException">If storage is not initialized</exception>
     Task ChangeKeyTimeoutAsync(TimeSpan timeout, CancellationToken token);
 
     /// <summary>

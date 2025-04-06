@@ -5,4 +5,4 @@ namespace PasswordManager.SecureData.Exceptions;
 /// <summary>
 /// Storage not initialized exception
 /// </summary>
-public class StorageIsNotInitializedException(string message) : Exception(message);
+public class StorageNotInitializedException(string message) : Exception(message);

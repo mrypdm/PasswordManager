@@ -62,7 +62,7 @@ public sealed class MasterKeyStorage(IKeyValidator keyValidator) : IMasterKeySto
     {
         if (!IsInitialized)
         {
-            throw new StorageIsNotInitializedException($"Storage is empty. Call {nameof(InitStorage)} first");
+            throw new StorageNotInitializedException($"Storage is empty. Call {nameof(InitStorage)} first");
         }
     }
 
