@@ -67,7 +67,7 @@ public class PwnedPasswordCheckerTests
 
     [Test]
     [Ignore("This test makes requests to the real service, which may have consequences, so the test is disabled by default.")]
-    public async Task CheckPwned_CompromisedPassword_ShoudReturnCompomisedResult()
+    public async Task CheckPwned_CompromisedPassword_ShouldReturnCompomisedResult()
     {
         // arrange
         var checker = new PwnedPasswordChecker();

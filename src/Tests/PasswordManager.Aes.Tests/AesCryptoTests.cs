@@ -12,7 +12,7 @@ namespace PasswordManager.Aes.Tests;
 public class AesCryptoTests
 {
     [Test]
-    public void EncryptWithDecrypt_ShoudBeEqualToEtalon()
+    public void EncryptWithDecrypt_ShouldBeEqualToEtalon()
     {
         // arrange
         var data = RandomNumberGenerator.GetBytes(100);
@@ -32,7 +32,7 @@ public class AesCryptoTests
     }
 
     [Test]
-    public void EncryptWithDecrypt_Json_ShoudBeEqualToEtalon()
+    public void EncryptWithDecrypt_Json_ShouldBeEqualToEtalon()
     {
         // arrange
         var data = "very cool string";
@@ -52,7 +52,7 @@ public class AesCryptoTests
     }
 
     [Test]
-    public void Encrypt_ShoudBeDifferentEncryptedValues()
+    public void Encrypt_ShouldBeDifferentEncryptedValues()
     {
         // arrange
         var data = RandomNumberGenerator.GetBytes(100);
@@ -68,7 +68,7 @@ public class AesCryptoTests
     }
 
     [Test]
-    public void Decrypt_WrongSalt_ShoudBeTrash()
+    public void Decrypt_WrongSalt_ShouldBeTrash()
     {
         // arrange
         var data = RandomNumberGenerator.GetBytes(100);
