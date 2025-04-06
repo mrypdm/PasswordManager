@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using PasswordManager.Abstractions.Factories;
 using PasswordManager.SecureData.Exceptions;
 
 namespace PasswordManager.SecureData.Services;
@@ -16,6 +17,12 @@ public interface IMasterKeyService
     /// </summary>
     /// <exception cref="InvalidMasterKeyException">If master password is invalid</exception>
     Task InitMasterKeyAsync(string masterPassword, TimeSpan sessionTimeout, CancellationToken token);
+
+    /// <summary>
+    /// Changes master key settings
+    /// </summary>
+    Task ChangeMasterKeySettingsAsync(string oldMasterPassword, string newMasterPassword,
+        IKeyGenerator newKeyGenerator, CancellationToken token);
 
     /// <summary>
     /// Clear master key

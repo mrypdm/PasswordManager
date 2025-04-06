@@ -72,10 +72,12 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddAesCrypto(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddScoped<IKeyGenerator>(services =>
+            .AddSingleton<IKeyGeneratorFactory, AesKeyGeneratorFactory>()
+            .AddScoped(services =>
             {
                 var userOptions = services.GetRequiredService<IWritableOptions<UserOptions>>();
-                return new AesKeyGenerator(userOptions.Value.MasterKeySaltBytes, userOptions.Value.MasterKeyIterations);
+                var factory = services.GetRequiredService<IKeyGeneratorFactory>();
+                return factory.Create(userOptions.Value.MasterKeySaltBytes, userOptions.Value.MasterKeyIterations);
             })
             .AddScoped<IKeyValidator, AesKeyValidator>()
             .AddScoped<ICrypto, AesCrypto>();
@@ -114,7 +116,7 @@ public static class WebApplicationBuilderExtensions
             .AddDbContext<SecureDbContext>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("SecureDb")))
             .AddSingleton<IMasterKeyStorage, MasterKeyStorage>()
             .AddScoped<ISecureItemsRepository, SecureItemsRepository>()
-            .AddScoped<IMasterKeyDataRepository, MasterKeyDataRepository>()
+            .AddScoped<IMasterKeyDataRepository, SecureItemsRepository>()
             .AddScoped<IMasterKeyService, MasterKeyService>();
         return builder;
     }

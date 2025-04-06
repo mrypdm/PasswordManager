@@ -1,13 +1,10 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.KeyStorage;
-using PasswordManager.SecureData.Models;
 using PasswordManager.SecureData.Repositories;
 
 namespace PasswordManager.SecureData.Services;
@@ -16,15 +13,14 @@ namespace PasswordManager.SecureData.Services;
 public sealed class MasterKeyService(
     IMasterKeyDataRepository masterKeyDataRepository,
     IMasterKeyStorage masterKeyStorage,
-    IKeyGenerator masterKeyGenerator,
-    IKeyValidator keyValidator,
-    ICrypto crypto) : IMasterKeyService
+    IKeyGenerator keyGenerator,
+    IKeyValidator keyValidator) : IMasterKeyService
 {
     /// <inheritdoc />
     public async Task InitMasterKeyAsync(string masterPassword, TimeSpan sessionTimeout,
         CancellationToken token)
     {
-        var masterKey = masterKeyGenerator.Generate(masterPassword);
+        var masterKey = keyGenerator.Generate(masterPassword);
 
         try
         {
@@ -32,10 +28,22 @@ public sealed class MasterKeyService(
         }
         catch (MasterKeyDataNotExistsException)
         {
-            await InitMasterKeyData(masterKey, token);
+            await masterKeyDataRepository.SetMasterKeyDataAsync(masterKey, token);
         }
 
         masterKeyStorage.InitStorage(masterKey, sessionTimeout);
+    }
+
+    /// <inheritdoc />
+    public async Task ChangeMasterKeySettingsAsync(string oldMasterPassword, string newMasterPassword,
+        IKeyGenerator newKeyGenerator, CancellationToken token)
+    {
+        var masterKey = keyGenerator.Generate(oldMasterPassword);
+        await ValidateKeyAsync(masterKey, token);
+
+        var newMasterKey = newKeyGenerator.Generate(newMasterPassword);
+        await masterKeyDataRepository.ChangeMasterKeyDataAsync(newMasterKey, token);
+        masterKeyStorage.ClearKey();
     }
 
     /// <inheritdoc />
@@ -52,27 +60,9 @@ public sealed class MasterKeyService(
         await masterKeyDataRepository.DeleteMasterKeyData(token);
     }
 
-    private async Task InitMasterKeyData(byte[] masterKey, CancellationToken token)
-    {
-        var encryptedData = crypto.Encrypt(masterKey, masterKey);
-        var masterKeyData = new EncryptedDataDbModel
-        {
-            Name = nameof(MasterKeyService),
-            Salt = encryptedData.Salt,
-            Data = encryptedData.Data
-        };
-        await masterKeyDataRepository.SetMasterKeyDataAsync(masterKeyData, token);
-    }
-
     private async Task ValidateKeyAsync(byte[] masterKey, CancellationToken token)
     {
         keyValidator.Validate(masterKey);
-        var masterKeyData = await masterKeyDataRepository.GetMasterKeyDataAsync(token);
-        var decryptedData = crypto.Decrypt(masterKeyData, masterKey);
-        if (!masterKey.SequenceEqual(decryptedData))
-        {
-            throw new InvalidMasterKeyException();
-        }
+        await masterKeyDataRepository.ValidateMasterKeyDataAsync(masterKey, token);
     }
-
 }
