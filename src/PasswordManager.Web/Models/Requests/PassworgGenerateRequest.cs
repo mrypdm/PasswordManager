@@ -1,9 +1,11 @@
-namespace PasswordManager.Web.Models;
+using System.Diagnostics.CodeAnalysis;
+
+namespace PasswordManager.Web.Models.Requests;
 
 /// <summary>
 /// Request for generating password
 /// </summary>
-public class PassworgGenerateRequest
+public class PassworgGenerateRequest : IRequest
 {
     /// <summary>
     /// Length of generating password
@@ -29,4 +31,16 @@ public class PassworgGenerateRequest
     /// Allowed specific characters for generating password
     /// </summary>
     public string SpecialSymbols { get; set; } = "";
+
+    /// <inheritdoc />
+    public bool Validate([NotNullWhen(false)] out string errorMessage)
+    {
+        errorMessage = null;
+        if (Length <= 0)
+        {
+            errorMessage = "Length cannot be zero or negative";
+        }
+
+        return errorMessage is null;
+    }
 }

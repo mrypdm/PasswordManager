@@ -7,6 +7,7 @@ using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Core;
 using PasswordManager.Web.Models;
+using PasswordManager.Web.Models.Requests;
 
 namespace PasswordManager.Web.Controllers;
 
@@ -27,6 +28,11 @@ public class PasswordsController(
     public async Task<ActionResult<PasswordVerifyReponse>> VerifyPasswordAsync([FromBody] PasswordVerifyRequest request,
         CancellationToken token)
     {
+        if (!request.Validate(out var error))
+        {
+            return BadRequest(error);
+        }
+
         var result = await VerifyPasswordAsync(request.Password, token);
         return Map(result);
     }
@@ -39,6 +45,11 @@ public class PasswordsController(
     public async Task<ActionResult<PasswordGenerateResponse>> GeneratePasswordAsync(
         [FromBody] PassworgGenerateRequest request, CancellationToken token)
     {
+        if (!request.Validate(out var error))
+        {
+            return BadRequest(error);
+        }
+
         var alphabet = SetupAlphabet(request);
         var generator = passwordGeneratorFactory.Create(alphabet);
         var checker = passwordCheckerFactory.Create(alphabet);

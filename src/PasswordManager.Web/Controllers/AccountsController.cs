@@ -5,6 +5,7 @@ using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.Models;
 using PasswordManager.SecureData.Repositories;
 using PasswordManager.Web.Models;
+using PasswordManager.Web.Models.Requests;
 
 namespace PasswordManager.Web.Controllers;
 
@@ -36,10 +37,21 @@ public class AccountsController(ISecureItemsRepository secureItemsRepository) : 
     /// Add new account
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult<AddAccountDataResponse>> AddAccountAsync([FromBody] AccountData request,
+    public async Task<ActionResult<AddAccountDataResponse>> AddAccountAsync([FromBody] UploadAccountRequest request,
         CancellationToken token)
     {
-        var id = await secureItemsRepository.AddAccountAsync(request, token);
+        if (!request.Validate(out var error))
+        {
+            return BadRequest(error);
+        }
+
+        var account = new AccountData
+        {
+            Name = request.Name,
+            Login = request.Login,
+            Password = request.Password
+        };
+        var id = await secureItemsRepository.AddAccountAsync(account, token);
         return new AddAccountDataResponse
         {
             Id = id
@@ -51,12 +63,24 @@ public class AccountsController(ISecureItemsRepository secureItemsRepository) : 
     /// </summary>
     [HttpPut]
     [Route("{accountId}")]
-    public async Task<ActionResult> UpdateAccountAsync(int accountId, [FromBody] AccountData request,
+    public async Task<ActionResult> UpdateAccountAsync(int accountId, [FromBody] UploadAccountRequest request,
         CancellationToken token)
     {
+        if (!request.Validate(out var error))
+        {
+            return BadRequest(error);
+        }
+
+        var account = new AccountData
+        {
+            Name = request.Name,
+            Login = request.Login,
+            Password = request.Password
+        };
+
         try
         {
-            await secureItemsRepository.UpdateAccountAsync(accountId, request, token);
+            await secureItemsRepository.UpdateAccountAsync(accountId, account, token);
             return Ok();
         }
         catch (ItemNotExistsException)
