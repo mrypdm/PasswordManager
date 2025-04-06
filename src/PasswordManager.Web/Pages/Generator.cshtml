@@ -1,9 +1,11 @@
 @page
-@model PasswordManager.Web.Pages.GeneratorModel
+@using PasswordManager.Web.Pages
+
+@model GeneratorModel
 @{
     ViewData["Title"] = "Password Generator";
 }
 
 @Html.AntiForgeryToken()
 
-@await Html.PartialAsync("Shared/_PasswordGenerator.cshtml")
+@await Html.PartialAsync("Shared/PasswordGenerator.cshtml")

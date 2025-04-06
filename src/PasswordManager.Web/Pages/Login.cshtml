@@ -1,5 +1,8 @@
 @page
-@model PasswordManager.Web.Pages.LoginModel
+@using PasswordManager.Web.Pages
+@using PasswordManager.Web.Pages.Shared
+
+@model LoginModel
 @{
     ViewData["Title"] = "Login";
 }
@@ -7,15 +10,11 @@
 @Html.AntiForgeryToken()
 
 <div>
-    <div class="row">
-        <div class="column">
-            <label for="master-password">Master password</label>
-        </div>
-        <div class="column">
-            <input id="master-password" placeholder="Master password" type="password" />
-            <input type="checkbox" onclick="showPassword('master-password')" />
-        </div>
-    </div>
+    @await Html.PartialAsync("Shared/InputForm.cshtml", new InputFormModel("master-password", "password", "Master password")
+{
+        NeedShow = true,
+        NeedVerify = true
+    })
 
     <input type="button" value="Login" onclick="logon('@(Model.ReturnUrl)')" />
 </div>

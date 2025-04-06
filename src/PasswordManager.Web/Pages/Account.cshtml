@@ -1,5 +1,8 @@
 @page
-@model PasswordManager.Web.Pages.AccountModel
+@using PasswordManager.Web.Pages
+@using PasswordManager.Web.Pages.Shared
+
+@model AccountModel
 @{
     ViewData["Title"] = "New Item";
 }
@@ -7,41 +10,19 @@
 @Html.AntiForgeryToken()
 
 <div>
-    <div class="row">
-        <div class="column">
-            <label for="account-data-name">Account name</label>
-        </div>
-        <div class="column">
-            <input id="account-data-name" placeholder="Account name" type="text" />
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="column">
-            <label for="account-data-login">Login</label>
-        </div>
-        <div class="column">
-            <input id="account-data-login" placeholder="Login" type="text" />
-            <input type="button" value="Copy" onclick="copyToClipboard('account-data-login')" />
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="column">
-            <label for="account-data-password">Password</label>
-        </div>
-        <div class="column">
-            <input id="account-data-password" placeholder="Password" type="password" />
-            <input type="checkbox" onclick="showPassword('account-data-password')" />
-            <input type="button" value="Copy" onclick="copyToClipboard('account-data-password')" />
-            <input type="button" value="Verify" onclick="verifyPassword('account-data-password')" />
-        </div>
-    </div>
+    @await Html.PartialAsync("Shared/InputForm.cshtml", new InputFormModel("account-data-name", "text", "Account name"))
+    @await Html.PartialAsync("Shared/InputForm.cshtml", new InputFormModel("account-data-login", "text", "Login") { NeedCopy = true })
+    @await Html.PartialAsync("Shared/InputForm.cshtml", new InputFormModel("account-data-password", "password", "Password")
+    {
+        NeedShow = true,
+        NeedCopy = true,
+        NeedVerify = true
+    })
 
     <input type="button" value="@(Model.AccountId == -1 ? "Add" : "Update")" onclick="postAccountData(@(Model.AccountId))" />
 </div>
 
-@await Html.PartialAsync("Shared/_PasswordGenerator.cshtml")
+@await Html.PartialAsync("Shared/PasswordGenerator.cshtml")
 
 <script>
     onload = async () => { await getAccountData(@(Model.AccountId)); };

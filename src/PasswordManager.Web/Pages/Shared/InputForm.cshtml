@@ -1,0 +1,31 @@
+@model PasswordManager.Web.Pages.Shared.InputFormModel
+
+<div class="row">
+    <div style="float: left; width: 35%">
+        <label for="@(Model.Id)">@(Model.Name)</label>
+    </div>
+    <div style="float: left; width: 65%">
+        <input
+            id="@(Model.Id)"
+            type="@(Model.Type)"
+            style="@(Model.Type == "checkbox" ? "" : "width: 75%")"
+            placeholder="@(Model.Name)"
+            value="@(Model.Value ?? "")"
+            @(Model.Type == "checkbox" && Model.Value == "true" ? "checked" : "") />
+
+        @if (Model.NeedShow)
+        {
+            <input type="checkbox" onclick="showPassword('@(Model.Id)')" />
+        }
+
+        @if (Model.NeedCopy)
+        {
+            <input type="button" value="Copy" onclick="copyToClipboard('@(Model.Id)')" />
+        }
+
+        @if (Model.NeedVerify)
+        {
+            <input type="button" value="Verify" onclick="verifyPassword('@(Model.Id)')" />
+        }
+    </div>
+</div>

@@ -29,6 +29,9 @@
                             <a class="nav-link text-dark" asp-area="" asp-page="/generator">Password Generator</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/settings">Settings</a>
+                        </li>
+                        <li class="nav-item">
                             @if (User.Identity?.IsAuthenticated == true)
                             {
                                 <a class="nav-link text-dark" asp-area="" asp-page="/logout">Sign Out</a>
@@ -51,7 +54,12 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/common.js" asp-append-version="true"></script>
     <script src="~/js/requests.js" asp-append-version="true"></script>
+    <script src="~/js/logon.js" asp-append-version="true"></script>
+    <script src="~/js/accounts.js" asp-append-version="true"></script>
+    <script src="~/js/passwords.js" asp-append-version="true"></script>
+    <script src="~/js/settings.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
