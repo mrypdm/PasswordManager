@@ -15,7 +15,7 @@ function copyToClipboard(boxId) {
 }
 
 function buildCheckStatus(checkStatus) {
-    let isCompomised = checkStatus.isCompomised ? " " : " not";
+    let isCompomised = checkStatus.isCompomised ? "" : " not";
     return `Password is${isCompomised} compomised and password strength is ${checkStatus.strength}`
 }
 
