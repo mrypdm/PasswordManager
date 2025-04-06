@@ -76,7 +76,6 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
         try
         {
             var masterKeyDataItem = items[0];
-            var masterKeyData = crypto.Decrypt(masterKeyDataItem, masterKeyStorage.MasterKey);
             var newMasterKeyData = crypto.Encrypt(newMasterKey, newMasterKey);
             masterKeyDataItem.Salt = newMasterKeyData.Salt;
             masterKeyDataItem.Data = newMasterKeyData.Data;

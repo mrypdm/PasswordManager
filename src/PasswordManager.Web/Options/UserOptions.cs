@@ -13,7 +13,7 @@ public class UserOptions
     /// <summary>
     /// Salt for master key generation
     /// </summary>
-    public string MasterKeySalt { get; set; } = RandomNumberGenerator.GetHexString(AesConstants.KeySize * 2);
+    public string MasterKeySalt { get; set; } = RandomNumberGenerator.GetHexString(AesConstants.BlockSize * 2);
 
     /// <summary>
     /// Salt for master key generation in bytes
