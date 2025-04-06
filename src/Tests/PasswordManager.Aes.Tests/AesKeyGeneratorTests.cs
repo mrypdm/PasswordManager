@@ -60,8 +60,8 @@ public class AesKeyGeneratorTests
         // act
         // assert
         Assert.Throws<ArgumentNullException>(() => generator.Generate(null));
-        Assert.Throws<ArgumentNullException>(() => generator.Generate(""));
-        Assert.Throws<ArgumentNullException>(() => generator.Generate(" "));
+        Assert.Throws<ArgumentException>(() => generator.Generate(""));
+        Assert.Throws<ArgumentException>(() => generator.Generate(" "));
     }
 
     [Test]

@@ -10,6 +10,7 @@ public interface IKeyGenerator
     /// <summary>
     /// Create master key by master password
     /// </summary>
-    /// <exception cref="ArgumentException">If <paramref name="masterPassword"/> is null or whitespace</exception>
+    /// <exception cref="ArgumentNullException">If <paramref name="masterPassword"/> is null</exception>
+    /// <exception cref="ArgumentException">If <paramref name="masterPassword"/> is whitespace</exception>
     byte[] Generate(string masterPassword);
 }
