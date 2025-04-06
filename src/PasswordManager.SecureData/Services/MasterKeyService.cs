@@ -38,6 +38,8 @@ public sealed class MasterKeyService(
     public async Task ChangeMasterKeySettingsAsync(string oldMasterPassword, string newMasterPassword,
         IKeyGenerator newKeyGenerator, CancellationToken token)
     {
+        ArgumentNullException.ThrowIfNull(newKeyGenerator);
+
         var masterKey = keyGenerator.Generate(oldMasterPassword);
         await ValidateKeyAsync(masterKey, token);
 

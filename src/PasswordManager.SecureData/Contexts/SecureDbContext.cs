@@ -1,4 +1,3 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using PasswordManager.SecureData.Models;
@@ -23,16 +22,14 @@ public sealed class SecureDbContext(DbContextOptions options) : DbContext(option
     }
 
     /// <summary>
-    /// Runtime design factory for EF Core. Using for migrations creation and testing
+    /// Runtime design factory for migrations creation
     /// </summary>
     public class SecureDbContextFactory : IDesignTimeDbContextFactory<SecureDbContext>
     {
         public SecureDbContext CreateDbContext(string[] args)
         {
             var options = new DbContextOptionsBuilder()
-                .UseSqlite("Filename=FakeFile.db")
-                .LogTo(Console.WriteLine)
-                .EnableSensitiveDataLogging()
+                .UseSqlite("Filename=fake-secure-db.db")
                 .Options;
 
             return new SecureDbContext(options);

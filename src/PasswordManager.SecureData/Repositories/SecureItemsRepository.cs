@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Abstractions.Crypto;
+using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Contexts;
 using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.KeyStorage;
@@ -14,12 +15,15 @@ using PasswordManager.SecureData.Services;
 namespace PasswordManager.SecureData.Repositories;
 
 /// <inheritdoc />
-public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypto, IMasterKeyStorage masterKeyStorage)
+public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypto, IMasterKeyStorage masterKeyStorage,
+    IKeyValidator keyValidator)
     : ISecureItemsRepository, IMasterKeyDataRepository
 {
     /// <inheritdoc />
     public async Task<int> AddAccountAsync(AccountData data, CancellationToken token)
     {
+        ArgumentNullException.ThrowIfNull(data);
+
         var encryptedData = crypto.EncryptJson(data, masterKeyStorage.MasterKey);
 
         var secureItem = new EncryptedDataDbModel
@@ -67,24 +71,19 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     /// <inheritdoc />
     public async Task ReEncryptRepositoryAsync(byte[] newMasterKey, CancellationToken token)
     {
+        keyValidator.Validate(newMasterKey);
+
         var items = await context.SecureItems.ToArrayAsync(token);
         if (items.Length == 0)
         {
             throw new MasterKeyDataNotExistsException();
         }
 
-        try
-        {
-            var masterKeyDataItem = items[0];
-            var newMasterKeyData = crypto.Encrypt(newMasterKey, newMasterKey);
-            masterKeyDataItem.Salt = newMasterKeyData.Salt;
-            masterKeyDataItem.Data = newMasterKeyData.Data;
-            context.SecureItems.Update(masterKeyDataItem);
-        }
-        catch (Exception)
-        {
-            throw new InvalidMasterKeyException();
-        }
+        var masterKeyDataItem = items[0];
+        var newMasterKeyData = crypto.Encrypt(newMasterKey, newMasterKey);
+        masterKeyDataItem.Salt = newMasterKeyData.Salt;
+        masterKeyDataItem.Data = newMasterKeyData.Data;
+        context.SecureItems.Update(masterKeyDataItem);
 
         foreach (var item in items[1..])
         {
@@ -102,6 +101,8 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     /// <inheritdoc />
     public async Task SetMasterKeyDataAsync(byte[] masterKey, CancellationToken token)
     {
+        keyValidator.Validate(masterKey);
+
         if (await GetMasterKeyDataInternalAsync(token) is not null)
         {
             throw new MasterKeyDataExistsException();
@@ -122,6 +123,7 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     /// <inheritdoc />
     public async Task ValidateMasterKeyDataAsync(byte[] masterKey, CancellationToken token)
     {
+        keyValidator.Validate(masterKey);
         var masterKeyData = await GetMasterKeyDataInternalAsync(token)
             ?? throw new MasterKeyDataNotExistsException();
 

@@ -45,7 +45,7 @@ public static class CookieExtensions
     public static bool ValidatePrincipal(this CookieValidatePrincipalContext context)
     {
         var keyStorage = context.HttpContext.RequestServices.GetRequiredService<IMasterKeyStorage>();
-        if (!keyStorage.IsInitialized())
+        if (!keyStorage.IsInitialized)
         {
             context.RejectPrincipal();
             return false;

@@ -1,12 +1,14 @@
 using System;
 using System.Runtime.Caching;
+using PasswordManager.Abstractions.Validators;
+using PasswordManager.SecureData.Exceptions;
 
 namespace PasswordManager.SecureData.KeyStorage;
 
 /// <summary>
 /// Storage for master key
 /// </summary>
-public sealed class MasterKeyStorage : IMasterKeyStorage, IDisposable
+public sealed class MasterKeyStorage(IKeyValidator keyValidator) : IMasterKeyStorage, IDisposable
 {
     private const string CacheKey = "MasterKey";
 
@@ -16,29 +18,31 @@ public sealed class MasterKeyStorage : IMasterKeyStorage, IDisposable
     public byte[] MasterKey => _cache.Get(CacheKey) as byte[];
 
     /// <inheritdoc />
-    public void InitStorage(byte[] masterKey, TimeSpan keyLifeTime)
+    public bool IsInitialized => MasterKey is not null;
+
+    /// <inheritdoc />
+    public void InitStorage(byte[] masterKey, TimeSpan timeout)
     {
+        keyValidator.Validate(masterKey);
+        ValidateTimeout(timeout);
+
         ClearKey();
-        _cache.Set(CacheKey, masterKey, new CacheItemPolicy { SlidingExpiration = keyLifeTime });
+        _cache.Set(CacheKey, masterKey, new CacheItemPolicy { SlidingExpiration = timeout });
     }
 
     /// <inheritdoc />
-    public void ChangeTimeout(TimeSpan keyLifeTime)
+    public void ChangeTimeout(TimeSpan timeout)
     {
+        ValidateTimeout(timeout);
         ThrowIfNotInitialized();
-        _cache.Set(CacheKey, MasterKey, new CacheItemPolicy { SlidingExpiration = keyLifeTime });
+
+        _cache.Set(CacheKey, MasterKey, new CacheItemPolicy { SlidingExpiration = timeout });
     }
 
     /// <inheritdoc />
     public void ClearKey()
     {
         _cache.Remove(CacheKey);
-    }
-
-    /// <inheritdoc />
-    public bool IsInitialized()
-    {
-        return MasterKey is not null;
     }
 
     /// <inheritdoc />
@@ -51,7 +55,15 @@ public sealed class MasterKeyStorage : IMasterKeyStorage, IDisposable
     {
         if (MasterKey is null)
         {
-            throw new InvalidOperationException($"Storage is empty. Call {nameof(InitStorage)} first");
+            throw new StorageIsNotInitializedException($"Storage is empty. Call {nameof(InitStorage)} first");
+        }
+    }
+
+    private void ValidateTimeout(TimeSpan timeout)
+    {
+        if (timeout <= TimeSpan.Zero)
+        {
+            throw new ArgumentException("Timeout cannot be zero or negative");
         }
     }
 }

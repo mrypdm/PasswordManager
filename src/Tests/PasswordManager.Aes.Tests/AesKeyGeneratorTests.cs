@@ -52,6 +52,19 @@ public class AesKeyGeneratorTests
     }
 
     [Test]
+    public void Generate_InvalidPassword_Throw()
+    {
+        // arrange
+        var generator = new AesKeyGenerator([0, 1, 2, 3, 4, 5, 6], 100);
+
+        // act
+        // assert
+        Assert.Throws<ArgumentNullException>(() => generator.Generate(null));
+        Assert.Throws<ArgumentNullException>(() => generator.Generate(""));
+        Assert.Throws<ArgumentNullException>(() => generator.Generate(" "));
+    }
+
+    [Test]
     public void Ctor_NullSalt_Throw()
     {
         // arrange

@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.SecureData.Exceptions;
 
@@ -15,12 +16,17 @@ public interface IMasterKeyService
     /// Init master key from <paramref name="masterPassword"/> and validates it with current master key data.
     /// If not master key data exists, then creates master key data with new master key
     /// </summary>
+    /// <exception cref="KeyValidationException">If <paramref name="masterPassword"/> is invalid</exception>
+    /// <exception cref="ArgumentException">If <paramref name="sessionTimeout"/> is invalid</exception>
     /// <exception cref="InvalidMasterKeyException">If master password is invalid</exception>
     Task InitMasterKeyAsync(string masterPassword, TimeSpan sessionTimeout, CancellationToken token);
 
     /// <summary>
     /// Changes master key settings
     /// </summary>
+    /// <exception cref="KeyValidationException">If <paramref name="oldMasterPassword"/> is invalid</exception>
+    /// <exception cref="KeyValidationException">If <paramref name="newMasterPassword"/> is invalid</exception>
+    /// <exception cref="ArgumentNullException">If <paramref name="newKeyGenerator"/> is null</exception>
     Task ChangeMasterKeySettingsAsync(string oldMasterPassword, string newMasterPassword,
         IKeyGenerator newKeyGenerator, CancellationToken token);
 
@@ -32,6 +38,8 @@ public interface IMasterKeyService
     /// <summary>
     /// Change timeout of master key
     /// </summary>
+    /// <exception cref="ArgumentException">If <paramref name="sessionTimeout"/> is invalid</exception>
+    /// <exception cref="StorageIsNotInitializedException">If storage is not initialized</exception>
     Task ChangeKeyTimeoutAsync(TimeSpan timeout, CancellationToken token);
 
     /// <summary>
