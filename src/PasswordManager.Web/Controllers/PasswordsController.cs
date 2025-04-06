@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Abstractions.Checkers;
 using PasswordManager.Abstractions.Factories;
@@ -25,6 +26,7 @@ public class PasswordsController(
     /// Verify password strength and compomistaion
     /// </summary>
     [HttpPost]
+    [AllowAnonymous]
     [Route("verify")]
     public async Task<ActionResult<PasswordVerifyReponse>> VerifyPasswordAsync([FromBody] PasswordVerifyRequest request,
         CancellationToken token)

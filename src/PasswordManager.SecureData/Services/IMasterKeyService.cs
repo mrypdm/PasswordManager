@@ -25,6 +25,11 @@ public interface IMasterKeyService
         IKeyGenerator newKeyGenerator, CancellationToken token);
 
     /// <summary>
+    /// Check if master key data exists
+    /// </summary>
+    Task<bool> IsMasterKeyDataExists(CancellationToken token);
+
+    /// <summary>
     /// Change lifetime of master key
     /// </summary>
     Task ChangeLifetimeAsync(TimeSpan lifetime, CancellationToken token);

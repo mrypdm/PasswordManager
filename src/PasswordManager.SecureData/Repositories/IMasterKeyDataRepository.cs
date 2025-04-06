@@ -21,6 +21,11 @@ public interface IMasterKeyDataRepository
     Task ValidateMasterKeyDataAsync(byte[] masterKey, CancellationToken token);
 
     /// <summary>
+    /// Check if master key data exists
+    /// </summary>
+    Task<bool> IsMasterKeyDataExists(CancellationToken token);
+
+    /// <summary>
     /// Delete master key data and all items in repository
     /// </summary>
     Task DeleteMasterKeyData(CancellationToken token);

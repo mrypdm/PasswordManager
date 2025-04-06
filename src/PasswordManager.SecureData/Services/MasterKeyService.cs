@@ -47,6 +47,12 @@ public sealed class MasterKeyService(
     }
 
     /// <inheritdoc />
+    public async Task<bool> IsMasterKeyDataExists(CancellationToken token)
+    {
+        return await masterKeyDataRepository.IsMasterKeyDataExists(token);
+    }
+
+    /// <inheritdoc />
     public Task ChangeLifetimeAsync(TimeSpan lifetime, CancellationToken token)
     {
         masterKeyStorage.ChangeLifetime(lifetime);
