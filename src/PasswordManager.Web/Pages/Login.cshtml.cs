@@ -21,6 +21,7 @@ public class LoginModel(
     IMasterKeyService masterKeyService,
     IWritableOptions<UserOptions> userOptions,
     IOptions<ConnectionOptions> connectionOptions,
+    IOptions<DevOptions> devOptions,
     ILogger<LoginModel> logger) : PageModel
 {
     /// <summary>
@@ -31,8 +32,14 @@ public class LoginModel(
     /// <summary>
     /// Get login page
     /// </summary>
-    public void OnGet()
+    public async Task<IActionResult> OnGetAsync(CancellationToken token)
     {
+        if (devOptions.Value.MasterPassword is not null)
+        {
+            return await OnPostAsync("/", devOptions.Value.MasterPassword, token);
+        }
+
+        return Page();
     }
 
     /// <summary>

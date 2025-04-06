@@ -57,6 +57,16 @@ public static class WebApplicationBuilderExtensions
     }
 
     /// <summary>
+    /// Add dev options to web application
+    /// </summary>
+    public static WebApplicationBuilder AddDevOptions(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .Configure<DevOptions>(builder.Configuration.GetSection("DevOptions"));
+        return builder;
+    }
+
+    /// <summary>
     /// Add AES crypto to web application
     /// </summary>
     public static WebApplicationBuilder AddAesCrypto(this WebApplicationBuilder builder)
