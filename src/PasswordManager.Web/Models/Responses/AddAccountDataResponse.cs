@@ -1,4 +1,4 @@
-namespace PasswordManager.Web.Models;
+namespace PasswordManager.Web.Models.Responses;
 
 /// <summary>
 /// Request for add/update account data

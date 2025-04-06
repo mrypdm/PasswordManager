@@ -7,8 +7,8 @@ using PasswordManager.Abstractions.Checkers;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Core;
-using PasswordManager.Web.Models;
 using PasswordManager.Web.Models.Requests;
+using PasswordManager.Web.Models.Responses;
 
 namespace PasswordManager.Web.Controllers;
 

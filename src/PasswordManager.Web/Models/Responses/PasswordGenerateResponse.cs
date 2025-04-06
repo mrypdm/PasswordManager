@@ -1,4 +1,4 @@
-namespace PasswordManager.Web.Models;
+namespace PasswordManager.Web.Models.Responses;
 
 /// <summary>
 /// Response for generating password

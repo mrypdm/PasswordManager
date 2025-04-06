@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.Models;
 using PasswordManager.SecureData.Repositories;
-using PasswordManager.Web.Models;
 using PasswordManager.Web.Models.Requests;
+using PasswordManager.Web.Models.Responses;
 
 namespace PasswordManager.Web.Controllers;
 
