@@ -30,7 +30,7 @@ public class AccountsController(ISecureItemsRepository secureItemsRepository) : 
         }
         catch (ItemNotExistsException)
         {
-            return NotFound();
+            return NotFound($"Cannot find account with id={accountId}");
         }
     }
 
@@ -86,7 +86,7 @@ public class AccountsController(ISecureItemsRepository secureItemsRepository) : 
         }
         catch (ItemNotExistsException)
         {
-            return NotFound();
+            return NotFound($"Cannot find account with id={accountId}");
         }
     }
 }
