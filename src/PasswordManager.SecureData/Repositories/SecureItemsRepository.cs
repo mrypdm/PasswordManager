@@ -69,7 +69,29 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     }
 
     /// <inheritdoc />
-    public async Task ReEncryptRepositoryAsync(byte[] newMasterKey, CancellationToken token)
+    public async Task SetMasterKeyDataAsync(byte[] masterKey, CancellationToken token)
+    {
+        keyValidator.Validate(masterKey);
+
+        if (await GetMasterKeyDataInternalAsync(token) is not null)
+        {
+            throw new MasterKeyDataExistsException();
+        }
+
+        var encryptedData = crypto.Encrypt(masterKey, masterKey);
+        var masterKeyData = new EncryptedDataDbModel
+        {
+            Name = nameof(MasterKeyService),
+            Salt = encryptedData.Salt,
+            Data = encryptedData.Data
+        };
+
+        await context.SecureItems.AddAsync(masterKeyData, token);
+        await context.SaveChangesAsync(token);
+    }
+
+    /// <inheritdoc />
+    public async Task ChangeMasterKeyDataAsync(byte[] newMasterKey, CancellationToken token)
     {
         keyValidator.Validate(newMasterKey);
 
@@ -96,28 +118,6 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
 
         await context.SaveChangesAsync(token);
         masterKeyStorage.ClearKey();
-    }
-
-    /// <inheritdoc />
-    public async Task SetMasterKeyDataAsync(byte[] masterKey, CancellationToken token)
-    {
-        keyValidator.Validate(masterKey);
-
-        if (await GetMasterKeyDataInternalAsync(token) is not null)
-        {
-            throw new MasterKeyDataExistsException();
-        }
-
-        var encryptedData = crypto.Encrypt(masterKey, masterKey);
-        var masterKeyData = new EncryptedDataDbModel
-        {
-            Name = nameof(MasterKeyService),
-            Salt = encryptedData.Salt,
-            Data = encryptedData.Data
-        };
-
-        await context.SecureItems.AddAsync(masterKeyData, token);
-        await context.SaveChangesAsync(token);
     }
 
     /// <inheritdoc />
@@ -150,16 +150,10 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     }
 
     /// <inheritdoc />
-    public async Task DeleteMasterKeyData(CancellationToken token)
+    public async Task DeleteMasterKeyDataAsync(CancellationToken token)
     {
         await context.Database.EnsureDeletedAsync(token);
         await context.Database.MigrateAsync(token);
-    }
-
-    /// <inheritdoc />
-    public async Task ChangeMasterKeyDataAsync(byte[] newMasterPassword, CancellationToken token)
-    {
-        await ReEncryptRepositoryAsync(newMasterPassword, token);
     }
 
     private Task<EncryptedDataDbModel> GetMasterKeyDataInternalAsync(CancellationToken token)

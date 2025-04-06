@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using PasswordManager.SecureData.Models;
@@ -12,11 +13,13 @@ public interface ISecureItemsRepository
     /// <summary>
     /// Add new account data to repository and return its ID
     /// </summary>
+    /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null</exception>
     Task<int> AddAccountAsync(AccountData data, CancellationToken token);
 
     /// <summary>
     /// Updates item with <paramref name="id"/> with new <paramref name="data"/>
     /// </summary>
+    /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null</exception>
     Task UpdateAccountAsync(int id, AccountData data, CancellationToken token);
 
     /// <summary>
@@ -28,9 +31,4 @@ public interface ISecureItemsRepository
     /// Get all items in repository
     /// </summary>
     Task<EncryptedDataDbModel[]> GetItemsAsync(CancellationToken token);
-
-    /// <summary>
-    /// Encrypts repository with new master key
-    /// </summary>
-    Task ReEncryptRepositoryAsync(byte[] newMasterKey, CancellationToken token);
 }

@@ -72,7 +72,7 @@ public sealed class MasterKeyService(
     public async Task ClearMasterKeyDataAsync(CancellationToken token)
     {
         await ClearMasterKeyAsync(token);
-        await masterKeyDataRepository.DeleteMasterKeyData(token);
+        await masterKeyDataRepository.DeleteMasterKeyDataAsync(token);
     }
 
     private async Task ValidateKeyAsync(byte[] masterKey, CancellationToken token)

@@ -21,8 +21,8 @@ public interface IMasterKeyDataRepository
     /// Changes master key data and re-encrypt all items repository
     /// </summary>
     /// <exception cref="MasterKeyDataNotExistsException">If master key data not exists</exception>
-    /// <exception cref="KeyValidationException">If <paramref name="newMasterPassword"/> is invalid</exception>
-    Task ChangeMasterKeyDataAsync(byte[] newMasterPassword, CancellationToken token);
+    /// <exception cref="KeyValidationException">If <paramref name="newMasterKey"/> is invalid</exception>
+    Task ChangeMasterKeyDataAsync(byte[] newMasterKey, CancellationToken token);
 
     /// <summary>
     /// Validates <paramref name="masterKey"/> with master key data
@@ -40,5 +40,5 @@ public interface IMasterKeyDataRepository
     /// <summary>
     /// Delete master key data and all items in repository
     /// </summary>
-    Task DeleteMasterKeyData(CancellationToken token);
+    Task DeleteMasterKeyDataAsync(CancellationToken token);
 }

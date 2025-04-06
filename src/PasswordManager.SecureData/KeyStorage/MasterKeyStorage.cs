@@ -15,10 +15,17 @@ public sealed class MasterKeyStorage(IKeyValidator keyValidator) : IMasterKeySto
     private readonly MemoryCache _cache = new(nameof(MasterKeyStorage));
 
     /// <inheritdoc />
-    public byte[] MasterKey => _cache.Get(CacheKey) as byte[];
+    public byte[] MasterKey
+    {
+        get
+        {
+            ThrowIfNotInitialized();
+            return _cache.Get(CacheKey) as byte[];
+        }
+    }
 
     /// <inheritdoc />
-    public bool IsInitialized => MasterKey is not null;
+    public bool IsInitialized => _cache.Get(CacheKey) is not null;
 
     /// <inheritdoc />
     public void InitStorage(byte[] masterKey, TimeSpan timeout)
@@ -53,7 +60,7 @@ public sealed class MasterKeyStorage(IKeyValidator keyValidator) : IMasterKeySto
 
     private void ThrowIfNotInitialized()
     {
-        if (MasterKey is null)
+        if (!IsInitialized)
         {
             throw new StorageIsNotInitializedException($"Storage is empty. Call {nameof(InitStorage)} first");
         }

@@ -12,7 +12,7 @@ public interface IMasterKeyStorage
     /// <summary>
     /// Current master key
     /// </summary>
-    /// <remarks>Can be <see langword="null"/> if storage has not been initialized or key has been expired</remarks>
+    /// <exception cref="StorageIsNotInitializedException">If storage not initialzied</exception>
     byte[] MasterKey { get; }
 
     /// <summary>
