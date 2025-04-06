@@ -106,7 +106,7 @@ public static class WebApplicationBuilderExtensions
             .AddDbContext<SecureDbContext>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("SecureDb")))
             .AddSingleton<IMasterKeyStorage, MasterKeyStorage>()
             .AddScoped<ISecureItemsRepository, SecureItemsRepository>()
-            .AddScoped<IMasterKeyDataRepository, SecureItemsRepository>()
+            .AddScoped<IMasterKeyDataRepository, MasterKeyDataRepository>()
             .AddScoped<IMasterKeyService, MasterKeyService>();
         return builder;
     }
