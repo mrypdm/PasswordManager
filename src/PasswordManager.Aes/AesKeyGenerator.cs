@@ -13,6 +13,7 @@ public sealed class AesKeyGenerator(byte[] salt, int iterations) : IKeyGenerator
     /// <inheritdoc />
     public byte[] Generate(string masterPassword)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(masterPassword);
         return Rfc2898DeriveBytes.Pbkdf2(Encoding.ASCII.GetBytes(masterPassword), _salt, iterations,
             HashAlgorithmName.SHA256, AesConstants.KeySize);
     }

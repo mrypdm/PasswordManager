@@ -8,9 +8,7 @@ namespace PasswordManager.Aes;
 /// </summary>
 public sealed class AesKeyValidator : IKeyValidator
 {
-    /// <summary>
-    /// Validate AES key
-    /// </summary>
+    /// <inheritdoc />
     public void Validate(byte[] key)
     {
         if (key is null)
