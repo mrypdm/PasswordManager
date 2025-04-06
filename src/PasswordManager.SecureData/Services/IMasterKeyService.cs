@@ -25,6 +25,11 @@ public interface IMasterKeyService
         IKeyGenerator newKeyGenerator, CancellationToken token);
 
     /// <summary>
+    /// Change lifetime of master key
+    /// </summary>
+    Task ChangeLifetimeAsync(TimeSpan lifetime, CancellationToken token);
+
+    /// <summary>
     /// Clear master key
     /// </summary>
     Task ClearMasterKeyAsync(CancellationToken token);

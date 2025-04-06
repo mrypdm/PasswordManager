@@ -47,6 +47,13 @@ public sealed class MasterKeyService(
     }
 
     /// <inheritdoc />
+    public Task ChangeLifetimeAsync(TimeSpan lifetime, CancellationToken token)
+    {
+        masterKeyStorage.ChangeLifetime(lifetime);
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
     public Task ClearMasterKeyAsync(CancellationToken token)
     {
         masterKeyStorage.ClearKey();

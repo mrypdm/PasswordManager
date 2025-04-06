@@ -34,7 +34,7 @@ public class UserSettingsController(
     /// </summary>
     [HttpPatch]
     [Route("session-timeout")]
-    public async Task<IActionResult> ChangeSessionTimeoutAsync([FromBody] ChangeSessionTimeoutRequest request,
+    public async Task<ActionResult> ChangeSessionTimeoutAsync([FromBody] ChangeSessionTimeoutRequest request,
         CancellationToken token)
     {
         if (!request.Validate(out var error))
@@ -43,6 +43,7 @@ public class UserSettingsController(
         }
 
         await userOptions.UpdateAsync(opt => opt.SessionTimeout = request.Timeout, token);
+        await masterKeyService.ChangeLifetimeAsync(request.Timeout, token);
         return Ok();
     }
 
@@ -51,7 +52,7 @@ public class UserSettingsController(
     /// </summary>
     [HttpPatch]
     [Route("master-key")]
-    public async Task<IActionResult> ChangeSessionTimeoutAsync([FromBody] ChangeMasterKeySettingsRequest request,
+    public async Task<ActionResult> ChangeSessionTimeoutAsync([FromBody] ChangeMasterKeySettingsRequest request,
         CancellationToken token)
     {
         if (!request.Validate(out var error))

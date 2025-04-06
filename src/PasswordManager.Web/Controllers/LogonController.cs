@@ -27,7 +27,7 @@ public class LogonController(
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SignInAsync([FromBody] LoginRequest request, CancellationToken token)
+    public async Task<ActionResult> SignInAsync([FromBody] LoginRequest request, CancellationToken token)
     {
         try
         {
@@ -46,7 +46,7 @@ public class LogonController(
     /// Sign out user with cookie
     /// </summary>
     [HttpDelete]
-    public async Task<IActionResult> SignOutAsync(CancellationToken token)
+    public async Task<ActionResult> SignOutAsync(CancellationToken token)
     {
         await masterKeyService.ClearMasterKeyAsync(token);
         await HttpContext.SignOutWithCookieAsync();
