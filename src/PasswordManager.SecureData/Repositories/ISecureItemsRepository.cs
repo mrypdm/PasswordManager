@@ -25,6 +25,11 @@ public interface ISecureItemsRepository
     Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token);
 
     /// <summary>
+    /// Get all items in repository
+    /// </summary>
+    Task<EncryptedDataDbModel[]> GetItemsAsync(CancellationToken token);
+
+    /// <summary>
     /// Encrypts repository with new master key
     /// </summary>
     Task ReEncryptRepositoryAsync(byte[] newMasterKey, CancellationToken token);

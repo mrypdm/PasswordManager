@@ -59,6 +59,12 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     }
 
     /// <inheritdoc />
+    public async Task<EncryptedDataDbModel[]> GetItemsAsync(CancellationToken token)
+    {
+        return await context.SecureItems.Skip(1).AsNoTracking().ToArrayAsync(token);
+    }
+
+    /// <inheritdoc />
     public async Task ReEncryptRepositoryAsync(byte[] newMasterKey, CancellationToken token)
     {
         var items = await context.SecureItems.ToArrayAsync(token);

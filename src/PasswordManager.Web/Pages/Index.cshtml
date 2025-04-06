@@ -4,7 +4,18 @@
     ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@Html.AntiForgeryToken()
+
+<table id="items-table" border="1">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th></th>
+        <th></th>
+        <th></th>
+    </tr>
+</table>
+
+<script>
+    onload = async () => { await getHeaders(); };
+</script>

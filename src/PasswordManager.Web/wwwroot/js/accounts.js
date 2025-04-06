@@ -1,3 +1,8 @@
+async function getAccountDataRaw(accountId) {
+    let response = await send(`api/account/${accountId}`, "POST", null, getCsrfTokenHeader());
+    return await response.json();
+}
+
 async function getAccountData(accountId) {
     if (accountId === -1) {
         return;
@@ -8,8 +13,7 @@ async function getAccountData(accountId) {
     let passwordBox = document.getElementById("account-data-password");
 
     try {
-        let response = await send(`api/account/${accountId}`, "POST", null, getCsrfTokenHeader());
-        response = await response.json();
+        response = await getAccountDataRaw(accountId)
         nameBox.value = response.name;
         loginBox.value = response.login;
         passwordBox.type = "password";
@@ -46,9 +50,9 @@ async function postAccountData(accountId) {
 
 async function addAccountData(data) {
     try {
-        let reponse = await send("api/account", "POST", data, getCsrfTokenHeader());
+        let response = await send("api/account", "POST", data, getCsrfTokenHeader());
         response = await response.json();
-        location.replace(`/account?id=${reponse.id}`);
+        location.replace(`/account?id=${response.id}`);
     } catch (response) {
         let text = await response.text()
         alert(text);

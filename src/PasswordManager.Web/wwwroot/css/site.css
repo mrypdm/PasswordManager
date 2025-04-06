@@ -21,13 +21,14 @@ body {
   margin-bottom: 60px;
 }
 
-.input-form {
-    width: 50%;
+table, td, th {
+    border: 1px solid black;
+    text-align: center
 }
 
-.column {
-    float: left;
-    width: 35%;
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .row:after {
