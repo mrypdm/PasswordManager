@@ -27,12 +27,12 @@ public interface IMasterKeyService
     /// <summary>
     /// Check if master key data exists
     /// </summary>
-    Task<bool> IsMasterKeyDataExists(CancellationToken token);
+    Task<bool> IsMasterKeyDataExistsAsync(CancellationToken token);
 
     /// <summary>
-    /// Change lifetime of master key
+    /// Change timeout of master key
     /// </summary>
-    Task ChangeLifetimeAsync(TimeSpan lifetime, CancellationToken token);
+    Task ChangeKeyTimeoutAsync(TimeSpan timeout, CancellationToken token);
 
     /// <summary>
     /// Clear master key

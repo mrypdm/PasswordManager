@@ -14,14 +14,14 @@ public interface IMasterKeyStorage
     byte[] MasterKey { get; }
 
     /// <summary>
-    /// Init storage with master key and Key lifetime
+    /// Init storage with master key and Key life timeout
     /// </summary>
-    void InitStorage(byte[] masterKey, TimeSpan keyLifeTime);
+    void InitStorage(byte[] masterKey, TimeSpan timeout);
 
     /// <summary>
-    /// Change current lifetime of master key
+    /// Change current timeout of master key
     /// </summary>
-    void ChangeLifetime(TimeSpan keyLifeTime);
+    void ChangeTimeout(TimeSpan timeout);
 
     /// <summary>
     /// Clear key from storage

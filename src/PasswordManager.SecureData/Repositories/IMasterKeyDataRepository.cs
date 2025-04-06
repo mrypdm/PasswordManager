@@ -23,7 +23,7 @@ public interface IMasterKeyDataRepository
     /// <summary>
     /// Check if master key data exists
     /// </summary>
-    Task<bool> IsMasterKeyDataExists(CancellationToken token);
+    Task<bool> IsMasterKeyDataExistsAsync(CancellationToken token);
 
     /// <summary>
     /// Delete master key data and all items in repository

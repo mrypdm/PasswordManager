@@ -23,7 +23,7 @@ public sealed class MasterKeyStorage : IMasterKeyStorage, IDisposable
     }
 
     /// <inheritdoc />
-    public void ChangeLifetime(TimeSpan keyLifeTime)
+    public void ChangeTimeout(TimeSpan keyLifeTime)
     {
         ThrowIfNotInitialized();
         _cache.Set(CacheKey, MasterKey, new CacheItemPolicy { SlidingExpiration = keyLifeTime });

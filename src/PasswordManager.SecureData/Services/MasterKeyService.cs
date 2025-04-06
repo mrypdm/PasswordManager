@@ -47,15 +47,15 @@ public sealed class MasterKeyService(
     }
 
     /// <inheritdoc />
-    public async Task<bool> IsMasterKeyDataExists(CancellationToken token)
+    public async Task<bool> IsMasterKeyDataExistsAsync(CancellationToken token)
     {
-        return await masterKeyDataRepository.IsMasterKeyDataExists(token);
+        return await masterKeyDataRepository.IsMasterKeyDataExistsAsync(token);
     }
 
     /// <inheritdoc />
-    public Task ChangeLifetimeAsync(TimeSpan lifetime, CancellationToken token)
+    public Task ChangeKeyTimeoutAsync(TimeSpan sessionTimeout, CancellationToken token)
     {
-        masterKeyStorage.ChangeLifetime(lifetime);
+        masterKeyStorage.ChangeTimeout(sessionTimeout);
         return Task.CompletedTask;
     }
 

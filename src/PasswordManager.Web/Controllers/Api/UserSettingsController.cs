@@ -43,7 +43,7 @@ public class UserSettingsController(
         }
 
         await userOptions.UpdateAsync(opt => opt.SessionTimeout = request.Timeout, token);
-        await masterKeyService.ChangeLifetimeAsync(request.Timeout, token);
+        await masterKeyService.ChangeKeyTimeoutAsync(request.Timeout, token);
         return Ok();
     }
 

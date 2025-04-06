@@ -29,6 +29,6 @@ public class LoginModel(IMasterKeyService masterKeyService) : PageModel
     public async Task OnGetAsync([FromQuery] string returnUrl, CancellationToken token)
     {
         ReturnUrl = returnUrl ?? "/";
-        IsMasterKeyDataExists = await masterKeyService.IsMasterKeyDataExists(token);
+        IsMasterKeyDataExists = await masterKeyService.IsMasterKeyDataExistsAsync(token);
     }
 }
