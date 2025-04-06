@@ -4,12 +4,18 @@
     ViewData["Title"] = "Login";
 }
 
-<form method="post" enctype="multipart/form-data">
-    <input id="password-box" asp name="masterPassword" type="password" placeholder="Master password" class="input-form" />
-    <input type="checkbox" onclick="showPassword('password-box')" />
-    <br/>
-    <br/>
-    <input type="submit" value="Login" />
-</form>
+@Html.AntiForgeryToken()
 
-<p style="color: red">@Model.AlertMessage</p>
+<div>
+    <div class="row">
+        <div class="column">
+            <label for="master-password">Master password</label>
+        </div>
+        <div class="column">
+            <input id="master-password" placeholder="Master password" type="password" />
+            <input type="checkbox" onclick="showPassword('master-password')" />
+        </div>
+    </div>
+
+    <input type="button" value="Login" onclick="logon('@(Model.ReturnUrl)')" />
+</div>

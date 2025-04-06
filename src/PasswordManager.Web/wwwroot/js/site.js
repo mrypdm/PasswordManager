@@ -1,3 +1,28 @@
+async function logout() {
+    await send("api/logon", "DELETE");
+    location.replace("/login");
+}
+
+async function logon(redirect) {
+    let passwordBox = document.getElementById("master-password");
+    let data = {
+        "MasterPassword": passwordBox.value,
+    }
+    let headers = {
+        "X-CSRF-TOKEN": $('input[name="__RequestVerificationToken"]').val()
+    }
+
+    try {
+        await send("api/logon", "POST", data, headers);
+        location.replace(redirect)
+    } catch (response) {
+        let text = await response.text()
+        if (response.status === 401) {
+            alert(text);
+        }
+    }
+}
+
 async function getAccountData(accountId) {
     if (accountId === -1) {
         return;
@@ -8,7 +33,8 @@ async function getAccountData(accountId) {
     let passwordBox = document.getElementById("account-data-password");
 
     try {
-        let response = await send(`api/account/${accountId}`, "POST", true);
+        let response = await send(`api/account/${accountId}`, "POST");
+        response = await response.json();
         nameBox.value = response.name;
         loginBox.value = response.login;
         passwordBox.type = "password";
@@ -33,10 +59,11 @@ async function postAccountData(accountId) {
     }
 
     if (accountId === -1) {
-        let result = await send_json("api/account", "POST", data, true);
+        let result = await send("api/account", "POST", data);
+        response = await response.json();
         location.replace(`/account?id=${result.id}`);
     } else {
-        await send_json(`api/account/${accountId}`, "PUT", data, false);
+        await send(`api/account/${accountId}`, "PUT", data);
         location.reload();
     }
 }
@@ -46,7 +73,8 @@ async function verifyPassword(passwordBoxId) {
     let data = {
         "Password": passwordBox.value
     };
-    let response = await send_json("api/password/verify", "POST", data, true);
+    let response = await send("api/password/verify", "POST", data);
+    response = await response.json();
     alert(buildCheckStatus(response));
 }
 
@@ -68,7 +96,8 @@ async function generatePassword()
         "SpecialSymbols": useCharactersBox.value
     }
 
-    let response = await send_json("api/password/generate", "POST", data, true);
+    let response = await send("api/password/generate", "POST", data);
+    response = await response.json();
     passwordBox.value = response.password;
     passwordVerifyResult.innerHTML = buildCheckStatus(response.checkStatus)
 }

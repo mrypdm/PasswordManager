@@ -1,0 +1,55 @@
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using PasswordManager.SecureData.Exceptions;
+using PasswordManager.SecureData.Services;
+using PasswordManager.UserSettings;
+using PasswordManager.Web.Extensions;
+using PasswordManager.Web.Models.Requests;
+using PasswordManager.Web.Options;
+
+namespace PasswordManager.Web.Controllers;
+
+/// <summary>
+/// Controller for logon
+/// </summary>
+[AllowAnonymous]
+[Route("api/logon")]
+public class LogonController(
+    IMasterKeyService masterKeyService,
+    IWritableOptions<UserOptions> userOptions,
+    IOptions<SessionOptions> connectionOptions) : Controller
+{
+    /// <summary>
+    /// Sign in user with cookie
+    /// </summary>
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SignInAsync([FromBody] LoginRequest request, CancellationToken token)
+    {
+        try
+        {
+            await masterKeyService.InitMasterKeyAsync(request.MasterPassword, userOptions.Value.SessionTimeout, token);
+        }
+        catch (InvalidMasterKeyException)
+        {
+            return Unauthorized("Master password is invalid");
+        }
+
+        await HttpContext.SignInWithCookieAsync(connectionOptions.Value);
+        return Ok();
+    }
+
+    /// <summary>
+    /// Sign out user with cookie
+    /// </summary>
+    [HttpDelete]
+    public async Task<IActionResult> SignOutAsync(CancellationToken token)
+    {
+        await masterKeyService.ClearMasterKeyAsync(token);
+        await HttpContext.SignOutWithCookieAsync();
+        return Ok();
+    }
+}

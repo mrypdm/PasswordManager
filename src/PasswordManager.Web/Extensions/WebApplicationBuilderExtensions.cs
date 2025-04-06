@@ -52,17 +52,7 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddConnectionOptions(this WebApplicationBuilder builder)
     {
         builder.Services
-            .Configure<ConnectionOptions>(builder.Configuration.GetSection("ConnectionOptions"));
-        return builder;
-    }
-
-    /// <summary>
-    /// Add dev options to web application
-    /// </summary>
-    public static WebApplicationBuilder AddDevOptions(this WebApplicationBuilder builder)
-    {
-        builder.Services
-            .Configure<DevOptions>(builder.Configuration.GetSection("DevOptions"));
+            .Configure<Options.SessionOptions>(builder.Configuration.GetSection("ConnectionOptions"));
         return builder;
     }
 
@@ -152,6 +142,10 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddRazorPages(this WebApplicationBuilder builder)
     {
         builder.Services
+            .AddAntiforgery(opt =>
+            {
+                opt.HeaderName = "X-CSRF-TOKEN";
+            })
             .ConfigureHttpJsonOptions(opt => opt.SerializerOptions.Converters.Add(new JsonStringEnumConverter()))
             .AddRouting(opt => opt.LowercaseUrls = true);
         builder.Services

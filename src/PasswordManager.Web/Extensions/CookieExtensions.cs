@@ -22,7 +22,7 @@ public static class CookieExtensions
     /// <summary>
     /// Sign in with cookie
     /// </summary>
-    public static async Task SignInWithCookieAsync(this HttpContext context, ConnectionOptions connectionOptions)
+    public static async Task SignInWithCookieAsync(this HttpContext context, SessionOptions connectionOptions)
     {
         var ip = GetUserIpAddress(context, connectionOptions.IsProxyUsed)
             ?? throw new InvalidOperationException("Cannot determine IP of user");
@@ -52,7 +52,7 @@ public static class CookieExtensions
         }
 
         var connectionOptions = context.HttpContext.RequestServices
-            .GetRequiredService<IOptions<ConnectionOptions>>();
+            .GetRequiredService<IOptions<SessionOptions>>();
         var ip = GetUserIpAddress(context.HttpContext, connectionOptions.Value.IsProxyUsed)
             ?? throw new InvalidOperationException("Cannot determine IP of user");
         if (!ValidateIpAddress(context.Principal, ip))
