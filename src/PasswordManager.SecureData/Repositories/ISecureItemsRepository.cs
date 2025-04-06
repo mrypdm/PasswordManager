@@ -6,7 +6,7 @@ using PasswordManager.SecureData.Models;
 namespace PasswordManager.SecureData.Repositories;
 
 /// <summary>
-/// Repository for <see cref="EncryptedDataDbModel"/>
+/// Repository for <see cref="SecureItemDbModel"/>
 /// </summary>
 public interface ISecureItemsRepository
 {
@@ -30,5 +30,5 @@ public interface ISecureItemsRepository
     /// <summary>
     /// Get all items in repository
     /// </summary>
-    Task<EncryptedDataDbModel[]> GetItemsAsync(CancellationToken token);
+    Task<SecureItemDbModel[]> GetItemsAsync(CancellationToken token);
 }

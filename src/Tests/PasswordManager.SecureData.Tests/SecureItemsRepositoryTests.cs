@@ -67,12 +67,15 @@ public class SecureItemsRepositoryTests
 
         using (var context = CreateDbContext())
         {
-            var dbData = context.SecureItems.FirstOrDefault();
+            var dbData = context.MasterKeyData.SingleOrDefault();
             Assert.That(dbData, Is.Not.Null);
-            Assert.That(dbData.Data.SequenceEqual(keyData.Data), Is.True, "Data in db and local must be same");
-            Assert.That(dbData.Salt.SequenceEqual(keyData.Salt), Is.True, "Salt in db and local must be same");
-            Assert.That(dbData.Id, Is.EqualTo(expectedId));
-            Assert.That(dbData.Version, Is.EqualTo(expectedVersion));
+            Assert.Multiple(() =>
+            {
+                Assert.That(dbData.Data.SequenceEqual(keyData.Data), Is.True, "Data in db and local must be same");
+                Assert.That(dbData.Salt.SequenceEqual(keyData.Salt), Is.True, "Salt in db and local must be same");
+                Assert.That(dbData.Id, Is.EqualTo(expectedId));
+                Assert.That(dbData.Version, Is.EqualTo(expectedVersion));
+            });
         }
     }
 
@@ -82,7 +85,7 @@ public class SecureItemsRepositoryTests
         // arrange
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(new EncryptedDataDbModel() { Name = "", Data = [], Salt = [] });
+            context.MasterKeyData.Add(new MasterKeyDataDbModel() { Data = [], Salt = [] });
             context.SaveChanges();
         }
 
@@ -125,12 +128,12 @@ public class SecureItemsRepositoryTests
             .Setup(m => m.Encrypt(newKey, newKey))
             .Returns(encryptedNewKey);
 
-        var encryptedOldItem = new EncryptedDataDbModel() { Name = expectedName, Data = [], Salt = [] };
+        var encryptedOldItem = new SecureItemDbModel() { Name = expectedName, Data = [], Salt = [] };
         var decrypted = new AccountData();
         var encryptedNewItem = new EncryptedData() { Data = [14], Salt = [15] };
         _cryptoMock
             .Setup(m => m.DecryptJson<AccountData>(
-                It.Is<EncryptedDataDbModel>(t => t.Name == expectedName),
+                It.Is<SecureItemDbModel>(t => t.Name == expectedName),
                 oldKey))
             .Returns(decrypted);
         _cryptoMock
@@ -139,7 +142,7 @@ public class SecureItemsRepositoryTests
 
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(new EncryptedDataDbModel() { Name = "", Data = [], Salt = [] });
+            context.MasterKeyData.Add(new MasterKeyDataDbModel() { Data = [], Salt = [] });
             context.SecureItems.Add(encryptedOldItem);
             context.SaveChanges();
         }
@@ -157,26 +160,32 @@ public class SecureItemsRepositoryTests
         _storageMock.Verify(m => m.MasterKey, Times.Once);
         _cryptoMock.Verify(m =>
             m.DecryptJson<AccountData>(
-                It.Is<EncryptedDataDbModel>(t => t.Name == expectedName),
+                It.Is<SecureItemDbModel>(t => t.Name == expectedName),
                 oldKey),
             Times.Once);
         _cryptoMock.Verify(m => m.EncryptJson(decrypted, newKey), Times.Once);
 
         using (var context = CreateDbContext())
         {
-            var dbKey = context.SecureItems.FirstOrDefault();
+            var dbKey = context.MasterKeyData.SingleOrDefault();
             Assert.That(dbKey, Is.Not.Null);
-            Assert.That(dbKey.Data.SequenceEqual(encryptedNewKey.Data), Is.True, "Data in db and local must be same");
-            Assert.That(dbKey.Salt.SequenceEqual(encryptedNewKey.Salt), Is.True, "Salt in db and local must be same");
-            Assert.That(dbKey.Id, Is.EqualTo(expectedId));
-            Assert.That(dbKey.Version, Is.EqualTo(expectedVersion));
+            Assert.Multiple(() =>
+            {
+                Assert.That(dbKey.Data.SequenceEqual(encryptedNewKey.Data), Is.True, "Data in db and local must be same");
+                Assert.That(dbKey.Salt.SequenceEqual(encryptedNewKey.Salt), Is.True, "Salt in db and local must be same");
+                Assert.That(dbKey.Id, Is.EqualTo(expectedId));
+                Assert.That(dbKey.Version, Is.EqualTo(expectedVersion));
+            });
 
-            var dbItem = context.SecureItems.ElementAtOrDefault(1);
+            var dbItem = context.SecureItems.SingleOrDefault();
             Assert.That(dbItem, Is.Not.Null);
-            Assert.That(dbItem.Data.SequenceEqual(encryptedNewItem.Data), Is.True, "Data in db and local must be same");
-            Assert.That(dbItem.Salt.SequenceEqual(encryptedNewItem.Salt), Is.True, "Salt in db and local must be same");
-            Assert.That(dbItem.Id, Is.EqualTo(expectedId + 1));
-            Assert.That(dbItem.Version, Is.EqualTo(expectedVersion));
+            Assert.Multiple(() =>
+            {
+                Assert.That(dbItem.Data.SequenceEqual(encryptedNewItem.Data), Is.True, "Data in db and local must be same");
+                Assert.That(dbItem.Salt.SequenceEqual(encryptedNewItem.Salt), Is.True, "Salt in db and local must be same");
+                Assert.That(dbItem.Id, Is.EqualTo(expectedId));
+                Assert.That(dbItem.Version, Is.EqualTo(expectedVersion));
+            });
         }
     }
 
@@ -196,17 +205,17 @@ public class SecureItemsRepositoryTests
     public async Task ValidateMasterKeyData_MasterKeyDataExists_ShouldValidateKeyAndDecrypData()
     {
         // arrange
-        var expectedName = "keyData";
+        var expectedId = 1;
         var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new EncryptedDataDbModel() { Name = expectedName, Data = [], Salt = [] };
+        var keyData = new MasterKeyDataDbModel() { Data = [], Salt = [] };
 
         _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<EncryptedDataDbModel>(m => m.Name == expectedName), key))
+            .Setup(m => m.Decrypt(It.Is<MasterKeyDataDbModel>(m => m.Id == expectedId), key))
             .Returns(key);
 
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(keyData);
+            context.MasterKeyData.Add(keyData);
             context.SaveChanges();
         }
 
@@ -219,24 +228,24 @@ public class SecureItemsRepositoryTests
 
         // assert
         _validatorMock.Verify(m => m.Validate(key), Times.Once);
-        _cryptoMock.Verify(m => m.Decrypt(It.Is<EncryptedDataDbModel>(m => m.Name == expectedName), key), Times.Once);
+        _cryptoMock.Verify(m => m.Decrypt(It.Is<MasterKeyDataDbModel>(m => m.Id == expectedId), key), Times.Once);
     }
 
     [Test]
     public void ValidateMasterKeyData_CryptoExceptionThrown_ShouldThrow()
     {
         // arrange
-        var expectedName = "keyData";
+        var expectedId = 1;
         var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new EncryptedDataDbModel() { Name = expectedName, Data = [], Salt = [] };
+        var keyData = new MasterKeyDataDbModel() { Data = [], Salt = [] };
 
         _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<EncryptedDataDbModel>(m => m.Name == expectedName), key))
+            .Setup(m => m.Decrypt(It.Is<MasterKeyDataDbModel>(m => m.Id == expectedId), key))
             .Throws(new CryptographicException());
 
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(keyData);
+            context.MasterKeyData.Add(keyData);
             context.SaveChanges();
         }
 
@@ -253,17 +262,17 @@ public class SecureItemsRepositoryTests
     public void ValidateMasterKeyData_DifferentKey_ShouldThrow()
     {
         // arrange
-        var expectedName = "keyData";
+        var expectedId = 1;
         var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new EncryptedDataDbModel() { Name = expectedName, Data = [], Salt = [] };
+        var keyData = new MasterKeyDataDbModel() { Data = [], Salt = [] };
 
         _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<EncryptedDataDbModel>(m => m.Name == expectedName), key))
+            .Setup(m => m.Decrypt(It.Is<MasterKeyDataDbModel>(m => m.Id == expectedId), key))
             .Returns([]);
 
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(keyData);
+            context.MasterKeyData.Add(keyData);
             context.SaveChanges();
         }
 
@@ -282,7 +291,7 @@ public class SecureItemsRepositoryTests
         // arrange
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(new EncryptedDataDbModel() { Name = "", Data = [], Salt = [] });
+            context.MasterKeyData.Add(new MasterKeyDataDbModel() { Data = [], Salt = [] });
             context.SaveChanges();
         }
 
@@ -316,7 +325,7 @@ public class SecureItemsRepositoryTests
         // arrange
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(new EncryptedDataDbModel() { Name = "", Data = [], Salt = [] });
+            context.MasterKeyData.Add(new MasterKeyDataDbModel() { Data = [], Salt = [] });
             context.SaveChanges();
         }
 
@@ -378,10 +387,13 @@ public class SecureItemsRepositoryTests
         {
             var dbData = context.SecureItems.FirstOrDefault();
             Assert.That(dbData, Is.Not.Null);
-            Assert.That(dbData.Data.SequenceEqual(encrypted.Data), Is.True, "Data in db and local must be same");
-            Assert.That(dbData.Salt.SequenceEqual(encrypted.Salt), Is.True, "Salt in db and local must be same");
-            Assert.That(dbData.Id, Is.EqualTo(expectedId));
-            Assert.That(dbData.Version, Is.EqualTo(expectedVersion));
+            Assert.Multiple(() =>
+            {
+                Assert.That(dbData.Data.SequenceEqual(encrypted.Data), Is.True, "Data in db and local must be same");
+                Assert.That(dbData.Salt.SequenceEqual(encrypted.Salt), Is.True, "Salt in db and local must be same");
+                Assert.That(dbData.Id, Is.EqualTo(expectedId));
+                Assert.That(dbData.Version, Is.EqualTo(expectedVersion));
+            });
         }
     }
 
@@ -404,7 +416,7 @@ public class SecureItemsRepositoryTests
         var expectedId = 3;
         var key = RandomNumberGenerator.GetBytes(32);
         var expectedAccount = new AccountData();
-        var item = new EncryptedDataDbModel
+        var item = new SecureItemDbModel
         {
             Name = "needed",
             Data = [],
@@ -415,7 +427,7 @@ public class SecureItemsRepositoryTests
             .Setup(m => m.MasterKey)
             .Returns(key);
         _cryptoMock
-            .Setup(m => m.DecryptJson<AccountData>(It.Is<EncryptedDataDbModel>(m => m.Name == item.Name), key))
+            .Setup(m => m.DecryptJson<AccountData>(It.Is<SecureItemDbModel>(m => m.Name == item.Name), key))
             .Returns(expectedAccount);
 
         using (var context = CreateDbContext())
@@ -437,21 +449,22 @@ public class SecureItemsRepositoryTests
 
         _storageMock.Verify(m => m.MasterKey, Times.Once);
         _cryptoMock.Verify(
-            m => m.DecryptJson<AccountData>(It.Is<EncryptedDataDbModel>(m => m.Name == item.Name), key),
+            m => m.DecryptJson<AccountData>(It.Is<SecureItemDbModel>(m => m.Name == item.Name), key),
             Times.Once);
     }
 
     [Test]
-    public async Task GetItems_ShouldReturnAllExceptFirst()
+    public async Task GetItems_ShouldReturnAll()
     {
         // arrange
-        var expectedName = "second";
-        var expectedLength = 1;
+        var expectedName0 = "first";
+        var expectedName1 = "second";
+        var expectedLength = 2;
 
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(new() { Name = "first", Data = [], Salt = [] });
-            context.SecureItems.Add(new() { Name = expectedName, Data = [], Salt = [] });
+            context.SecureItems.Add(new() { Name = expectedName0, Data = [], Salt = [] });
+            context.SecureItems.Add(new() { Name = expectedName1, Data = [], Salt = [] });
             context.SaveChanges();
         }
 
@@ -462,8 +475,12 @@ public class SecureItemsRepositoryTests
             var repo = CreateRepository(context);
             var items = await repo.GetItemsAsync(default);
 
-            Assert.That(items.Length, Is.EqualTo(expectedLength));
-            Assert.That(items[0].Name, Is.EqualTo(expectedName));
+            Assert.That(items, Has.Length.EqualTo(expectedLength));
+            Assert.Multiple(() =>
+            {
+                Assert.That(items[0].Name, Is.EqualTo(expectedName0));
+                Assert.That(items[1].Name, Is.EqualTo(expectedName1));
+            });
         }
     }
 
@@ -472,7 +489,7 @@ public class SecureItemsRepositoryTests
         return new SecureItemsRepository(context, _cryptoMock.Object, _storageMock.Object, _validatorMock.Object);
     }
 
-    public static SecureDbContext CreateDbContext()
+    private static SecureDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder()
             .UseSqlite("Filename=fake-secure-db.db")

@@ -30,7 +30,7 @@ public class MasterKeyStorageServiceTests
 
         // act
         // assert
-        Assert.Throws<StorageNotInitializedException>(() => { storage.MasterKey.Any(); });
+        Assert.Throws<StorageNotInitializedException>(() => { storage.MasterKey.ToArray(); });
     }
 
     [Test]

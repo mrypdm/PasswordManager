@@ -5,12 +5,12 @@ using PasswordManager.SecureData.Models;
 namespace PasswordManager.SecureData.Configurations;
 
 /// <summary>
-/// Configuration for <see cref="EncryptedDataDbModel"/>
+/// Configuration for <see cref="SecureItemDbModel"/>
 /// </summary>
-public sealed class EncryptedDataDbModelConfiguration : IEntityTypeConfiguration<EncryptedDataDbModel>
+public class SecureItemDbModelConfiguration : IEntityTypeConfiguration<SecureItemDbModel>
 {
     /// <inheritdoc />
-    public void Configure(EntityTypeBuilder<EncryptedDataDbModel> builder)
+    public void Configure(EntityTypeBuilder<SecureItemDbModel> builder)
     {
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Id).ValueGeneratedOnAdd();

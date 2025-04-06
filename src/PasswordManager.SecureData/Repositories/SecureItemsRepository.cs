@@ -10,7 +10,6 @@ using PasswordManager.SecureData.Contexts;
 using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.SecureData.Models;
-using PasswordManager.SecureData.Services;
 
 namespace PasswordManager.SecureData.Repositories;
 
@@ -26,7 +25,7 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
 
         var encryptedData = crypto.EncryptJson(data, masterKeyStorage.MasterKey);
 
-        var secureItem = new EncryptedDataDbModel
+        var secureItem = new SecureItemDbModel
         {
             Name = data.Name,
             Salt = encryptedData.Salt,
@@ -63,9 +62,9 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     }
 
     /// <inheritdoc />
-    public async Task<EncryptedDataDbModel[]> GetItemsAsync(CancellationToken token)
+    public async Task<SecureItemDbModel[]> GetItemsAsync(CancellationToken token)
     {
-        return await context.SecureItems.Skip(1).AsNoTracking().ToArrayAsync(token);
+        return await context.SecureItems.AsNoTracking().ToArrayAsync(token);
     }
 
     /// <inheritdoc />
@@ -79,14 +78,13 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
         }
 
         var encryptedData = crypto.Encrypt(masterKey, masterKey);
-        var masterKeyData = new EncryptedDataDbModel
+        var masterKeyData = new MasterKeyDataDbModel
         {
-            Name = nameof(MasterKeyService),
             Salt = encryptedData.Salt,
             Data = encryptedData.Data
         };
 
-        await context.SecureItems.AddAsync(masterKeyData, token);
+        await context.MasterKeyData.AddAsync(masterKeyData, token);
         await context.SaveChangesAsync(token);
     }
 
@@ -95,19 +93,15 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     {
         keyValidator.Validate(newMasterKey);
 
-        var items = await context.SecureItems.ToArrayAsync(token);
-        if (items.Length == 0)
-        {
-            throw new MasterKeyDataNotExistsException();
-        }
-
-        var masterKeyDataItem = items[0];
+        var masterKeyData = await GetMasterKeyDataInternalAsync(token)
+            ?? throw new MasterKeyDataNotExistsException();
         var newMasterKeyData = crypto.Encrypt(newMasterKey, newMasterKey);
-        masterKeyDataItem.Salt = newMasterKeyData.Salt;
-        masterKeyDataItem.Data = newMasterKeyData.Data;
-        context.SecureItems.Update(masterKeyDataItem);
+        masterKeyData.Salt = newMasterKeyData.Salt;
+        masterKeyData.Data = newMasterKeyData.Data;
+        context.MasterKeyData.Update(masterKeyData);
 
-        foreach (var item in items[1..])
+        var items = await context.SecureItems.ToArrayAsync(token);
+        foreach (var item in items)
         {
             var decrypted = crypto.DecryptJson<AccountData>(item, masterKeyStorage.MasterKey);
             var encrypted = crypto.EncryptJson(decrypted, newMasterKey);
@@ -156,8 +150,8 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
         await context.Database.MigrateAsync(token);
     }
 
-    private Task<EncryptedDataDbModel> GetMasterKeyDataInternalAsync(CancellationToken token)
+    private Task<MasterKeyDataDbModel> GetMasterKeyDataInternalAsync(CancellationToken token)
     {
-        return context.SecureItems.SingleOrDefaultAsync(m => m.Id == 1, token);
+        return context.MasterKeyData.SingleOrDefaultAsync(token);
     }
 }

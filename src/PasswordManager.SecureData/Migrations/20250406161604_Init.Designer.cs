@@ -10,7 +10,7 @@ using PasswordManager.SecureData.Contexts;
 namespace PasswordManager.SecureData.Migrations
 {
     [DbContext(typeof(SecureDbContext))]
-    [Migration("20250403075436_Init")]
+    [Migration("20250406161604_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -19,7 +19,32 @@ namespace PasswordManager.SecureData.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
 
-            modelBuilder.Entity("PasswordManager.SecureData.Models.EncryptedDataDbModel", b =>
+            modelBuilder.Entity("PasswordManager.SecureData.Models.MasterKeyDataDbModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<byte[]>("Salt")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<long>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MasterKeyData");
+                });
+
+            modelBuilder.Entity("PasswordManager.SecureData.Models.SecureItemDbModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

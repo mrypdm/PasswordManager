@@ -12,7 +12,12 @@ public sealed class SecureDbContext(DbContextOptions options) : DbContext(option
     /// <summary>
     /// Secure items
     /// </summary>
-    public DbSet<EncryptedDataDbModel> SecureItems { get; set; }
+    public DbSet<SecureItemDbModel> SecureItems { get; set; }
+
+    /// <summary>
+    /// Master key data
+    /// </summary>
+    public DbSet<MasterKeyDataDbModel> MasterKeyData { get; set; }
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)

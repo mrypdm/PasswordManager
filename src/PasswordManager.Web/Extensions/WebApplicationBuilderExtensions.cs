@@ -63,14 +63,14 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services
             .AddSingleton<IKeyGeneratorFactory, AesKeyGeneratorFactory>()
+            .AddSingleton<IKeyValidator, AesKeyValidator>()
+            .AddSingleton<ICrypto, AesCrypto>()
             .AddScoped(services =>
             {
                 var userOptions = services.GetRequiredService<IWritableOptions<UserOptions>>();
                 var factory = services.GetRequiredService<IKeyGeneratorFactory>();
                 return factory.Create(userOptions.Value.MasterKeySaltBytes, userOptions.Value.MasterKeyIterations);
-            })
-            .AddScoped<IKeyValidator, AesKeyValidator>()
-            .AddScoped<ICrypto, AesCrypto>();
+            });
         return builder;
     }
 

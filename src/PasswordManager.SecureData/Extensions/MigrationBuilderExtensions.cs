@@ -8,20 +8,20 @@ namespace PasswordManager.SecureData.Extensions;
 public static class MigrationBuilderExtensions
 {
     /// <summary>
-    /// Add trigger for updating <paramref name="columnName"/> in <paramref name="tableName"/> at each row update
+    /// Add trigger for updating <paramref name="column"/> in <paramref name="table"/> at each row update
     /// </summary>
     /// <remarks>
-    /// <paramref name="columnName"/> must be <see langword="int"/> or other number format
+    /// <paramref name="column"/> must be <see langword="int"/> or other number format
     /// </remarks>
-    public static void AddVersionTrigger(this MigrationBuilder builder, string tableName, string columnName)
+    public static void AddVersionTrigger(this MigrationBuilder builder, string table, string column)
     {
         builder.Sql(
             $$"""
-            CREATE TRIGGER Set_{{tableName}}_{{columnName}}_OnUpdate
-            AFTER UPDATE ON {{tableName}}
+            CREATE TRIGGER Set_{{table}}_{{column}}_OnUpdate
+            AFTER UPDATE ON {{table}}
             BEGIN
-                UPDATE {{tableName}}
-                SET {{columnName}} = {{columnName}} + 1
+                UPDATE {{table}}
+                SET {{column}} = {{column}} + 1
                 WHERE rowid = NEW.rowid;
             END
             """);
