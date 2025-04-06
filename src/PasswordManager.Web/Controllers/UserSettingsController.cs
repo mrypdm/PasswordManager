@@ -30,7 +30,7 @@ public class UserSettingsController(
     }
 
     /// <summary>
-    /// Changes session timeout
+    /// Change session timeout
     /// </summary>
     [HttpPatch]
     [Route("session-timeout")]
@@ -48,7 +48,7 @@ public class UserSettingsController(
     }
 
     /// <summary>
-    /// Changes master key parameters
+    /// Change master key parameters
     /// </summary>
     [HttpPatch]
     [Route("master-key")]
@@ -74,6 +74,21 @@ public class UserSettingsController(
             opt.MasterKeyIterations = request.Iterations ?? opt.MasterKeyIterations;
         }, token);
         await HttpContext.SignOutWithCookieAsync();
-        return Redirect("/login");
+        return Ok();
+    }
+
+    /// <summary>
+    /// Delete all data
+    /// </summary>
+    [HttpDelete]
+    public async Task<ActionResult> DeleteStorageAsync(CancellationToken token)
+    {
+        await masterKeyService.ClearMasterKeyDataAsync(token);
+        await HttpContext.SignOutWithCookieAsync();
+        await userOptions.UpdateAsync(opt =>
+        {
+            opt.MasterKeySalt = new UserOptions().MasterKeySalt;
+        }, token);
+        return Ok();
     }
 }

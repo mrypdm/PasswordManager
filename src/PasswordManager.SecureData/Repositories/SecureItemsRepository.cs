@@ -145,7 +145,8 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     /// <inheritdoc />
     public async Task DeleteMasterKeyData(CancellationToken token)
     {
-        await context.SecureItems.ExecuteDeleteAsync(token);
+        await context.Database.EnsureDeletedAsync(token);
+        await context.Database.MigrateAsync(token);
     }
 
     /// <inheritdoc />

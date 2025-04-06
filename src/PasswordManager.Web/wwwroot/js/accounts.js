@@ -18,6 +18,7 @@ async function getAccountData(accountId) {
     } catch (response) {
         if (response.status == 404) {
             location.replace("/account");
+            return;
         }
 
         let text = await response.text();

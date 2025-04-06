@@ -51,3 +51,16 @@ async function updateMasterKeySettings() {
         alert(text)
     }
 }
+
+async function deleteStorage() {
+    if (!confirm("Are you sure?")) {
+        return;
+    }
+
+    try {
+        await send("api/settings", "DELETE", null, getCsrfTokenHeader())
+    } catch (response) {
+        let text = await response.text();
+        alert(text)
+    }
+}
