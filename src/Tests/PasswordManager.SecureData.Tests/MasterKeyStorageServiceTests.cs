@@ -122,6 +122,35 @@ public class MasterKeyStorageServiceTests
         Assert.That(storage.IsInitialized, Is.False);
     }
 
+    [Test]
+    public void Block_ShouldBlock()
+    {
+        // arrange
+        var seconds = 10;
+        using var storage = CreateStorage();
+
+        // act
+        storage.Block(TimeSpan.FromSeconds(seconds));
+
+        // assert
+        Assert.Throws<StorageBlockedException>(storage.ThrowIfBlocked);
+    }
+
+    [Test]
+    public async Task Block_ShouldUnblockAfterTimeout()
+    {
+        // arrange
+        var seconds = 2;
+        using var storage = CreateStorage();
+
+        // act
+        storage.Block(TimeSpan.FromSeconds(seconds));
+        await Task.Delay(TimeSpan.FromSeconds(seconds + 1));
+
+        // assert
+        storage.ThrowIfBlocked();
+    }
+
     private MasterKeyStorage CreateStorage()
     {
         return new MasterKeyStorage(_validatorMock.Object);
