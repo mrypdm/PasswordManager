@@ -1,0 +1,7 @@
+@{
+    ViewData["Title"] = "Password Generator";
+}
+
+@Html.AntiForgeryToken()
+
+@await Html.PartialAsync("/Views/Shared/PasswordGenerator.cshtml")

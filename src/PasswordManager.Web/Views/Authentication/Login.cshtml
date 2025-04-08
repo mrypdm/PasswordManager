@@ -1,0 +1,19 @@
+@using PasswordManager.Web.Views.Authentication
+@using PasswordManager.Web.Views.Shared
+
+@model LoginModel
+@{
+    ViewData["Title"] = Model.IsMasterKeyDataExist ? "Login" : "Init";
+}
+
+@Html.AntiForgeryToken()
+
+<div>
+    @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("master-password", "password", "Master password")
+{
+        NeedShow = true,
+        NeedVerify = !Model.IsMasterKeyDataExist
+    })
+
+    <input type="button" value="@(Model.IsMasterKeyDataExist ? "Login" : "Init")" onclick="logon('@(Model.ReturnUrl)')" />
+</div>

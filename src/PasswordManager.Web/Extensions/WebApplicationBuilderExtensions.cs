@@ -23,7 +23,6 @@ using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.SecureData.Repositories;
 using PasswordManager.SecureData.Services;
 using PasswordManager.UserSettings;
-using PasswordManager.Web.Extensions;
 using PasswordManager.Web.Options;
 
 namespace PasswordManager.Web.Extensions;
@@ -120,9 +119,8 @@ public static class WebApplicationBuilderExtensions
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(opt =>
             {
-                opt.LoginPath = "/login";
-                opt.LogoutPath = opt.LoginPath;
-                opt.AccessDeniedPath = "/error";
+                opt.LoginPath = "/auth/login";
+                opt.LogoutPath = "/auth/logout";
                 opt.Events.OnValidatePrincipal = context =>
                 {
                     if (!context.ValidatePrincipal())
@@ -149,10 +147,8 @@ public static class WebApplicationBuilderExtensions
             .ConfigureHttpJsonOptions(opt => opt.SerializerOptions.Converters.Add(new JsonStringEnumConverter()))
             .AddRouting(opt => opt.LowercaseUrls = true);
         builder.Services
-            .AddControllers()
+            .AddControllersWithViews()
             .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-        builder.Services
-            .AddRazorPages();
         return builder;
     }
 

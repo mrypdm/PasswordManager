@@ -25,7 +25,6 @@ application
     .UseAuthentication()
     .UseAuthorization();
 
-application.MapRazorPages();
 application.MapControllers();
 application.MapSwagger();
 

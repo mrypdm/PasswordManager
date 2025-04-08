@@ -1,0 +1,29 @@
+@using PasswordManager.Web.Views
+@using PasswordManager.Web.Views.Shared
+
+@model AccountModel
+@{
+    ViewData["Title"] = "New Item";
+}
+
+@Html.AntiForgeryToken()
+
+<div>
+    @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("account-data-name", "text", "Account name"))
+    @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("account-data-login", "text", "Login") { NeedCopy = true })
+    @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("account-data-password", "password", "Password")
+{
+        NeedShow = true,
+        NeedCopy = true,
+        NeedVerify = true
+    })
+
+    <input type="button" value="@(Model.AccountId == -1 ? "Add" : "Update")" onclick="postAccountData(@(Model.AccountId))" />
+</div>
+
+<h2>Password generator</h2>
+@await Html.PartialAsync("/Views/Shared/PasswordGenerator.cshtml")
+
+<script>
+    onload = async () => { await getAccountData(@(Model.AccountId)); };
+</script>

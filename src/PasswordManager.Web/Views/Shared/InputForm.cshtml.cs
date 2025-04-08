@@ -1,4 +1,4 @@
-namespace PasswordManager.Web.Pages.Shared;
+namespace PasswordManager.Web.Views.Shared;
 
 /// <summary>
 /// Form for user input
