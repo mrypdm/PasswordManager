@@ -46,6 +46,7 @@ async function updateMasterKeySettings() {
 
     try {
         await send("/api/settings/master-key", "PATCH", data, getCsrfTokenHeader())
+        location.replace("/auth/login")
     } catch (response) {
         let text = await response.text();
         alert(text)
