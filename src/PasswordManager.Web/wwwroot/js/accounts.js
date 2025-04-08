@@ -1,5 +1,5 @@
 async function getAccountDataRaw(accountId) {
-    let response = await send(`api/account/${accountId}`, "POST", null, getCsrfTokenHeader());
+    let response = await send(`/api/account/${accountId}`, "POST", null, getCsrfTokenHeader());
     return await response.json();
 }
 
@@ -50,7 +50,7 @@ async function postAccountData(accountId) {
 
 async function addAccountData(data) {
     try {
-        let response = await send("api/account", "POST", data, getCsrfTokenHeader());
+        let response = await send("/api/account", "POST", data, getCsrfTokenHeader());
         response = await response.json();
         location.replace(`/account?id=${response.id}`);
     } catch (response) {
@@ -61,7 +61,7 @@ async function addAccountData(data) {
 
 async function updateAccountData(accountId, data) {
     try {
-        await send(`api/account/${accountId}`, "PUT", data, getCsrfTokenHeader());
+        await send(`/api/account/${accountId}`, "PUT", data, getCsrfTokenHeader());
         location.reload();
     } catch (response) {
         let text = await response.text()

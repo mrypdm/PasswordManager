@@ -3,7 +3,7 @@ async function getHeaders() {
 
     let response = null
     try {
-        response = await send("api/account/headers", "GET", null, getCsrfTokenHeader())
+        response = await send("/api/account/headers", "GET", null, getCsrfTokenHeader())
         response = await response.json();
     } catch (error) {
         let text = await response.text();

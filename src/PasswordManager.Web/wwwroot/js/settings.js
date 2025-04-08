@@ -4,7 +4,7 @@ async function getSettings() {
     let iterationsBox = document.getElementById("master-key-iterations");
 
     try {
-        let response = await send("api/settings", "GET", null, getCsrfTokenHeader());
+        let response = await send("/api/settings", "GET", null, getCsrfTokenHeader());
         response = await response.json();
 
         timeoutBox.value = response.sessionTimeout;
@@ -24,7 +24,7 @@ async function updateSessionTimeout() {
     };
 
     try {
-        await send("api/settings/session-timeout", "PATCH", data, getCsrfTokenHeader())
+        await send("/api/settings/session-timeout", "PATCH", data, getCsrfTokenHeader())
     } catch (response) {
         let text = await response.text();
         alert(text)
@@ -45,7 +45,7 @@ async function updateMasterKeySettings() {
     };
 
     try {
-        await send("api/settings/master-key", "PATCH", data, getCsrfTokenHeader())
+        await send("/api/settings/master-key", "PATCH", data, getCsrfTokenHeader())
     } catch (response) {
         let text = await response.text();
         alert(text)
@@ -58,7 +58,7 @@ async function deleteStorage() {
     }
 
     try {
-        await send("api/settings", "DELETE", null, getCsrfTokenHeader())
+        await send("/api/settings", "DELETE", null, getCsrfTokenHeader())
     } catch (response) {
         let text = await response.text();
         alert(text)

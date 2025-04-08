@@ -1,5 +1,5 @@
 async function logout() {
-    await send("api/logon", "DELETE");
+    await send("/api/logon", "DELETE");
     location.replace("/login");
 }
 
@@ -10,7 +10,7 @@ async function logon(redirect) {
     }
 
     try {
-        await send("api/logon", "POST", data, getCsrfTokenHeader());
+        await send("/api/logon", "POST", data, getCsrfTokenHeader());
         location.replace(redirect)
     } catch (response) {
         let text = await response.text()

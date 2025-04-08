@@ -5,7 +5,7 @@ async function verifyPassword(passwordBoxId) {
     };
 
     try {
-        let response = await send("api/password/verify", "POST", data, getCsrfTokenHeader());
+        let response = await send("/api/password/verify", "POST", data, getCsrfTokenHeader());
         response = await response.json();
         alert(buildCheckStatus(response));
     } catch (response) {
@@ -32,7 +32,7 @@ async function generatePassword() {
     }
 
     try {
-        let response = await send("api/password/generate", "POST", data, getCsrfTokenHeader());
+        let response = await send("/api/password/generate", "POST", data, getCsrfTokenHeader());
         response = await response.json();
         passwordBox.value = response.password;
         passwordVerifyResult.innerHTML = buildCheckStatus(response.checkStatus)
