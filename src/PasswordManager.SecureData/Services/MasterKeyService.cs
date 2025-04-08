@@ -1,10 +1,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.KeyStorage;
+using PasswordManager.SecureData.Options;
 using PasswordManager.SecureData.Repositories;
 
 namespace PasswordManager.SecureData.Services;
@@ -14,12 +17,16 @@ public sealed class MasterKeyService(
     IMasterKeyDataRepository masterKeyDataRepository,
     IMasterKeyStorage masterKeyStorage,
     IKeyGenerator keyGenerator,
-    IKeyValidator keyValidator) : IMasterKeyService
+    IKeyValidator keyValidator,
+    ICounter counter,
+    IOptions<MasterKeyServiceOptions> options) : IMasterKeyService
 {
     /// <inheritdoc />
     public async Task InitMasterKeyAsync(string masterPassword, TimeSpan sessionTimeout,
         CancellationToken token)
     {
+        masterKeyStorage.ThrowIfBlocked();
+
         var masterKey = keyGenerator.Generate(masterPassword);
 
         try
@@ -30,7 +37,13 @@ public sealed class MasterKeyService(
         {
             await masterKeyDataRepository.SetMasterKeyDataAsync(masterKey, token);
         }
+        catch (InvalidMasterKeyException)
+        {
+            CountInvalidAttempt();
+            throw;
+        }
 
+        counter.Clear();
         masterKeyStorage.InitStorage(masterKey, sessionTimeout);
     }
 
@@ -79,5 +92,15 @@ public sealed class MasterKeyService(
     {
         keyValidator.Validate(masterKey);
         await masterKeyDataRepository.ValidateMasterKeyDataAsync(masterKey, token);
+    }
+
+    private void CountInvalidAttempt()
+    {
+        counter.Increment();
+        if (counter.Count == options.Value.MaxAttemptCounts)
+        {
+            counter.Clear();
+            masterKeyStorage.Block(options.Value.BlockTimeout);
+        }
     }
 }

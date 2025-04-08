@@ -10,16 +10,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PasswordManager.Abstractions.Checkers;
+using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.Aes;
 using PasswordManager.Core.Checkers;
+using PasswordManager.Core.Counters;
 using PasswordManager.Core.Factories;
 using PasswordManager.External.Checkers;
 using PasswordManager.Options;
 using PasswordManager.SecureData.Contexts;
 using PasswordManager.SecureData.KeyStorage;
+using PasswordManager.SecureData.Options;
 using PasswordManager.SecureData.Repositories;
 using PasswordManager.SecureData.Services;
 using PasswordManager.UserSettings;
@@ -51,7 +54,7 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddConnectionOptions(this WebApplicationBuilder builder)
     {
         builder.Services
-            .Configure<Options.SessionOptions>(builder.Configuration.GetSection("ConnectionOptions"));
+            .Configure<Options.SessionOptions>(builder.Configuration.GetSection(nameof(Options.SessionOptions)));
         return builder;
     }
 
@@ -102,6 +105,8 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddSecureDb(this WebApplicationBuilder builder)
     {
         builder.Services
+            .AddSingleton<ICounter, Counter>()
+            .Configure<MasterKeyServiceOptions>(builder.Configuration.GetSection(nameof(MasterKeyServiceOptions)))
             .AddDbContext<SecureDbContext>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("SecureDb")))
             .AddSingleton<IMasterKeyStorage, MasterKeyStorage>()
             .AddScoped<ISecureItemsRepository, SecureItemsRepository>()

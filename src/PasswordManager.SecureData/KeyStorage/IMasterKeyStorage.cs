@@ -38,4 +38,15 @@ public interface IMasterKeyStorage
     /// Clear key from storage
     /// </summary>
     void ClearKey();
+
+    /// <summary>
+    /// Blocks storage for <paramref name="timeout"/>
+    /// </summary>
+    void Block(TimeSpan timeout);
+
+    /// <summary>
+    /// Throws if blocked
+    /// </summary>
+    /// <exception cref="StorageBlockedException">If storage is blocked</exception>
+    void ThrowIfBlocked();
 }

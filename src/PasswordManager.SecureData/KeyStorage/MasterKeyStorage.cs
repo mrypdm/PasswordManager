@@ -10,7 +10,8 @@ namespace PasswordManager.SecureData.KeyStorage;
 /// </summary>
 public sealed class MasterKeyStorage(IKeyValidator keyValidator) : IMasterKeyStorage, IDisposable
 {
-    private const string CacheKey = "MasterKey";
+    private const string MasterKeyCacheKey = nameof(MasterKeyCacheKey);
+    private const string BlockStorageCacheKey = nameof(BlockStorageCacheKey);
 
     private readonly MemoryCache _cache = new(nameof(MasterKeyStorage));
 
@@ -20,36 +21,57 @@ public sealed class MasterKeyStorage(IKeyValidator keyValidator) : IMasterKeySto
         get
         {
             ThrowIfNotInitialized();
-            return _cache.Get(CacheKey) as byte[];
+            return _cache.Get(MasterKeyCacheKey) as byte[];
         }
     }
 
     /// <inheritdoc />
-    public bool IsInitialized => _cache.Get(CacheKey) is not null;
+    public bool IsInitialized => _cache.Get(MasterKeyCacheKey) is not null;
 
     /// <inheritdoc />
     public void InitStorage(byte[] masterKey, TimeSpan timeout)
     {
+        ThrowIfBlocked();
         keyValidator.Validate(masterKey);
         ValidateTimeout(timeout);
 
         ClearKey();
-        _cache.Set(CacheKey, masterKey, new CacheItemPolicy { SlidingExpiration = timeout });
+        _cache.Set(MasterKeyCacheKey, masterKey, new CacheItemPolicy { SlidingExpiration = timeout });
     }
 
     /// <inheritdoc />
     public void ChangeTimeout(TimeSpan timeout)
     {
         ValidateTimeout(timeout);
+        ThrowIfBlocked();
         ThrowIfNotInitialized();
 
-        _cache.Set(CacheKey, MasterKey, new CacheItemPolicy { SlidingExpiration = timeout });
+        _cache.Set(MasterKeyCacheKey, MasterKey, new CacheItemPolicy { SlidingExpiration = timeout });
     }
 
     /// <inheritdoc />
     public void ClearKey()
     {
-        _cache.Remove(CacheKey);
+        _cache.Remove(MasterKeyCacheKey);
+    }
+
+    /// <inheritdoc />
+    public void Block(TimeSpan timeout)
+    {
+        ClearKey();
+        _cache.Set(BlockStorageCacheKey, BlockStorageCacheKey, new CacheItemPolicy
+        {
+            AbsoluteExpiration = DateTimeOffset.UtcNow.Add(timeout)
+        });
+    }
+
+    /// <inheritdoc />
+    public void ThrowIfBlocked()
+    {
+        if (_cache.Get(BlockStorageCacheKey) is not null)
+        {
+            throw new StorageBlockedException();
+        }
     }
 
     /// <inheritdoc />

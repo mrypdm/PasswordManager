@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -37,6 +38,10 @@ public class LogonApiController(
         catch (InvalidMasterKeyException)
         {
             return Unauthorized("Master password is invalid");
+        }
+        catch (StorageBlockedException)
+        {
+            return StatusCode((int)HttpStatusCode.Forbidden, "Storage is blocked");
         }
 
         await HttpContext.SignInWithCookieAsync(connectionOptions.Value);
