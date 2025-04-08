@@ -8,14 +8,15 @@ using PasswordManager.Web.Extensions;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Options;
 
-namespace PasswordManager.Web.Controllers;
+namespace PasswordManager.Web.Controllers.Api;
 
 /// <summary>
 /// Controller for use settings
 /// </summary>
+[ApiController]
 [Route("api/settings")]
 [ValidateAntiForgeryToken]
-public class UserSettingsController(
+public class UserSettingsApiController(
     IWritableOptions<UserOptions> userOptions,
     IKeyGeneratorFactory keyGeneratorFactory,
     IMasterKeyService masterKeyService) : Controller
@@ -32,8 +33,7 @@ public class UserSettingsController(
     /// <summary>
     /// Change session timeout
     /// </summary>
-    [HttpPatch]
-    [Route("session-timeout")]
+    [HttpPatch("session-timeout")]
     public async Task<ActionResult> ChangeSessionTimeoutAsync([FromBody] ChangeSessionTimeoutRequest request,
         CancellationToken token)
     {
@@ -50,8 +50,7 @@ public class UserSettingsController(
     /// <summary>
     /// Change master key parameters
     /// </summary>
-    [HttpPatch]
-    [Route("master-key")]
+    [HttpPatch("master-key")]
     public async Task<ActionResult> ChangeSessionTimeoutAsync([FromBody] ChangeMasterKeySettingsRequest request,
         CancellationToken token)
     {

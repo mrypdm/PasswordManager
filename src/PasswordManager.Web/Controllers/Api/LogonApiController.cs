@@ -10,14 +10,15 @@ using PasswordManager.Web.Extensions;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Options;
 
-namespace PasswordManager.Web.Controllers;
+namespace PasswordManager.Web.Controllers.Api;
 
 /// <summary>
 /// Controller for logon
 /// </summary>
+[ApiController]
 [AllowAnonymous]
 [Route("api/logon")]
-public class LogonController(
+public class LogonApiController(
     IMasterKeyService masterKeyService,
     IWritableOptions<UserOptions> userOptions,
     IOptions<SessionOptions> connectionOptions) : Controller

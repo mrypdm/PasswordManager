@@ -8,21 +8,21 @@ using PasswordManager.SecureData.Repositories;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Models.Responses;
 
-namespace PasswordManager.Web.Controllers;
+namespace PasswordManager.Web.Controllers.Api;
 
 /// <summary>
 /// Controller for account manipulation
 /// </summary>
 /// <param name="secureItemsRepository"></param>
+[ApiController]
 [Route("api/account")]
 [ValidateAntiForgeryToken]
-public class AccountsController(ISecureItemsRepository secureItemsRepository) : Controller
+public class AccountsApiController(ISecureItemsRepository secureItemsRepository) : Controller
 {
     /// <summary>
     /// Get account data by id
     /// </summary>
-    [HttpPost]
-    [Route("{accountId}")]
+    [HttpPost("{accountId}")]
     public async Task<ActionResult<AccountData>> GetAccountByIdAsync(int accountId, CancellationToken token)
     {
         try
@@ -38,8 +38,7 @@ public class AccountsController(ISecureItemsRepository secureItemsRepository) : 
     /// <summary>
     /// Get all items headers in storage
     /// </summary>
-    [HttpGet]
-    [Route("headers")]
+    [HttpGet("headers")]
     public async Task<ActionResult<ItemHeaderResponse[]>> GetAllHeadersAsync(CancellationToken token)
     {
         var items = await secureItemsRepository.GetItemsAsync(token);

@@ -10,14 +10,15 @@ using PasswordManager.Core;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Models.Responses;
 
-namespace PasswordManager.Web.Controllers;
+namespace PasswordManager.Web.Controllers.Api;
 
 /// <summary>
 /// Controller for password manipulations
 /// </summary>
+[ApiController]
 [Route("api/password")]
 [ValidateAntiForgeryToken]
-public class PasswordsController(
+public class PasswordsApiController(
     IEnumerable<IPasswordChecker> passwordCheckers,
     IPasswordCheckerFactory passwordCheckerFactory,
     IPasswordGeneratorFactory passwordGeneratorFactory) : Controller
@@ -25,9 +26,8 @@ public class PasswordsController(
     /// <summary>
     /// Verify password strength and compomistaion
     /// </summary>
-    [HttpPost]
+    [HttpPost("verify")]
     [AllowAnonymous]
-    [Route("verify")]
     public async Task<ActionResult<PasswordVerifyReponse>> VerifyPasswordAsync([FromBody] PasswordVerifyRequest request,
         CancellationToken token)
     {
@@ -43,8 +43,7 @@ public class PasswordsController(
     /// <summary>
     /// Generate password
     /// </summary>
-    [HttpPost]
-    [Route("generate")]
+    [HttpPost("generate")]
     public async Task<ActionResult<PasswordGenerateResponse>> GeneratePasswordAsync(
         [FromBody] PassworgGenerateRequest request, CancellationToken token)
     {
