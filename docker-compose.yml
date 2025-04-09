@@ -1,0 +1,9 @@
+services:
+  password-manager:
+    build: https://github.com/mrypdm/PasswordManager.git
+    container_name: password-manager
+    volumes:
+      - $PWD/db/:/etc/password-manager/
+    ports:
+      - 17318:443/tcp
+    restart: unless-stopped
