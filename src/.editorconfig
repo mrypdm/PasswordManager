@@ -173,4 +173,3 @@ dotnet_style_object_initializer = true:warning
 dotnet_style_collection_initializer = true:warning
 dotnet_style_prefer_collection_expression = when_types_exactly_match:warning
 dotnet_style_prefer_simplified_boolean_expressions = true:warning
-

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace PasswordManager.External.Exceptions;
 
