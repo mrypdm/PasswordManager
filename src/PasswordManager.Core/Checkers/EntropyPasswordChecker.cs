@@ -17,12 +17,15 @@ public sealed class EntropyPasswordChecker(IAlphabet alphabet) : IPasswordChecke
     /// <inheritdoc/>
     public Task<PasswordCheckStatus> CheckAsync(string password, CancellationToken token)
     {
-        ValidatePasswordCharacters(password);
+        if (ValidatePasswordCharacters(password))
+        {
+            return Task.FromResult(
+                new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Unknown, -1));
+        }
 
         var entropy = Math.Log2(alphabet.GetCharacters().Count) * password.Length;
         var strength = entropy switch
         {
-            <= 0 => PasswordStrength.Unknown, // if alphabet is empty
             < 60 => PasswordStrength.VeryLow,
             < 80 => PasswordStrength.Low,
             < 100 => PasswordStrength.Medium,
@@ -33,11 +36,8 @@ public sealed class EntropyPasswordChecker(IAlphabet alphabet) : IPasswordChecke
         return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, strength, entropy));
     }
 
-    private void ValidatePasswordCharacters(string password)
+    private bool ValidatePasswordCharacters(string password)
     {
-        if (password.ToHashSet().Except(alphabet.GetCharacters()).Any())
-        {
-            throw new InvalidOperationException("Password contains characters, which does not exist in alphabet");
-        }
+        return password.ToHashSet().Except(alphabet.GetCharacters()).Any();
     }
 }

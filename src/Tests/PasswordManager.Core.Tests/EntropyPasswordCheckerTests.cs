@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Core.Checkers;
@@ -59,14 +58,20 @@ public class EntropyPasswordCheckerTests
     }
 
     [Test]
-    public void CheckEntropy_WrongAlphabet_ShouldThrow()
+    public async Task CheckEntropy_WrongAlphabet_ShouldReturnUnknown()
     {
         // arrange
         var alphabet = new Alphabet().WithNumbers();
         var checker = new EntropyPasswordChecker(alphabet);
 
         // act
+        var res = await checker.CheckAsync("letters", default);
+
         // assert
-        Assert.ThrowsAsync<InvalidOperationException>(() => checker.CheckAsync("letters", default));
+        Assert.Multiple(() =>
+        {
+            Assert.That(res.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
+            Assert.That(res.Strength, Is.EqualTo(PasswordStrength.Unknown));
+        });
     }
 }
