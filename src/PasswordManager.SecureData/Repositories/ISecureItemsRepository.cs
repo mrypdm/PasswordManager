@@ -23,6 +23,11 @@ public interface ISecureItemsRepository
     Task UpdateAccountAsync(int id, AccountData data, CancellationToken token);
 
     /// <summary>
+    /// Deletes account by <paramref name="id"/>
+    /// </summary>
+    Task DeleteAccountAsync(int id, CancellationToken token);
+
+    /// <summary>
     /// Get account data from repository by id
     /// </summary>
     Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token);

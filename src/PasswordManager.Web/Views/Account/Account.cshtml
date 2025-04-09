@@ -19,7 +19,13 @@
     })
 
     <input type="button" value="@(Model.AccountId == -1 ? "Add" : "Update")" onclick="postAccountData(@(Model.AccountId))" />
+
+    @if (Model.AccountId != -1)
+    {
+        <input type="button" value="Delete account" onclick="deleteAccount(@(Model.AccountId))" style="color: red" />
+    }
 </div>
+<br />
 
 <h2>Password generator</h2>
 @await Html.PartialAsync("/Views/Shared/PasswordGenerator.cshtml")

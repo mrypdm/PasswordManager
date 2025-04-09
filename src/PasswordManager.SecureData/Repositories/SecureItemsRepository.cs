@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +48,12 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
 
         context.Update(secureItem);
         await context.SaveChangesAsync(token);
+    }
+
+    /// <inheritdoc />
+    public async Task DeleteAccountAsync(int id, CancellationToken token)
+    {
+        await context.SecureItems.Where(m => m.Id == id).ExecuteDeleteAsync(token);
     }
 
     /// <inheritdoc />

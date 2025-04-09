@@ -71,10 +71,9 @@ public class AccountsApiController(ISecureItemsRepository secureItemsRepository)
     }
 
     /// <summary>
-    /// Updates current account
+    /// Updates account
     /// </summary>
-    [HttpPut]
-    [Route("{accountId}")]
+    [HttpPut("{accountId}")]
     public async Task<ActionResult> UpdateAccountAsync(int accountId, [FromBody] UploadAccountRequest request,
         CancellationToken token)
     {
@@ -99,5 +98,15 @@ public class AccountsApiController(ISecureItemsRepository secureItemsRepository)
         {
             return NotFound($"Cannot find account with id={accountId}");
         }
+    }
+
+    /// <summary>
+    /// Delete account
+    /// </summary>
+    [HttpDelete("{accountId}")]
+    public async Task<ActionResult> DeleteAccountAsync(int accountId, CancellationToken token)
+    {
+        await secureItemsRepository.DeleteAccountAsync(accountId, token);
+        return Ok();
     }
 }

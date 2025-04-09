@@ -273,11 +273,24 @@ public class AccountsApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
         _repositoryMock.Verify(
-            m => m.UpdateAccountAsync(
-                id,
-                It.Is<AccountData>(
-                    m => m.Name == request.Name && m.Login == request.Login && m.Password == request.Password),
-                default),
+            m => m.UpdateAccountAsync(id, It.Is<AccountData>(m => CheckAccount(m, request)), default),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteAccount_CommonWay_ShouldDeleteAccount()
+    {
+        // arrange
+        var id = 12;
+        var controller = CreateController();
+
+        // act
+        var res = await controller.DeleteAccountAsync(id, default);
+
+        // assert
+        Assert.That(res, Is.TypeOf<OkResult>());
+        _repositoryMock.Verify(
+            m => m.DeleteAccountAsync(id, default),
             Times.Once);
     }
 

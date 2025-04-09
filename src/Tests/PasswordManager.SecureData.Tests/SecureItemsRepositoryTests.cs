@@ -169,6 +169,38 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         }
     }
 
+    [Test]
+    public async Task DeleteAccount_AccountNotExists_ShouldNotThrow()
+    {
+        // arrange
+        var idToDelete = 1;
+        var expectedId = 2;
+        var expectedLength = 1;
+
+        using (var context = CreateDbContext())
+        {
+            context.SecureItems.Add(new() { Name = "", Data = [], Salt = [] });
+            context.SecureItems.Add(new() { Name = "", Data = [], Salt = [] });
+            context.SaveChanges();
+        }
+
+        // act
+        using (var context = CreateDbContext())
+        {
+            var repo = CreateRepository(context);
+            await repo.DeleteAccountAsync(idToDelete, default);
+        }
+
+        // assert
+        using (var context = CreateDbContext())
+        {
+            var repo = CreateRepository(context);
+            var items = context.SecureItems.ToArray();
+            Assert.That(items, Has.Length.EqualTo(expectedLength));
+            Assert.That(items[0].Id, Is.EqualTo(expectedId));
+        }
+    }
+
     private SecureItemsRepository CreateRepository(SecureDbContext context)
     {
         return new SecureItemsRepository(context, _cryptoMock.Object, _storageMock.Object);

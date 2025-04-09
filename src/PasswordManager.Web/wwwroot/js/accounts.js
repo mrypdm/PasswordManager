@@ -68,3 +68,13 @@ async function updateAccountData(accountId, data) {
         alert(text);
     }
 }
+
+async function deleteAccount(accountId) {
+    try {
+        await send(`/api/account/${accountId}`, "DELETE", null, getCsrfTokenHeader());
+        location.replace("/");
+    } catch (response) {
+        let text = await response.text()
+        alert(text);
+    }
+}
