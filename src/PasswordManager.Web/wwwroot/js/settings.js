@@ -60,6 +60,7 @@ async function deleteStorage() {
 
     try {
         await send("/api/settings", "DELETE", null, getCsrfTokenHeader())
+        location.replace("/auth/login")
     } catch (response) {
         let text = await response.text();
         alert(text)
