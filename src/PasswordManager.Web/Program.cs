@@ -4,7 +4,7 @@ using PasswordManager.Web.Extensions;
 
 var builder = await WebApplication
     .CreateBuilder(args)
-    .AddConnectionOptions()
+    .ConfigureConnectionOptions()
     .AddAesCrypto()
     .AddPasswordCheckers()
     .AddPasswordGeneratorFactory()

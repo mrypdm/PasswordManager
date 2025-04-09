@@ -3,7 +3,7 @@ namespace PasswordManager.Web.Options;
 /// <summary>
 /// Options for connection
 /// </summary>
-public class SessionOptions
+public class ConnectionOptions
 {
     /// <summary>
     /// If password manager work under a proxy

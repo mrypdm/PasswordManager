@@ -22,7 +22,7 @@ namespace PasswordManager.Web.Controllers.Api;
 public class LogonApiController(
     IMasterKeyService masterKeyService,
     IWritableOptions<UserOptions> userOptions,
-    IOptions<SessionOptions> connectionOptions) : Controller
+    IOptions<ConnectionOptions> connectionOptions) : Controller
 {
     /// <summary>
     /// Sign in user with cookie

@@ -51,10 +51,10 @@ public static class WebApplicationBuilderExtensions
     /// <summary>
     /// Add connection options to web application
     /// </summary>
-    public static WebApplicationBuilder AddConnectionOptions(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder ConfigureConnectionOptions(this WebApplicationBuilder builder)
     {
         builder.Services
-            .Configure<Options.SessionOptions>(builder.Configuration.GetSection(nameof(Options.SessionOptions)));
+            .Configure<ConnectionOptions>(builder.Configuration.GetSection(nameof(ConnectionOptions)));
         return builder;
     }
 
