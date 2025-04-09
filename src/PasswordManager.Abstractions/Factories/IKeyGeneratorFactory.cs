@@ -1,3 +1,5 @@
+using PasswordManager.Abstractions.Generators;
+
 namespace PasswordManager.Abstractions.Factories;
 
 /// <summary>

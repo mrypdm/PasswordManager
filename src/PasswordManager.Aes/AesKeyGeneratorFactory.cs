@@ -1,4 +1,5 @@
 using PasswordManager.Abstractions.Factories;
+using PasswordManager.Abstractions.Generators;
 
 namespace PasswordManager.Aes;
 

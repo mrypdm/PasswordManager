@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using PasswordManager.Abstractions.Counters;
-using PasswordManager.Abstractions.Factories;
+using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.KeyStorage;

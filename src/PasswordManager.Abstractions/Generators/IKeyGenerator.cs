@@ -1,6 +1,6 @@
 using System;
 
-namespace PasswordManager.Abstractions.Factories;
+namespace PasswordManager.Abstractions.Generators;
 
 /// <summary>
 /// Factory for master key

@@ -1,7 +1,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using PasswordManager.Abstractions.Factories;
+using PasswordManager.Abstractions.Generators;
 
 namespace PasswordManager.Aes;
 
