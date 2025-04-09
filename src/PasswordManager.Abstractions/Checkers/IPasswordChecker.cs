@@ -12,5 +12,5 @@ public interface IPasswordChecker
     /// <summary>
     /// Check strength of password
     /// </summary>
-    Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token);
+    Task<PasswordCheckStatus> CheckAsync(string password, CancellationToken token);
 }

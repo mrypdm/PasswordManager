@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PasswordManager.Abstractions.Checkers;
+using PasswordManager.Abstractions;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Core;
@@ -19,16 +19,15 @@ namespace PasswordManager.Web.Controllers.Api;
 [Route("api/password")]
 [ValidateAntiForgeryToken]
 public class PasswordsApiController(
-    IEnumerable<IPasswordChecker> passwordCheckers,
-    IPasswordCheckerFactory passwordCheckerFactory,
-    IPasswordGeneratorFactory passwordGeneratorFactory) : Controller
+    IPasswordGeneratorFactory passwordGeneratorFactory,
+    IEnumerable<IPasswordCheckerFactory> passwordCheckerFactories) : Controller
 {
     /// <summary>
     /// Verify password strength and compomistaion
     /// </summary>
     [HttpPost("verify")]
     [AllowAnonymous]
-    public async Task<ActionResult<PasswordVerifyReponse>> VerifyPasswordAsync([FromBody] PasswordVerifyRequest request,
+    public async Task<ActionResult<PasswordVerifyReponse>> VerifyPasswordAsync([FromBody] VerifyPasswordRequest request,
         CancellationToken token)
     {
         if (!request.Validate(out var error))
@@ -36,7 +35,7 @@ public class PasswordsApiController(
             return BadRequest(error);
         }
 
-        var result = await VerifyPasswordAsync(request.Password, token);
+        var result = await VerifyPasswordAsync(request.Password, Alphabet.Empty, token);
         return Map(result);
     }
 
@@ -45,7 +44,7 @@ public class PasswordsApiController(
     /// </summary>
     [HttpPost("generate")]
     public async Task<ActionResult<PasswordGenerateResponse>> GeneratePasswordAsync(
-        [FromBody] PassworgGenerateRequest request, CancellationToken token)
+        [FromBody] GeneratePasswordRequest request, CancellationToken token)
     {
         if (!request.Validate(out var error))
         {
@@ -54,12 +53,9 @@ public class PasswordsApiController(
 
         var alphabet = SetupAlphabet(request);
         var generator = passwordGeneratorFactory.Create(alphabet);
-        var checker = passwordCheckerFactory.Create(alphabet);
 
-        var password = generator.GeneratePassword(request.Length);
-        var checkResult = PasswordCheckStatus.MinOf(
-            await checker.CheckPasswordAsync(password, token),
-            await VerifyPasswordAsync(password, token));
+        var password = generator.Generate(request.Length);
+        var checkResult = await VerifyPasswordAsync(password, alphabet, token);
 
         return new PasswordGenerateResponse
         {
@@ -68,13 +64,15 @@ public class PasswordsApiController(
         };
     }
 
-    private async Task<PasswordCheckStatus> VerifyPasswordAsync(string password, CancellationToken token)
+    private async Task<PasswordCheckStatus> VerifyPasswordAsync(string password, IAlphabet alphabet,
+        CancellationToken token)
     {
         var result = new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Unknown, double.MaxValue);
 
-        foreach (var checker in passwordCheckers)
+        foreach (var factory in passwordCheckerFactories)
         {
-            var checkResult = await checker.CheckPasswordAsync(password, token);
+            var checker = factory.Create(alphabet);
+            var checkResult = await checker.CheckAsync(password, token);
             result = PasswordCheckStatus.MinOf(result, checkResult);
         }
 
@@ -95,7 +93,7 @@ public class PasswordsApiController(
         };
     }
 
-    private static Alphabet SetupAlphabet(PassworgGenerateRequest request)
+    private static Alphabet SetupAlphabet(GeneratePasswordRequest request)
     {
         var alphabet = new Alphabet();
         if (request.UseNumbers)

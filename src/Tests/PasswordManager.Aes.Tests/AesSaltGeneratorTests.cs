@@ -8,7 +8,7 @@ namespace PasswordManager.Aes.Tests;
 public class AesSaltGeneratorTests
 {
     [Test]
-    public void Generate_WithCorrectSize()
+    public void Generate_ShouldGenerateWithCorrectSize()
     {
         // arrange
         var generator = new AesSaltGenerator();
@@ -21,7 +21,7 @@ public class AesSaltGeneratorTests
     }
 
     [Test]
-    public void Generate_DifferentSalts()
+    public void Generate_ShouldGenerateDifferentSalts()
     {
         // arrange
         var generator = new AesSaltGenerator();

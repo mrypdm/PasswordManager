@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.SecureData.Services;
 using PasswordManager.UserSettings;
-using PasswordManager.Web.Extensions;
+using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Options;
 
@@ -18,6 +18,7 @@ namespace PasswordManager.Web.Controllers.Api;
 [ValidateAntiForgeryToken]
 public class UserSettingsApiController(
     IWritableOptions<UserOptions> userOptions,
+    ICookieAuthorizationHelper cookieAuthorizationHelper,
     IKeyGeneratorFactory keyGeneratorFactory,
     IMasterKeyService masterKeyService) : Controller
 {
@@ -72,7 +73,9 @@ public class UserSettingsApiController(
             opt.MasterKeySalt = request.Salt ?? opt.MasterKeySalt;
             opt.MasterKeyIterations = request.Iterations ?? opt.MasterKeyIterations;
         }, token);
-        await HttpContext.SignOutWithCookieAsync();
+
+        await cookieAuthorizationHelper.SignOutAsync(HttpContext);
+
         return Ok();
     }
 
@@ -83,11 +86,12 @@ public class UserSettingsApiController(
     public async Task<ActionResult> DeleteStorageAsync(CancellationToken token)
     {
         await masterKeyService.ClearMasterKeyDataAsync(token);
-        await HttpContext.SignOutWithCookieAsync();
         await userOptions.UpdateAsync(opt =>
         {
             opt.MasterKeySalt = new UserOptions().MasterKeySalt;
         }, token);
+        await cookieAuthorizationHelper.SignOutAsync(HttpContext);
+
         return Ok();
     }
 }

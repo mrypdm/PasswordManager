@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
 using PasswordManager.Abstractions.Counters;
-using PasswordManager.Abstractions.Factories;
+using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.KeyStorage;
@@ -199,7 +199,7 @@ public class MasterKeyServiceServiceTests
     }
 
     [Test]
-    public void ChangeMasterKeySettings_NullGenerator_Throw()
+    public void ChangeMasterKeySettings_NullGenerator_ShouldThrow()
     {
         // arrange
         var service = CreateService();

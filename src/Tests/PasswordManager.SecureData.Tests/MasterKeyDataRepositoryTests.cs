@@ -273,7 +273,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
     }
 
     [Test]
-    public async Task IsMasterKeyDataExistsAsync_MasterKeyDataExists()
+    public async Task IsMasterKeyDataExistsAsync_MasterKeyDataExists_ShouldReturnTrue()
     {
         // arrange
         using (var context = CreateDbContext())
@@ -293,7 +293,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
     }
 
     [Test]
-    public async Task IsMasterKeyDataExistsAsync_MasterKeyDataNotExists()
+    public async Task IsMasterKeyDataExistsAsync_MasterKeyDataNotExists_ShouldReturnFalse()
     {
         // arrange
         using var context = CreateDbContext();

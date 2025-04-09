@@ -9,16 +9,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PasswordManager.Abstractions.Checkers;
 using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.Aes;
-using PasswordManager.Core.Checkers;
 using PasswordManager.Core.Counters;
 using PasswordManager.Core.Factories;
-using PasswordManager.External.Checkers;
+using PasswordManager.External.Factories;
 using PasswordManager.Options;
 using PasswordManager.SecureData.Contexts;
 using PasswordManager.SecureData.KeyStorage;
@@ -26,6 +24,7 @@ using PasswordManager.SecureData.Options;
 using PasswordManager.SecureData.Repositories;
 using PasswordManager.SecureData.Services;
 using PasswordManager.UserSettings;
+using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Options;
 
 namespace PasswordManager.Web.Extensions;
@@ -83,9 +82,9 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services
             .AddScoped<IPasswordCheckerFactory, EntropyPasswordCheckerFactory>()
-            .AddScoped<IPasswordChecker, SeaMonkeyPasswordChecker>()
-            .AddScoped<IPasswordChecker, ZxcvbnPasswordChecker>()
-            .AddScoped<IPasswordChecker, PwnedPasswordChecker>();
+            .AddScoped<IPasswordCheckerFactory, SeaMonkeyPasswordCheckerFactory>()
+            .AddScoped<IPasswordCheckerFactory, ZxcvbnPasswordCheckerFactory>()
+            .AddScoped<IPasswordCheckerFactory, PwnedPasswordCheckerFactory>();
         return builder;
     }
 
@@ -121,6 +120,7 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddCookieAuthentication(this WebApplicationBuilder builder)
     {
         builder.Services
+            .AddScoped<ICookieAuthorizationHelper, CookieAuthorizationHelper>()
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(opt =>
             {
@@ -128,10 +128,14 @@ public static class WebApplicationBuilderExtensions
                 opt.LogoutPath = "/auth/logout";
                 opt.Events.OnValidatePrincipal = context =>
                 {
-                    if (!context.ValidatePrincipal())
+                    var helper = context.HttpContext.RequestServices
+                        .GetRequiredService<ICookieAuthorizationHelper>();
+
+                    if (!helper.ValidatePrincipal(context))
                     {
                         context.RejectPrincipal();
                     }
+
                     return Task.CompletedTask;
                 };
             });

@@ -5,24 +5,21 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.Web.Options;
 
-namespace PasswordManager.Web.Extensions;
+namespace PasswordManager.Web.Helpers;
 
-/// <summary>
-/// Helper for cookie authentication
-/// </summary>
-public static class CookieExtensions
+/// <inheritdoc />
+public class CookieAuthorizationHelper(
+    IMasterKeyStorage masterKeyStorage,
+    IOptions<ConnectionOptions> connectionOptions) : ICookieAuthorizationHelper
 {
     private const string IpAddressClaim = "IpAddress";
 
-    /// <summary>
-    /// Sign in with cookie
-    /// </summary>
-    public static async Task SignInWithCookieAsync(this HttpContext context, ConnectionOptions connectionOptions)
+    /// <inheritdoc />
+    public async Task SignInAsync(HttpContext context, ConnectionOptions connectionOptions)
     {
         var ip = GetUserIpAddress(context, connectionOptions.IsProxyUsed)
             ?? throw new InvalidOperationException("Cannot determine IP of user");
@@ -31,33 +28,24 @@ public static class CookieExtensions
         await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
     }
 
-    /// <summary>
-    /// Sign out with cookie
-    /// </summary>
-    public static async Task SignOutWithCookieAsync(this HttpContext context)
+    /// <inheritdoc />
+    public async Task SignOutAsync(HttpContext context)
     {
         await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
 
-    /// <summary>
-    /// Validate principal
-    /// </summary>
-    public static bool ValidatePrincipal(this CookieValidatePrincipalContext context)
+    /// <inheritdoc />
+    public bool ValidatePrincipal(CookieValidatePrincipalContext context)
     {
-        var keyStorage = context.HttpContext.RequestServices.GetRequiredService<IMasterKeyStorage>();
-        if (!keyStorage.IsInitialized)
+        if (!masterKeyStorage.IsInitialized)
         {
-            context.RejectPrincipal();
             return false;
         }
 
-        var connectionOptions = context.HttpContext.RequestServices
-            .GetRequiredService<IOptions<ConnectionOptions>>();
         var ip = GetUserIpAddress(context.HttpContext, connectionOptions.Value.IsProxyUsed)
             ?? throw new InvalidOperationException("Cannot determine IP of user");
         if (!ValidateIpAddress(context.Principal, ip))
         {
-            context.RejectPrincipal();
             return false;
         }
 

@@ -8,5 +8,5 @@ public interface IPasswordGenerator
     /// <summary>
     /// Generate password with <paramref name="length"/>
     /// </summary>
-    string GeneratePassword(int length);
+    string Generate(int length);
 }

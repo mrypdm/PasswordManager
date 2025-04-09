@@ -9,7 +9,7 @@ namespace PasswordManager.Aes.Tests;
 public class AesKeyGeneratorTests
 {
     [Test]
-    public void Generate_OneValueForSameSettings()
+    public void Generate_ShouldGenerateOneValueForSameSettings()
     {
         // arrange
         var generator = new AesKeyGenerator([0, 1, 2, 3, 4, 5, 6], 100);
@@ -23,7 +23,7 @@ public class AesKeyGeneratorTests
     }
 
     [Test]
-    public void Generate_DifferentValuesForDifferentPasswords()
+    public void Generate_ShouldGenerateDifferentValuesForDifferentPasswords()
     {
         // arrange
         var generator = new AesKeyGenerator([0, 1, 2, 3, 4, 5, 6], 100);
@@ -37,7 +37,7 @@ public class AesKeyGeneratorTests
     }
 
     [Test]
-    public void Generate_DifferentValuesForDifferentSettings()
+    public void Generate_ShouldGenerateDifferentValuesForDifferentSettings()
     {
         // arrange
         var generator1 = new AesKeyGenerator([0, 1, 2, 3, 4, 5, 6], 100);
@@ -52,7 +52,7 @@ public class AesKeyGeneratorTests
     }
 
     [Test]
-    public void Generate_InvalidPassword_Throw()
+    public void Generate_InvalidPassword_ShouldThrow()
     {
         // arrange
         var generator = new AesKeyGenerator([0, 1, 2, 3, 4, 5, 6], 100);
@@ -65,7 +65,7 @@ public class AesKeyGeneratorTests
     }
 
     [Test]
-    public void Ctor_NullSalt_Throw()
+    public void Ctor_NullSalt_ShouldThrow()
     {
         // arrange
         // act

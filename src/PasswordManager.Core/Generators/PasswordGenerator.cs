@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Security.Cryptography;
 using PasswordManager.Abstractions;
@@ -6,11 +7,23 @@ using PasswordManager.Abstractions.Generators;
 namespace PasswordManager.Core.Generators;
 
 /// <inheritdoc />
-public sealed class PasswordGenerator(IAlphabet alphabet) : IPasswordGenerator
+public sealed class PasswordGenerator : IPasswordGenerator
 {
-    /// <inheritdoc />
-    public string GeneratePassword(int length)
+    private readonly IAlphabet _alphabet;
+
+    public PasswordGenerator(IAlphabet alphabet)
     {
-        return new(RandomNumberGenerator.GetItems<char>(alphabet.GetCharacters().ToArray(), length));
+        if (alphabet.GetCharacters().Count == 0)
+        {
+            throw new ArgumentException("Alphabet is empty");
+        }
+
+        _alphabet = alphabet;
+    }
+
+    /// <inheritdoc />
+    public string Generate(int length)
+    {
+        return new(RandomNumberGenerator.GetItems<char>(_alphabet.GetCharacters().ToArray(), length));
     }
 }

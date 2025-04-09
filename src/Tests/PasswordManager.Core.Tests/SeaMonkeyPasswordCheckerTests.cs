@@ -22,7 +22,7 @@ public class SeaMonkeyPasswordCheckerTests
         var checker = new SeaMonkeyPasswordChecker();
 
         // act
-        var result = await checker.CheckPasswordAsync(password, default);
+        var result = await checker.CheckAsync(password, default);
 
         // assert
         Assert.Multiple(() =>

@@ -22,7 +22,7 @@ public class NistPasswordCheckerTests
         var checker = new NistPasswordChecker();
 
         // act
-        var result = await checker.CheckPasswordAsync(password, default);
+        var result = await checker.CheckAsync(password, default);
 
         // assert
         Assert.Multiple(() =>

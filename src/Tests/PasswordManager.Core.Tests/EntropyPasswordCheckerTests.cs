@@ -21,7 +21,7 @@ public class EntropyPasswordCheckerTests
         var checker = new EntropyPasswordChecker(alphabet);
 
         // act
-        var result = await checker.CheckPasswordAsync(password, default);
+        var result = await checker.CheckAsync(password, default);
 
         // assert
         Assert.Multiple(() =>
@@ -47,7 +47,7 @@ public class EntropyPasswordCheckerTests
         var checker = new EntropyPasswordChecker(alphabet);
 
         // act
-        var result = await checker.CheckPasswordAsync(password, default);
+        var result = await checker.CheckAsync(password, default);
 
         // assert
         Assert.Multiple(() =>
@@ -59,7 +59,7 @@ public class EntropyPasswordCheckerTests
     }
 
     [Test]
-    public void CheckEntropy_WrongAlphabet_Throw()
+    public void CheckEntropy_WrongAlphabet_ShouldThrow()
     {
         // arrange
         var alphabet = new Alphabet().WithNumbers();
@@ -67,6 +67,6 @@ public class EntropyPasswordCheckerTests
 
         // act
         // assert
-        Assert.ThrowsAsync<InvalidOperationException>(() => checker.CheckPasswordAsync("letters", default));
+        Assert.ThrowsAsync<InvalidOperationException>(() => checker.CheckAsync("letters", default));
     }
 }

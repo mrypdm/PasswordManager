@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.SecureData.Services;
-using PasswordManager.Web.Extensions;
+using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Views.Authentication;
 
 namespace PasswordManager.Web.Controllers;
@@ -13,7 +13,9 @@ namespace PasswordManager.Web.Controllers;
 /// </summary>
 [AllowAnonymous]
 [Route("auth")]
-public class AuthenticationController(IMasterKeyService masterKeyService) : Controller
+public class AuthenticationController(
+    IMasterKeyService masterKeyService,
+    ICookieAuthorizationHelper cookieAuthorizationHelper) : Controller
 {
     /// <summary>
     /// Get login view
@@ -32,7 +34,7 @@ public class AuthenticationController(IMasterKeyService masterKeyService) : Cont
     public async Task<ActionResult> LogoutAsync(CancellationToken token)
     {
         await masterKeyService.ClearMasterKeyAsync(token);
-        await HttpContext.SignOutWithCookieAsync();
+        await cookieAuthorizationHelper.SignOutAsync(HttpContext);
         return Redirect("/auth/login");
     }
 }

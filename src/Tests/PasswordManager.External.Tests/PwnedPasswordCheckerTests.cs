@@ -13,7 +13,7 @@ namespace PasswordManager.External.Tests;
 public class PwnedPasswordCheckerTests
 {
     [Test]
-    public async Task CheckPwned_HttpRequestIsMade()
+    public async Task CheckPwned_ShouldMakeHttpRequest()
     {
         // arrange
         var httpTest = new HttpTest();
@@ -22,14 +22,14 @@ public class PwnedPasswordCheckerTests
         var checker = new PwnedPasswordChecker();
 
         // act
-        await checker.CheckPasswordAsync("qwerty123", default);
+        await checker.CheckAsync("qwerty123", default);
 
         // assert
         httpTest.ShouldHaveCalled("https://api.pwnedpasswords.com/range/5CEC1").Times(1);
     }
 
     [Test]
-    public async Task CheckPwned_HandleServerErrors()
+    public async Task CheckPwned_ShouldHandleServerError()
     {
         // arrange
         var httpTest = new HttpTest();
@@ -38,7 +38,7 @@ public class PwnedPasswordCheckerTests
         var checker = new PwnedPasswordChecker();
 
         // act
-        var result = await checker.CheckPasswordAsync("qwerty123", default);
+        var result = await checker.CheckAsync("qwerty123", default);
 
         // assert
         httpTest.ShouldHaveCalled("https://api.pwnedpasswords.com/range/5CEC1").Times(1);
@@ -51,7 +51,7 @@ public class PwnedPasswordCheckerTests
     }
 
     [Test]
-    public void CheckPwned_NotServerErrorThrows()
+    public void CheckPwned_ShouldThrowOnNotServerError()
     {
         // arrange
         var httpTest = new HttpTest();
@@ -61,7 +61,7 @@ public class PwnedPasswordCheckerTests
 
         // act
         // assert
-        Assert.ThrowsAsync<PwnedRequestException>(() => checker.CheckPasswordAsync("qwerty123", default));
+        Assert.ThrowsAsync<PwnedRequestException>(() => checker.CheckAsync("qwerty123", default));
         httpTest.ShouldHaveCalled("https://api.pwnedpasswords.com/range/5CEC1").Times(1);
     }
 
@@ -73,7 +73,7 @@ public class PwnedPasswordCheckerTests
         var checker = new PwnedPasswordChecker();
 
         // act
-        var result = await checker.CheckPasswordAsync("qwerty123", default);
+        var result = await checker.CheckAsync("qwerty123", default);
 
         // assert
         Assert.Multiple(() =>

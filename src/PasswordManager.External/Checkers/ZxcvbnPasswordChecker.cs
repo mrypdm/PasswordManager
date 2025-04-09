@@ -11,7 +11,7 @@ namespace PasswordManager.External.Checkers;
 public sealed class ZxcvbnPasswordChecker : IPasswordChecker
 {
     /// <inheritdoc/>
-    public Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)
+    public Task<PasswordCheckStatus> CheckAsync(string password, CancellationToken token)
     {
         var strength = Zxcvbn.Core.EvaluatePassword(password).Score;
         return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, (PasswordStrength)strength, strength));

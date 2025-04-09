@@ -1,4 +1,3 @@
-using System;
 using PasswordManager.Abstractions;
 using PasswordManager.Abstractions.Checkers;
 using PasswordManager.Abstractions.Factories;
@@ -7,14 +6,13 @@ using PasswordManager.Core.Checkers;
 namespace PasswordManager.Core.Factories;
 
 /// <summary>
-/// Factory for <see cref="EntropyPasswordChecker"/>
+/// Factory for <see cref="SeaMonkeyPasswordChecker"/>
 /// </summary>
-public class EntropyPasswordCheckerFactory : IPasswordCheckerFactory
+public class SeaMonkeyPasswordCheckerFactory : IPasswordCheckerFactory
 {
     /// <inheritdoc />
     public IPasswordChecker Create(IAlphabet alphabet)
     {
-        ArgumentNullException.ThrowIfNull(alphabet);
-        return new EntropyPasswordChecker(alphabet);
+        return new SeaMonkeyPasswordChecker();
     }
 }

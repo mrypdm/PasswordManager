@@ -85,7 +85,7 @@ public class AesCryptoTests
     }
 
     [Test]
-    public void InvalidKey_Throw()
+    public void InvalidKey_ShouldThrow()
     {
         // arrange
         var crypto = new AesCrypto();
@@ -108,7 +108,7 @@ public class AesCryptoTests
     }
 
     [Test]
-    public void NullSalt_Throw()
+    public void NullSalt_ShouldThrow()
     {
         // arrange
         var crypto = new AesCrypto();
@@ -125,7 +125,7 @@ public class AesCryptoTests
     }
 
     [Test]
-    public void WrongSizeSalt_Throw()
+    public void WrongSizeSalt_ShouldThrow()
     {
         // arrange
         var crypto = new AesCrypto();
@@ -142,7 +142,7 @@ public class AesCryptoTests
     }
 
     [Test]
-    public void NullData_Throw()
+    public void NullData_ShouldThrow()
     {
         // arrange
         var crypto = new AesCrypto();

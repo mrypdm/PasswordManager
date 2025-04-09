@@ -5,7 +5,7 @@ namespace PasswordManager.Web.Models.Requests;
 /// <summary>
 /// Request for generating password
 /// </summary>
-public class PassworgGenerateRequest : IRequest
+public class GeneratePasswordRequest : IRequest
 {
     /// <summary>
     /// Length of generating password
@@ -39,6 +39,11 @@ public class PassworgGenerateRequest : IRequest
         if (Length <= 0)
         {
             errorMessage = "Length cannot be zero or negative";
+        }
+
+        if (!UseLowerLetters && !UseUpperLetters && !UseNumbers && string.IsNullOrWhiteSpace(SpecialSymbols))
+        {
+            errorMessage = "Alphabet is empty";
         }
 
         return errorMessage is null;

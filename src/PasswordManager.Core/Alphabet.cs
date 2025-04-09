@@ -9,13 +9,18 @@ namespace PasswordManager.Core;
 /// <inheritdoc />
 public sealed class Alphabet : IAlphabet
 {
-    public const string LowerLetters = "qwertyuiopasdfghjklzxcvbnm";
+    /// <summary>
+    /// Empty alphabet
+    /// </summary>
+    public static IAlphabet Empty { get; } = new Alphabet();
 
-    public const string UpperLetters = "QWERTYUIOPASDFGHJKLZXCVBNM";
+    private const string LowerLetters = "qwertyuiopasdfghjklzxcvbnm";
 
-    public const string Numbers = "0123456789";
+    private const string UpperLetters = "QWERTYUIOPASDFGHJKLZXCVBNM";
 
-    public const string Charecters = "`~!@#$%^&*+-/.,\\{}[]();:?<>\"'_";
+    private const string Numbers = "0123456789";
+
+    private const string Characters = "`~!@#$%^&*+-/.,\\{}[]();:?<>\"'_";
 
     private readonly StringBuilder _alphabetBuilder = new();
 
@@ -53,11 +58,11 @@ public sealed class Alphabet : IAlphabet
     }
 
     /// <summary>
-    /// Append intersection of <paramref name="allowedCharacters"/> and <see cref="Charecters"/> to alphabet
+    /// Append intersection of <paramref name="allowedCharacters"/> and <see cref="Characters"/> to alphabet
     /// </summary>
-    public Alphabet WithCharacters(string allowedCharacters = Charecters)
+    public Alphabet WithCharacters(string allowedCharacters = Characters)
     {
-        _alphabetBuilder.Append([.. allowedCharacters.Intersect(Charecters)]);
+        _alphabetBuilder.Append([.. allowedCharacters.Intersect(Characters)]);
         return this;
     }
 }

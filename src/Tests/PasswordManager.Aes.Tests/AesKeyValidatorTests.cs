@@ -9,7 +9,7 @@ namespace PasswordManager.Aes.Tests;
 public class AesKeyValidatorTests
 {
     [Test]
-    public void Validate_SuccessWay()
+    public void Validate_CommonWay_ShouldNotThrow()
     {
         // arrange
         var key = (byte[])Array.CreateInstance(typeof(byte), AesConstants.KeySize);
@@ -21,7 +21,7 @@ public class AesKeyValidatorTests
     }
 
     [Test]
-    public void Validate_Null_Throw()
+    public void Validate_Null_ShouldThrow()
     {
         // arrange
         var validator = new AesKeyValidator();
@@ -32,7 +32,7 @@ public class AesKeyValidatorTests
     }
 
     [Test]
-    public void Validate_WrongSize_Throw()
+    public void Validate_WrongSize_ShouldThrow()
     {
         // arrange
         var key = (byte[])Array.CreateInstance(typeof(byte), AesConstants.KeySize - 1);

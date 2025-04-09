@@ -15,7 +15,7 @@ public class JsonWriteableOptionsTests
     }
 
     [Test]
-    public async Task WithoutFile_CreatesNew()
+    public async Task WithoutFile_ShouldCreateFile()
     {
         // arrange
         using var file = new TempFile("not-exist");
@@ -39,7 +39,7 @@ public class JsonWriteableOptionsTests
     }
 
     [Test]
-    public async Task BadJson_ReturnsNew()
+    public async Task BadJson_ShouldReturnNewValue()
     {
         // arrange
         using var file = new TempFile();
@@ -57,7 +57,7 @@ public class JsonWriteableOptionsTests
     }
 
     [Test]
-    public async Task WithFile_ReadsFromFile()
+    public async Task WithFile_ShouldReadFromFile()
     {
         // arrange
         const int number = 321;

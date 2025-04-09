@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.Services;
 using PasswordManager.UserSettings;
-using PasswordManager.Web.Extensions;
+using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Options;
 
@@ -21,6 +21,7 @@ namespace PasswordManager.Web.Controllers.Api;
 [Route("api/logon")]
 public class LogonApiController(
     IMasterKeyService masterKeyService,
+    ICookieAuthorizationHelper cookieAuthorizationHelper,
     IWritableOptions<UserOptions> userOptions,
     IOptions<ConnectionOptions> connectionOptions) : Controller
 {
@@ -31,6 +32,11 @@ public class LogonApiController(
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> SignInAsync([FromBody] LoginRequest request, CancellationToken token)
     {
+        if (!request.Validate(out var error))
+        {
+            return BadRequest(error);
+        }
+
         try
         {
             await masterKeyService.InitMasterKeyAsync(request.MasterPassword, userOptions.Value.SessionTimeout, token);
@@ -44,7 +50,7 @@ public class LogonApiController(
             return StatusCode((int)HttpStatusCode.Forbidden, "Storage is blocked");
         }
 
-        await HttpContext.SignInWithCookieAsync(connectionOptions.Value);
+        await cookieAuthorizationHelper.SignInAsync(HttpContext, connectionOptions.Value);
         return Ok();
     }
 
@@ -55,7 +61,7 @@ public class LogonApiController(
     public async Task<ActionResult> SignOutAsync(CancellationToken token)
     {
         await masterKeyService.ClearMasterKeyAsync(token);
-        await HttpContext.SignOutWithCookieAsync();
+        await cookieAuthorizationHelper.SignOutAsync(HttpContext);
         return Ok();
     }
 }

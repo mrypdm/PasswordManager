@@ -13,7 +13,7 @@ namespace PasswordManager.Core.Checkers;
 public sealed class NistPasswordChecker : IPasswordChecker
 {
     /// <inheritdoc/>
-    public Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)
+    public Task<PasswordCheckStatus> CheckAsync(string password, CancellationToken token)
     {
         if (password.Length == 0)
         {

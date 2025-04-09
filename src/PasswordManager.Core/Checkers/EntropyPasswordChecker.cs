@@ -15,13 +15,14 @@ namespace PasswordManager.Core.Checkers;
 public sealed class EntropyPasswordChecker(IAlphabet alphabet) : IPasswordChecker
 {
     /// <inheritdoc/>
-    public Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)
+    public Task<PasswordCheckStatus> CheckAsync(string password, CancellationToken token)
     {
         ValidatePasswordCharacters(password);
 
         var entropy = Math.Log2(alphabet.GetCharacters().Count) * password.Length;
         var strength = entropy switch
         {
+            <= 0 => PasswordStrength.Unknown, // if alphabet is empty
             < 60 => PasswordStrength.VeryLow,
             < 80 => PasswordStrength.Low,
             < 100 => PasswordStrength.Medium,

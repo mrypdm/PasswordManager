@@ -13,7 +13,7 @@ namespace PasswordManager.Core.Checkers;
 public sealed class SeaMonkeyPasswordChecker : IPasswordChecker
 {
     /// <inheritdoc/>
-    public Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)
+    public Task<PasswordCheckStatus> CheckAsync(string password, CancellationToken token)
     {
         var length = Math.Min(password.Length, 5);
         var uppers = Math.Min(CountOfUppers(password), 3);

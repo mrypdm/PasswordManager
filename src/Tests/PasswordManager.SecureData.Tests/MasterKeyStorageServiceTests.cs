@@ -34,7 +34,7 @@ public class MasterKeyStorageServiceTests
     }
 
     [Test]
-    public void IsInitialized_NotInitialized()
+    public void IsInitialized_NotInitialized_ShouldReturnFalse()
     {
         // arrange
         using var storage = CreateStorage();
@@ -45,7 +45,7 @@ public class MasterKeyStorageServiceTests
     }
 
     [Test]
-    public void ChangeTimeout_ShouldThrow()
+    public void ChangeTimeout_NotInitialized_ShouldThrow()
     {
         // arrange
         using var storage = CreateStorage();
@@ -56,7 +56,7 @@ public class MasterKeyStorageServiceTests
     }
 
     [Test]
-    public void ChangeTimeout_ShouldThrow_InvalidTimeout_ShouldThrow()
+    public void ChangeTimeout_InvalidTimeout_ShouldThrow()
     {
         // arrange
         using var storage = CreateStorage();
@@ -67,7 +67,7 @@ public class MasterKeyStorageServiceTests
     }
 
     [Test]
-    public void Initialize_NotInitialized_ShoudValidateKeyAndInitStorage()
+    public void Initialize_NotInitialized_ShouldValidateKeyAndInitStorage()
     {
         // arrange
         var key = RandomNumberGenerator.GetBytes(32);
@@ -93,7 +93,7 @@ public class MasterKeyStorageServiceTests
     }
 
     [Test]
-    public async Task Initialize_ShoudBeClearedAfterTimeout()
+    public async Task Initialize_ShouldBeClearedAfterTimeout()
     {
         // arrange
         var key = RandomNumberGenerator.GetBytes(32);

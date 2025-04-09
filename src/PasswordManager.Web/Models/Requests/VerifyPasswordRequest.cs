@@ -5,7 +5,7 @@ namespace PasswordManager.Web.Models.Requests;
 /// <summary>
 /// Request to verify password
 /// </summary>
-public class PasswordVerifyRequest : IRequest
+public class VerifyPasswordRequest : IRequest
 {
     /// <summary>
     /// Password for verify

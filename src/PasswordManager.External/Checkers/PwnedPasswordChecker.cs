@@ -20,7 +20,7 @@ public sealed class PwnedPasswordChecker : IPasswordChecker
     public const string UrlPrefix = "https://api.pwnedpasswords.com/range";
 
     /// <inheritdoc/>
-    public async Task<PasswordCheckStatus> CheckPasswordAsync(string password, CancellationToken token)
+    public async Task<PasswordCheckStatus> CheckAsync(string password, CancellationToken token)
     {
         var hash = Convert.ToHexString(SHA1.HashData(Encoding.UTF8.GetBytes(password)));
 
