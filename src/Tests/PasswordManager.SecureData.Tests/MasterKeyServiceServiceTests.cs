@@ -224,7 +224,7 @@ public class MasterKeyServiceServiceTests
     }
 
     [Test]
-    public async Task ChangeKeyTimeout_ShouldChangeLifeTimeInStorage()
+    public async Task ChangeKeyTimeout_ShouldChangeTimeoutInStorage()
     {
         // arrange
         var timeout = TimeSpan.FromSeconds(10);

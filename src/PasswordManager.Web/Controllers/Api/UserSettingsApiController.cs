@@ -52,12 +52,17 @@ public class UserSettingsApiController(
     /// Change master key parameters
     /// </summary>
     [HttpPatch("master-key")]
-    public async Task<ActionResult> ChangeSessionTimeoutAsync([FromBody] ChangeMasterKeySettingsRequest request,
+    public async Task<ActionResult> ChangeMasterKeySettingsAsync([FromBody] ChangeMasterKeySettingsRequest request,
         CancellationToken token)
     {
         if (!request.Validate(out var error))
         {
             return BadRequest(error);
+        }
+
+        if (!request.HasSense())
+        {
+            return Ok();
         }
 
         var keyGenerator = keyGeneratorFactory.Create(

@@ -29,7 +29,7 @@ public class ChangeMasterKeySettingsRequest : IRequest
     /// Salt for master key generation in bytes
     /// </summary>
     [JsonIgnore]
-    public byte[] SaltBytes => Convert.FromHexString(Salt);
+    public byte[] SaltBytes => Salt is null ? null : Convert.FromHexString(Salt);
 
     /// <summary>
     /// Count of iterations for key generation
@@ -73,5 +73,15 @@ public class ChangeMasterKeySettingsRequest : IRequest
         }
 
         return errorMessage is null;
+    }
+
+    /// <summary>
+    /// If request can change something
+    /// </summary>
+    public bool HasSense()
+    {
+        return Salt is not null
+            || Iterations is not null
+            || (NewMasterPassword is not null && NewMasterPassword != MasterPassword);
     }
 }
