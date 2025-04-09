@@ -1,6 +1,5 @@
 using System;
 using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -47,7 +46,7 @@ public class MasterKeyServiceServiceTests
 
         _generatorMock.Setup(m => m.Generate(password)).Returns(key);
         _repositoryMock
-            .Setup(m => m.ValidateMasterKeyDataAsync(key, It.IsAny<CancellationToken>()))
+            .Setup(m => m.ValidateMasterKeyDataAsync(key, default))
             .ThrowsAsync(new MasterKeyDataNotExistsException());
 
         var service = CreateService();
@@ -59,8 +58,8 @@ public class MasterKeyServiceServiceTests
 
         _generatorMock.Verify(m => m.Generate(password), Times.Once);
         _validatorMock.Verify(m => m.Validate(key), Times.Once);
-        _repositoryMock.Verify(m => m.ValidateMasterKeyDataAsync(key, It.IsAny<CancellationToken>()), Times.Once);
-        _repositoryMock.Verify(m => m.SetMasterKeyDataAsync(key, It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(m => m.ValidateMasterKeyDataAsync(key, default), Times.Once);
+        _repositoryMock.Verify(m => m.SetMasterKeyDataAsync(key, default), Times.Once);
         _storageMock.Verify(m => m.InitStorage(key, timeout), Times.Once);
     }
 
@@ -83,8 +82,8 @@ public class MasterKeyServiceServiceTests
 
         _generatorMock.Verify(m => m.Generate(password), Times.Once);
         _validatorMock.Verify(m => m.Validate(key), Times.Once);
-        _repositoryMock.Verify(m => m.ValidateMasterKeyDataAsync(key, It.IsAny<CancellationToken>()), Times.Once);
-        _repositoryMock.Verify(m => m.SetMasterKeyDataAsync(key, It.IsAny<CancellationToken>()), Times.Never);
+        _repositoryMock.Verify(m => m.ValidateMasterKeyDataAsync(key, default), Times.Once);
+        _repositoryMock.Verify(m => m.SetMasterKeyDataAsync(key, default), Times.Never);
         _storageMock.Verify(m => m.InitStorage(key, timeout), Times.Once);
     }
 
@@ -101,7 +100,7 @@ public class MasterKeyServiceServiceTests
         };
 
         _repositoryMock
-            .Setup(m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
+            .Setup(m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), default))
             .ThrowsAsync(new InvalidMasterKeyException());
         _optionsMock
             .Setup(m => m.Value)
@@ -114,7 +113,7 @@ public class MasterKeyServiceServiceTests
 
         // assert
         _repositoryMock.Verify(
-            m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()),
+            m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), default),
             Times.Once);
         _counterMock.Verify(m => m.Increment(), Times.Once);
     }
@@ -132,7 +131,7 @@ public class MasterKeyServiceServiceTests
         };
 
         _repositoryMock
-            .Setup(m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()))
+            .Setup(m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), default))
             .ThrowsAsync(new InvalidMasterKeyException());
         _counterMock
             .Setup(m => m.Count)
@@ -148,7 +147,7 @@ public class MasterKeyServiceServiceTests
 
         // assert
         _repositoryMock.Verify(
-            m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), It.IsAny<CancellationToken>()),
+            m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), default),
             Times.Once);
         _counterMock.Verify(m => m.Increment(), Times.Once);
         _counterMock.Verify(m => m.Count, Times.Once);
@@ -193,8 +192,8 @@ public class MasterKeyServiceServiceTests
         _generatorMock.Verify(m => m.Generate(oldPassword), Times.Once);
         newGeneratorMock.Verify(m => m.Generate(newPassword), Times.Once);
         _validatorMock.Verify(m => m.Validate(oldKey), Times.Once);
-        _repositoryMock.Verify(m => m.ValidateMasterKeyDataAsync(oldKey, It.IsAny<CancellationToken>()), Times.Once);
-        _repositoryMock.Verify(m => m.ChangeMasterKeyDataAsync(newKey, It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(m => m.ValidateMasterKeyDataAsync(oldKey, default), Times.Once);
+        _repositoryMock.Verify(m => m.ChangeMasterKeyDataAsync(newKey, default), Times.Once);
         _storageMock.Verify(m => m.ClearKey(), Times.Once);
     }
 
@@ -220,7 +219,7 @@ public class MasterKeyServiceServiceTests
         await service.IsMasterKeyDataExistsAsync(default);
 
         // assert
-        _repositoryMock.Verify(m => m.IsMasterKeyDataExistsAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(m => m.IsMasterKeyDataExistsAsync(default), Times.Once);
     }
 
     [Test]
@@ -248,7 +247,7 @@ public class MasterKeyServiceServiceTests
 
         // assert
         _storageMock.Verify(m => m.ClearKey(), Times.Once);
-        _repositoryMock.Verify(m => m.DeleteMasterKeyDataAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(m => m.DeleteMasterKeyDataAsync(default), Times.Once);
     }
 
     [Test]
