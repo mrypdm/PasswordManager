@@ -31,6 +31,6 @@ public class AesSaltGeneratorTests
         var salt2 = generator.Generate();
 
         // assert
-        Assert.That(salt1.SequenceEqual(salt2), Is.Not.True, "Salts shoud be different");
+        Assert.That(salt1.SequenceEqual(salt2), Is.Not.True, "Salts should be different");
     }
 }

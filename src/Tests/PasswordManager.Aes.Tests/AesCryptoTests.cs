@@ -27,8 +27,8 @@ public class AesCryptoTests
         var decrypted2 = crypto.Decrypt(encrypted2, key);
 
         // assert
-        CollectionAssert.AreEqual(data, decrypted1, "Decrypted value shoud be equal to etalon");
-        Assert.That(decrypted1.SequenceEqual(decrypted1), Is.True, "Decrypted values shoud be equal");
+        CollectionAssert.AreEqual(data, decrypted1, "Decrypted value should be equal to etalon");
+        Assert.That(decrypted1.SequenceEqual(decrypted1), Is.True, "Decrypted values should be equal");
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class AesCryptoTests
         var encrypted2 = crypto.Encrypt(data, key);
 
         // assert
-        Assert.That(encrypted1.Data.SequenceEqual(encrypted2.Data), Is.False, "Encrypted values shoud be different");
+        Assert.That(encrypted1.Data.SequenceEqual(encrypted2.Data), Is.False, "Encrypted values should be different");
     }
 
     [Test]
@@ -81,7 +81,7 @@ public class AesCryptoTests
         var decrypted = crypto.Decrypt(encrypted, key);
 
         // assert
-        CollectionAssert.AreNotEqual(data, decrypted, "Decrypted with wrong salt shoud be not equal to etalon");
+        CollectionAssert.AreNotEqual(data, decrypted, "Decrypted with wrong salt should be not equal to etalon");
     }
 
     [Test]
