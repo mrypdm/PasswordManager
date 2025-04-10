@@ -146,7 +146,7 @@ public static class WebApplicationBuilderExtensions
     /// <summary>
     /// Add routing to web application
     /// </summary>
-    public static WebApplicationBuilder AddRazorPages(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddControllers(this WebApplicationBuilder builder)
     {
         builder.Services
             .AddAntiforgery(opt =>
