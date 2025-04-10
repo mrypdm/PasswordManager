@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
+using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.Services;
 using PasswordManager.UserSettings;
@@ -89,7 +90,7 @@ public class LogonApiControllerTests
 
         _keyServiceMock
             .Setup(m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default))
-            .ThrowsAsync(new InvalidKeyException());
+            .ThrowsAsync(new KeyValidationException());
 
         // act
         var res = await controller.SignInAsync(request, default);

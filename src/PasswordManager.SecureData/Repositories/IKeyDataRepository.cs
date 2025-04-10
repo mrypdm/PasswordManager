@@ -29,7 +29,6 @@ public interface IKeyDataRepository
     /// </summary>
     /// <exception cref="KeyDataNotExistsException">If key data not exists</exception>
     /// <exception cref="KeyValidationException">If <paramref name="key"/> is invalid</exception>
-    /// <exception cref="InvalidKeyException">If key is invalid</exception>
     Task ValidateKeyDataAsync(byte[] key, CancellationToken token);
 
     /// <summary>

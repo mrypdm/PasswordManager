@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Moq;
 using PasswordManager.Abstractions.Crypto;
+using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Contexts;
@@ -241,7 +242,7 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            Assert.ThrowsAsync<InvalidKeyException>(() => repo.ValidateKeyDataAsync(key, default));
+            Assert.ThrowsAsync<KeyValidationException>(() => repo.ValidateKeyDataAsync(key, default));
         }
     }
 
@@ -268,7 +269,7 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            Assert.ThrowsAsync<InvalidKeyException>(() => repo.ValidateKeyDataAsync(key, default));
+            Assert.ThrowsAsync<KeyValidationException>(() => repo.ValidateKeyDataAsync(key, default));
         }
     }
 

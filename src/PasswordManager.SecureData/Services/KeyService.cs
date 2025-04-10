@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using PasswordManager.Abstractions.Counters;
+using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Exceptions;
@@ -37,7 +38,7 @@ public sealed class KeyService(
         {
             await keyDataRepository.SetKeyDataAsync(key, token);
         }
-        catch (InvalidKeyException)
+        catch (KeyValidationException)
         {
             CountInvalidAttempt();
             throw;

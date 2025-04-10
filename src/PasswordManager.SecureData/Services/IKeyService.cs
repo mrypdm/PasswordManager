@@ -20,7 +20,6 @@ public interface IKeyService
     /// <exception cref="ArgumentException">If <paramref name="password"/> is whitespace</exception>
     /// <exception cref="KeyValidationException">If <paramref name="password"/> is invalid</exception>
     /// <exception cref="ArgumentException">If <paramref name="sessionTimeout"/> is invalid</exception>
-    /// <exception cref="InvalidKeyException">If password is invalid</exception>
     Task InitKeyAsync(string password, TimeSpan sessionTimeout, CancellationToken token);
 
     /// <summary>

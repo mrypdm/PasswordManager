@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Abstractions.Crypto;
+using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Contexts;
 using PasswordManager.SecureData.Exceptions;
@@ -89,7 +90,7 @@ public class KeyDataRepository(
             // NOP
         }
 
-        throw new InvalidKeyException();
+        throw new KeyValidationException();
     }
 
     /// <inheritdoc />

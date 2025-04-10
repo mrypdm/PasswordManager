@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.Services;
 using PasswordManager.UserSettings;
@@ -41,7 +42,7 @@ public class LogonApiController(
         {
             await keyService.InitKeyAsync(request.MasterPassword, userOptions.Value.SessionTimeout, token);
         }
-        catch (InvalidKeyException)
+        catch (KeyValidationException)
         {
             return Unauthorized("Master password is invalid");
         }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
 using PasswordManager.Abstractions.Counters;
+using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Exceptions;
@@ -101,7 +102,7 @@ public class KeyServiceTests
 
         _repositoryMock
             .Setup(m => m.ValidateKeyDataAsync(It.IsAny<byte[]>(), default))
-            .ThrowsAsync(new InvalidKeyException());
+            .ThrowsAsync(new KeyValidationException());
         _optionsMock
             .Setup(m => m.Value)
             .Returns(options);
@@ -109,7 +110,7 @@ public class KeyServiceTests
         var service = CreateService();
 
         // act
-        Assert.ThrowsAsync<InvalidKeyException>(() => service.InitKeyAsync(password, timeout, default));
+        Assert.ThrowsAsync<KeyValidationException>(() => service.InitKeyAsync(password, timeout, default));
 
         // assert
         _repositoryMock.Verify(
@@ -132,7 +133,7 @@ public class KeyServiceTests
 
         _repositoryMock
             .Setup(m => m.ValidateKeyDataAsync(It.IsAny<byte[]>(), default))
-            .ThrowsAsync(new InvalidKeyException());
+            .ThrowsAsync(new KeyValidationException());
         _counterMock
             .Setup(m => m.Count)
             .Returns(options.MaxAttemptCounts);
@@ -143,7 +144,7 @@ public class KeyServiceTests
         var service = CreateService();
 
         // act
-        Assert.ThrowsAsync<InvalidKeyException>(() => service.InitKeyAsync(password, timeout, default));
+        Assert.ThrowsAsync<KeyValidationException>(() => service.InitKeyAsync(password, timeout, default));
 
         // assert
         _repositoryMock.Verify(
