@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore.Migrations;
-using PasswordManager.SecureData.Extensions;
+using PasswordManager.Data.Extensions;
 
 #nullable disable
 
-namespace PasswordManager.SecureData.Migrations;
+namespace PasswordManager.Data.Migrations;
 
 /// <inheritdoc />
 public partial class Init : Migration

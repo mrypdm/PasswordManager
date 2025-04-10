@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace PasswordManager.SecureData.Extensions;
+namespace PasswordManager.Data.Extensions;
 
 /// <summary>
 /// Extensions for <see cref="MigrationBuilder"/>

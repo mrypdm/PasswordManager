@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using PasswordManager.SecureData.Models;
+using PasswordManager.Data.Models;
 
-namespace PasswordManager.SecureData.Contexts;
+namespace PasswordManager.Data.Contexts;
 
 /// <summary>
 /// DB context for secure items

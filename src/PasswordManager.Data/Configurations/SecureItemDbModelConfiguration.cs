@@ -1,21 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PasswordManager.SecureData.Models;
+using PasswordManager.Data.Models;
 
-namespace PasswordManager.SecureData.Configurations;
+namespace PasswordManager.Data.Configurations;
 
 /// <summary>
-/// Configuration for <see cref="KeyDataDbModel"/>
+/// Configuration for <see cref="SecureItemDbModel"/>
 /// </summary>
-public sealed class KeyDataDbModelConfiguration : IEntityTypeConfiguration<KeyDataDbModel>
+public class SecureItemDbModelConfiguration : IEntityTypeConfiguration<SecureItemDbModel>
 {
     /// <inheritdoc />
-    public void Configure(EntityTypeBuilder<KeyDataDbModel> builder)
+    public void Configure(EntityTypeBuilder<SecureItemDbModel> builder)
     {
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Id).ValueGeneratedOnAdd();
+        builder.Property(m => m.Name).IsRequired();
         builder.Property(m => m.Salt).IsRequired();
         builder.Property(m => m.Data).IsRequired();
         builder.Property(m => m.Version).HasDefaultValue(0).IsRowVersion();
+        builder.HasIndex(m => m.Name);
     }
 }

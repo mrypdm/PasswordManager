@@ -1,6 +1,6 @@
 using PasswordManager.Abstractions.Models;
 
-namespace PasswordManager.SecureData.Models;
+namespace PasswordManager.Data.Models;
 
 /// <summary>
 /// Encrypted item

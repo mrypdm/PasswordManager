@@ -7,11 +7,11 @@ using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Abstractions.Storages;
-using PasswordManager.SecureData.Contexts;
-using PasswordManager.SecureData.Models;
-using PasswordManager.SecureData.Repositories;
+using PasswordManager.Data.Contexts;
+using PasswordManager.Data.Models;
+using PasswordManager.Data.Repositories;
 
-namespace PasswordManager.SecureData.Tests;
+namespace PasswordManager.Data.Tests;
 
 /// <summary>
 /// Tests for <see cref="SecureItemsRepository"/>

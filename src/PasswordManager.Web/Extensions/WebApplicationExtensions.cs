@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PasswordManager.SecureData.Contexts;
+using PasswordManager.Data.Contexts;
 
 namespace PasswordManager.Web.Extensions;
 

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using PasswordManager.SecureData.Contexts;
+using PasswordManager.Data.Contexts;
 
-namespace PasswordManager.SecureData.Tests;
+namespace PasswordManager.Data.Tests;
 
 /// <summary>
 /// Tests for repositories

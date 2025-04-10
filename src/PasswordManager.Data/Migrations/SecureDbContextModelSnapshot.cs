@@ -2,11 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PasswordManager.SecureData.Contexts;
+using PasswordManager.Data.Contexts;
 
 #nullable disable
 
-namespace PasswordManager.SecureData.Migrations
+namespace PasswordManager.Data.Migrations
 {
     [DbContext(typeof(SecureDbContext))]
     partial class SecureDbContextModelSnapshot : ModelSnapshot
@@ -16,7 +16,7 @@ namespace PasswordManager.SecureData.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
 
-            modelBuilder.Entity("PasswordManager.SecureData.Models.KeyDataDbModel", b =>
+            modelBuilder.Entity("PasswordManager.Data.Models.KeyDataDbModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +41,7 @@ namespace PasswordManager.SecureData.Migrations
                     b.ToTable("KeyData");
                 });
 
-            modelBuilder.Entity("PasswordManager.SecureData.Models.SecureItemDbModel", b =>
+            modelBuilder.Entity("PasswordManager.Data.Models.SecureItemDbModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

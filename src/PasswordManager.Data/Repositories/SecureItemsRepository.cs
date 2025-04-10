@@ -8,10 +8,10 @@ using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Abstractions.Storages;
-using PasswordManager.SecureData.Contexts;
-using PasswordManager.SecureData.Models;
+using PasswordManager.Data.Contexts;
+using PasswordManager.Data.Models;
 
-namespace PasswordManager.SecureData.Repositories;
+namespace PasswordManager.Data.Repositories;
 
 /// <inheritdoc />
 public sealed class SecureItemsRepository(

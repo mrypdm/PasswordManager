@@ -1,4 +1,4 @@
-namespace PasswordManager.SecureData.Models;
+namespace PasswordManager.Data.Models;
 
 /// <summary>
 /// Model for key data
