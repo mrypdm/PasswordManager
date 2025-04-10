@@ -1,7 +1,7 @@
 using System;
-using PasswordManager.SecureData.Services;
+using PasswordManager.Core.Services;
 
-namespace PasswordManager.SecureData.Options;
+namespace PasswordManager.Core.Options;
 
 /// <summary>
 /// Options for <see cref="KeyService"/>

@@ -9,9 +9,9 @@ using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Abstractions.Services;
 using PasswordManager.Abstractions.Storages;
 using PasswordManager.Abstractions.Validators;
-using PasswordManager.SecureData.Options;
+using PasswordManager.Core.Options;
 
-namespace PasswordManager.SecureData.Services;
+namespace PasswordManager.Core.Services;
 
 /// <inheritdoc />
 public sealed class KeyService(

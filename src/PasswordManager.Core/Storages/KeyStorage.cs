@@ -4,7 +4,7 @@ using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Storages;
 using PasswordManager.Abstractions.Validators;
 
-namespace PasswordManager.SecureData.Storages;
+namespace PasswordManager.Core.Storages;
 
 /// <inheritdoc cref="IKeyStorage"/>
 public sealed class KeyStorage(IKeyValidator keyValidator) : IKeyStorage, IDisposable

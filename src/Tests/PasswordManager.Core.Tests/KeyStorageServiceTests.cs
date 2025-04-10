@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using Moq;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Validators;
-using PasswordManager.SecureData.Storages;
+using PasswordManager.Core.Storages;
 
-namespace PasswordManager.SecureData.Tests;
+namespace PasswordManager.Core.Tests;
 
 /// <summary>
-/// Tests for <see cref="Storages.KeyStorage"/>
+/// Tests for <see cref="KeyStorage"/>
 /// </summary>
 public class KeyStorageServiceTests
 {

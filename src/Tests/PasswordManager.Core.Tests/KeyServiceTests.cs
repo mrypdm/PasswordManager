@@ -9,10 +9,10 @@ using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Abstractions.Storages;
 using PasswordManager.Abstractions.Validators;
-using PasswordManager.SecureData.Options;
-using PasswordManager.SecureData.Services;
+using PasswordManager.Core.Options;
+using PasswordManager.Core.Services;
 
-namespace PasswordManager.SecureData.Tests;
+namespace PasswordManager.Core.Tests;
 
 /// <summary>
 /// Tests for <see cref="KeyService"/>
