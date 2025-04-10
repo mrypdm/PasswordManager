@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using PasswordManager.SecureData.Storages;
+using PasswordManager.Abstractions.Storages;
 using PasswordManager.Web.Options;
 
 namespace PasswordManager.Web.Helpers;

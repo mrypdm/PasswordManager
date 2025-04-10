@@ -3,8 +3,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Moq;
+using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Validators;
-using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.Storages;
 
 namespace PasswordManager.SecureData.Tests;

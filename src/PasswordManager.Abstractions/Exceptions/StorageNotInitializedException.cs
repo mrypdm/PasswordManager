@@ -1,6 +1,6 @@
 using System;
 
-namespace PasswordManager.SecureData.Exceptions;
+namespace PasswordManager.Abstractions.Exceptions;
 
 /// <summary>
 /// Storage not initialized exception

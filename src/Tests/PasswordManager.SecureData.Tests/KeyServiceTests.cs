@@ -6,12 +6,11 @@ using Moq;
 using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Generators;
+using PasswordManager.Abstractions.Repositories;
+using PasswordManager.Abstractions.Storages;
 using PasswordManager.Abstractions.Validators;
-using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.Options;
-using PasswordManager.SecureData.Repositories;
 using PasswordManager.SecureData.Services;
-using PasswordManager.SecureData.Storages;
 
 namespace PasswordManager.SecureData.Tests;
 
@@ -156,7 +155,7 @@ public class KeyServiceTests
     }
 
     [Test]
-    public async Task InitKey_StorageBlocked_ShouldThrow()
+    public async Task InitKey_ShouldCheckForBlockedStorage()
     {
         // arrange
         var password = "password";

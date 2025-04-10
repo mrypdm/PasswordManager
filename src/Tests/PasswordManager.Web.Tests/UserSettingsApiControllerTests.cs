@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Generators;
-using PasswordManager.SecureData.Services;
+using PasswordManager.Abstractions.Services;
 using PasswordManager.UserSettings;
 using PasswordManager.Web.Controllers.Api;
 using PasswordManager.Web.Helpers;

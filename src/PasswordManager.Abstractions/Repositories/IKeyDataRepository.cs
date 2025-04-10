@@ -1,9 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using PasswordManager.Abstractions.Exceptions;
-using PasswordManager.SecureData.Exceptions;
 
-namespace PasswordManager.SecureData.Repositories;
+namespace PasswordManager.Abstractions.Repositories;
 
 /// <summary>
 /// Repository for key data

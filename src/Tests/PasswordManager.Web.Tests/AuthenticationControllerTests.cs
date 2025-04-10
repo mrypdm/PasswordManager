@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using PasswordManager.SecureData.Services;
+using PasswordManager.Abstractions.Services;
 using PasswordManager.Web.Controllers;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Views.Authentication;
@@ -34,8 +34,11 @@ public class AuthenticationControllerTests
         var res = await controller.LogoutAsync(default);
 
         // assert
-        Assert.That(res, Is.TypeOf<RedirectResult>());
-        Assert.That((res as RedirectResult).Url, Is.EqualTo("/auth/login"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(res, Is.TypeOf<RedirectResult>());
+            Assert.That((res as RedirectResult).Url, Is.EqualTo("/auth/login"));
+        });
         _keyServiceMock.Verify(m => m.ClearKeyAsync(default), Times.Once);
         _cookieHelperMock.Verify(m => m.SignOutAsync(It.IsAny<HttpContext>()), Times.Once);
     }

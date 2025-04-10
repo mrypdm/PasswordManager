@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using PasswordManager.SecureData.Exceptions;
-using PasswordManager.SecureData.Models;
-using PasswordManager.SecureData.Repositories;
+using PasswordManager.Abstractions.Exceptions;
+using PasswordManager.Abstractions.Models;
+using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Web.Controllers.Api;
 using PasswordManager.Web.Models.Requests;
 
@@ -64,10 +64,10 @@ public class AccountsApiControllerTests
     public async Task GetAllHeaders_CommonWay_ShouldReturnHeaders()
     {
         // arrange
-        var item0 = new SecureItemDbModel() { Id = 1, Name = "0" };
-        var item1 = new SecureItemDbModel() { Id = 1, Name = "1" };
+        var item0 = new ItemHeader() { Id = 1, Name = "0" };
+        var item1 = new ItemHeader() { Id = 1, Name = "1" };
         _repositoryMock
-            .Setup(m => m.GetItemsAsync(default))
+            .Setup(m => m.GetItemHeadersAsync(default))
             .ReturnsAsync([item0, item1]);
 
         var controller = CreateController();
@@ -85,7 +85,7 @@ public class AccountsApiControllerTests
             Assert.That(res.Value[1].Id, Is.EqualTo(item1.Id));
             Assert.That(res.Value[1].Name, Is.EqualTo(item1.Name));
         });
-        _repositoryMock.Verify(m => m.GetItemsAsync(default), Times.Once);
+        _repositoryMock.Verify(m => m.GetItemHeadersAsync(default), Times.Once);
     }
 
     [Test]

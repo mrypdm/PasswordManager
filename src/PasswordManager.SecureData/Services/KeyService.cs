@@ -5,11 +5,11 @@ using Microsoft.Extensions.Options;
 using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Generators;
+using PasswordManager.Abstractions.Repositories;
+using PasswordManager.Abstractions.Services;
+using PasswordManager.Abstractions.Storages;
 using PasswordManager.Abstractions.Validators;
-using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.Options;
-using PasswordManager.SecureData.Repositories;
-using PasswordManager.SecureData.Storages;
 
 namespace PasswordManager.SecureData.Services;
 

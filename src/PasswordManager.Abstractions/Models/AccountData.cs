@@ -1,4 +1,4 @@
-namespace PasswordManager.SecureData.Models;
+namespace PasswordManager.Abstractions.Models;
 
 /// <summary>
 /// Account data

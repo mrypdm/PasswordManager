@@ -1,7 +1,8 @@
 using System;
 using System.Runtime.Caching;
+using PasswordManager.Abstractions.Exceptions;
+using PasswordManager.Abstractions.Storages;
 using PasswordManager.Abstractions.Validators;
-using PasswordManager.SecureData.Exceptions;
 
 namespace PasswordManager.SecureData.Storages;
 
@@ -18,6 +19,7 @@ public sealed class KeyStorage(IKeyValidator keyValidator) : IKeyStorage, IDispo
     {
         get
         {
+            ThrowIfBlocked();
             ThrowIfNotInitialized();
             return _cache.Get(KeyCacheKey) as byte[];
         }
@@ -50,6 +52,7 @@ public sealed class KeyStorage(IKeyValidator keyValidator) : IKeyStorage, IDispo
     /// <inheritdoc />
     public void ClearKey()
     {
+        ThrowIfBlocked();
         _cache.Remove(KeyCacheKey);
     }
 

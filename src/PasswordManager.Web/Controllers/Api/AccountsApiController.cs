@@ -1,10 +1,9 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using PasswordManager.SecureData.Exceptions;
-using PasswordManager.SecureData.Models;
-using PasswordManager.SecureData.Repositories;
+using PasswordManager.Abstractions.Exceptions;
+using PasswordManager.Abstractions.Models;
+using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Models.Responses;
 
@@ -39,10 +38,9 @@ public class AccountsApiController(ISecureItemsRepository secureItemsRepository)
     /// Get all items headers in storage
     /// </summary>
     [HttpGet("headers")]
-    public async Task<ActionResult<ItemHeaderResponse[]>> GetAllHeadersAsync(CancellationToken token)
+    public async Task<ActionResult<ItemHeader[]>> GetAllHeadersAsync(CancellationToken token)
     {
-        var items = await secureItemsRepository.GetItemsAsync(token);
-        return items.Select(m => new ItemHeaderResponse(m.Id, m.Name)).ToArray();
+        return await secureItemsRepository.GetItemHeadersAsync(token);
     }
 
     /// <summary>

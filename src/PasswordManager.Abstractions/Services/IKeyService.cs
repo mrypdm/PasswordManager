@@ -3,9 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Generators;
-using PasswordManager.SecureData.Exceptions;
 
-namespace PasswordManager.SecureData.Services;
+namespace PasswordManager.Abstractions.Services;
 
 /// <summary>
 /// Service for key

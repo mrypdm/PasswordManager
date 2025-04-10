@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PasswordManager.SecureData.Services;
+using PasswordManager.Abstractions.Services;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Views.Authentication;
 

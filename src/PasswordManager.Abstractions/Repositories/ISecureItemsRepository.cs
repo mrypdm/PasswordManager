@@ -1,9 +1,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using PasswordManager.SecureData.Models;
+using PasswordManager.Abstractions.Exceptions;
+using PasswordManager.Abstractions.Models;
 
-namespace PasswordManager.SecureData.Repositories;
+namespace PasswordManager.Abstractions.Repositories;
 
 /// <summary>
 /// Repository for <see cref="SecureItemDbModel"/>
@@ -20,6 +21,7 @@ public interface ISecureItemsRepository
     /// Updates item with <paramref name="id"/> with new <paramref name="data"/>
     /// </summary>
     /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null</exception>
+    /// <exception cref="ItemNotExistsException">If item with <paramref name="id"/> not exists</exception>
     Task UpdateAccountAsync(int id, AccountData data, CancellationToken token);
 
     /// <summary>
@@ -30,10 +32,11 @@ public interface ISecureItemsRepository
     /// <summary>
     /// Get account data from repository by id
     /// </summary>
+    /// <exception cref="ItemNotExistsException">If item with <paramref name="id"/> not exists</exception>
     Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token);
 
     /// <summary>
-    /// Get all items in repository
+    /// Get items headers from repository
     /// </summary>
-    Task<SecureItemDbModel[]> GetItemsAsync(CancellationToken token);
+    Task<ItemHeader[]> GetItemHeadersAsync(CancellationToken token);
 }

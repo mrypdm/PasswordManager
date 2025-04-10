@@ -4,12 +4,12 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Moq;
 using PasswordManager.Abstractions.Crypto;
+using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Models;
+using PasswordManager.Abstractions.Storages;
 using PasswordManager.SecureData.Contexts;
-using PasswordManager.SecureData.Exceptions;
 using PasswordManager.SecureData.Models;
 using PasswordManager.SecureData.Repositories;
-using PasswordManager.SecureData.Storages;
 
 namespace PasswordManager.SecureData.Tests;
 
@@ -158,7 +158,7 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            var items = await repo.GetItemsAsync(default);
+            var items = await repo.GetItemHeadersAsync(default);
 
             Assert.That(items, Has.Length.EqualTo(expectedLength));
             Assert.Multiple(() =>

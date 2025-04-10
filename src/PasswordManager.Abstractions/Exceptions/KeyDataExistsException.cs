@@ -1,6 +1,6 @@
 using System;
 
-namespace PasswordManager.SecureData.Exceptions;
+namespace PasswordManager.Abstractions.Exceptions;
 
 /// <summary>
 /// Exception that key data has been already initialized
