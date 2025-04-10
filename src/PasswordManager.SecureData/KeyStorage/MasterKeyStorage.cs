@@ -10,33 +10,33 @@ namespace PasswordManager.SecureData.KeyStorage;
 /// </summary>
 public sealed class MasterKeyStorage(IKeyValidator keyValidator) : IMasterKeyStorage, IDisposable
 {
-    private const string MasterKeyCacheKey = nameof(MasterKeyCacheKey);
+    private const string KeyCacheKey = nameof(KeyCacheKey);
     private const string BlockStorageCacheKey = nameof(BlockStorageCacheKey);
 
     private readonly MemoryCache _cache = new(nameof(MasterKeyStorage));
 
     /// <inheritdoc />
-    public byte[] MasterKey
+    public byte[] Key
     {
         get
         {
             ThrowIfNotInitialized();
-            return _cache.Get(MasterKeyCacheKey) as byte[];
+            return _cache.Get(KeyCacheKey) as byte[];
         }
     }
 
     /// <inheritdoc />
-    public bool IsInitialized => _cache.Get(MasterKeyCacheKey) is not null;
+    public bool IsInitialized => _cache.Get(KeyCacheKey) is not null;
 
     /// <inheritdoc />
-    public void InitStorage(byte[] masterKey, TimeSpan timeout)
+    public void InitStorage(byte[] key, TimeSpan timeout)
     {
         ThrowIfBlocked();
-        keyValidator.Validate(masterKey);
+        keyValidator.Validate(key);
         ValidateTimeout(timeout);
 
         ClearKey();
-        _cache.Set(MasterKeyCacheKey, masterKey, new CacheItemPolicy { SlidingExpiration = timeout });
+        _cache.Set(KeyCacheKey, key, new CacheItemPolicy { SlidingExpiration = timeout });
     }
 
     /// <inheritdoc />
@@ -46,13 +46,13 @@ public sealed class MasterKeyStorage(IKeyValidator keyValidator) : IMasterKeySto
         ThrowIfBlocked();
         ThrowIfNotInitialized();
 
-        _cache.Set(MasterKeyCacheKey, MasterKey, new CacheItemPolicy { SlidingExpiration = timeout });
+        _cache.Set(KeyCacheKey, Key, new CacheItemPolicy { SlidingExpiration = timeout });
     }
 
     /// <inheritdoc />
     public void ClearKey()
     {
-        _cache.Remove(MasterKeyCacheKey);
+        _cache.Remove(KeyCacheKey);
     }
 
     /// <inheritdoc />

@@ -108,7 +108,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         var oldKey = RandomNumberGenerator.GetBytes(32);
         var newKey = RandomNumberGenerator.GetBytes(32);
 
-        _storageMock.Setup(m => m.MasterKey).Returns(oldKey);
+        _storageMock.Setup(m => m.Key).Returns(oldKey);
 
         var encryptedNewKey = new EncryptedData() { Data = [10], Salt = [11] };
         _cryptoMock
@@ -144,7 +144,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         // assert
         _validatorMock.Verify(m => m.Validate(newKey), Times.Once);
         _cryptoMock.Verify(m => m.Encrypt(newKey, newKey), Times.Once);
-        _storageMock.Verify(m => m.MasterKey, Times.Once);
+        _storageMock.Verify(m => m.Key, Times.Once);
         _cryptoMock.Verify(m =>
             m.DecryptJson<AccountData>(
                 It.Is<SecureItemDbModel>(t => t.Name == expectedName),

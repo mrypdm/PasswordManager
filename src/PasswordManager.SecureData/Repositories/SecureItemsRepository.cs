@@ -20,7 +20,7 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     {
         ArgumentNullException.ThrowIfNull(data);
 
-        var encryptedData = crypto.EncryptJson(data, masterKeyStorage.MasterKey);
+        var encryptedData = crypto.EncryptJson(data, masterKeyStorage.Key);
 
         var secureItem = new SecureItemDbModel
         {
@@ -41,7 +41,7 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
         var secureItem = await context.SecureItems.SingleOrDefaultAsync(m => m.Id == id, token)
             ?? throw new ItemNotExistsException($"Item with id={id} not exists");
 
-        var encryptedData = crypto.EncryptJson(data, masterKeyStorage.MasterKey);
+        var encryptedData = crypto.EncryptJson(data, masterKeyStorage.Key);
         secureItem.Name = data.Name;
         secureItem.Salt = encryptedData.Salt;
         secureItem.Data = encryptedData.Data;
@@ -61,7 +61,7 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     {
         var item = await context.SecureItems.AsNoTracking().SingleOrDefaultAsync(m => m.Id == id, token)
             ?? throw new ItemNotExistsException($"Item with id={id} not exists");
-        return crypto.DecryptJson<AccountData>(item, masterKeyStorage.MasterKey);
+        return crypto.DecryptJson<AccountData>(item, masterKeyStorage.Key);
     }
 
     /// <inheritdoc />

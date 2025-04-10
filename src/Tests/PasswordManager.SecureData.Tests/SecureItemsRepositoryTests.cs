@@ -52,7 +52,7 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         var encrypted = new EncryptedData { Data = [11], Salt = [12] };
 
         _storageMock
-            .Setup(m => m.MasterKey)
+            .Setup(m => m.Key)
             .Returns(key);
         _cryptoMock
             .Setup(m => m.EncryptJson(data, key))
@@ -66,7 +66,7 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         }
 
         // assert
-        _storageMock.Verify(m => m.MasterKey, Times.Once);
+        _storageMock.Verify(m => m.Key, Times.Once);
         _cryptoMock.Verify(m => m.EncryptJson(data, key), Times.Once);
         using (var context = CreateDbContext())
         {
@@ -109,7 +109,7 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         };
 
         _storageMock
-            .Setup(m => m.MasterKey)
+            .Setup(m => m.Key)
             .Returns(key);
         _cryptoMock
             .Setup(m => m.DecryptJson<AccountData>(It.Is<SecureItemDbModel>(m => m.Name == item.Name), key))
@@ -132,7 +132,7 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
             Assert.That(account, Is.EqualTo(expectedAccount));
         }
 
-        _storageMock.Verify(m => m.MasterKey, Times.Once);
+        _storageMock.Verify(m => m.Key, Times.Once);
         _cryptoMock.Verify(
             m => m.DecryptJson<AccountData>(It.Is<SecureItemDbModel>(m => m.Name == item.Name), key),
             Times.Once);

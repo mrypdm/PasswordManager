@@ -57,7 +57,7 @@ public class MasterKeyDataRepository(
         var items = await context.SecureItems.ToArrayAsync(token);
         foreach (var item in items)
         {
-            var decrypted = crypto.DecryptJson<AccountData>(item, masterKeyStorage.MasterKey);
+            var decrypted = crypto.DecryptJson<AccountData>(item, masterKeyStorage.Key);
             var encrypted = crypto.EncryptJson(decrypted, newMasterKey);
             item.Salt = encrypted.Salt;
             item.Data = encrypted.Data;

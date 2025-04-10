@@ -5,15 +5,15 @@ using PasswordManager.SecureData.Exceptions;
 namespace PasswordManager.SecureData.KeyStorage;
 
 /// <summary>
-/// Initializer for Master Key storage
+/// Storage for key
 /// </summary>
 public interface IMasterKeyStorage
 {
     /// <summary>
-    /// Current master key
+    /// Current key
     /// </summary>
     /// <exception cref="StorageNotInitializedException">If storage not initialzied</exception>
-    byte[] MasterKey { get; }
+    byte[] Key { get; }
 
     /// <summary>
     /// Check if storage is initialized
@@ -21,14 +21,14 @@ public interface IMasterKeyStorage
     bool IsInitialized { get; }
 
     /// <summary>
-    /// Init storage with master key and Key life timeout
+    /// Init storage with key and key timeout
     /// </summary>
-    /// <exception cref="KeyValidationException">If <paramref name="masterKey"/> is invalid</exception>
+    /// <exception cref="KeyValidationException">If <paramref name="key"/> is invalid</exception>
     /// <exception cref="ArgumentException">If <paramref name="timeout"/> is invalid</exception>
-    void InitStorage(byte[] masterKey, TimeSpan timeout);
+    void InitStorage(byte[] key, TimeSpan timeout);
 
     /// <summary>
-    /// Change current timeout of master key
+    /// Change current timeout of key
     /// </summary>
     /// <exception cref="ArgumentException">If <paramref name="timeout"/> is invalid</exception>
     /// <exception cref="StorageNotInitializedException">If storage is not initialized</exception>
