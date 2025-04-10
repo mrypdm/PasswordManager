@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PasswordManager.Abstractions;
+namespace PasswordManager.Abstractions.Alphabets;
 
 /// <summary>
 /// Alphabet

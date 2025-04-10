@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using PasswordManager.Core.Alphabets;
 using PasswordManager.Core.Generators;
 
 namespace PasswordManager.Core.Tests;

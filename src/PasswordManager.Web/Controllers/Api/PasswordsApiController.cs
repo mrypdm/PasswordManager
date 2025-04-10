@@ -3,10 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PasswordManager.Abstractions;
+using PasswordManager.Abstractions.Alphabets;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Models;
-using PasswordManager.Core;
+using PasswordManager.Core.Alphabets;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Models.Responses;
 

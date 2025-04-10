@@ -2,12 +2,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using PasswordManager.Abstractions;
+using PasswordManager.Abstractions.Alphabets;
 using PasswordManager.Abstractions.Checkers;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Models;
-using PasswordManager.Core;
+using PasswordManager.Core.Alphabets;
 using PasswordManager.Web.Controllers.Api;
 using PasswordManager.Web.Models.Requests;
 

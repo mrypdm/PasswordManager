@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Security.Cryptography;
-using PasswordManager.Abstractions;
+using PasswordManager.Abstractions.Alphabets;
 using PasswordManager.Abstractions.Generators;
 
 namespace PasswordManager.Core.Generators;

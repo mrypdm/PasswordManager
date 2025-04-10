@@ -1,4 +1,4 @@
-using PasswordManager.Abstractions;
+using PasswordManager.Abstractions.Alphabets;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Generators;
 using PasswordManager.Core.Generators;

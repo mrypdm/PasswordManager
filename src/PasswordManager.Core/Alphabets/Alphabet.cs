@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using PasswordManager.Abstractions.Alphabets;
 
-using PasswordManager.Abstractions;
-
-namespace PasswordManager.Core;
+namespace PasswordManager.Core.Alphabets;
 
 /// <inheritdoc />
 public sealed class Alphabet : IAlphabet

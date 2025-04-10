@@ -1,3 +1,4 @@
+using PasswordManager.Abstractions.Alphabets;
 using PasswordManager.Abstractions.Checkers;
 
 namespace PasswordManager.Abstractions.Factories;
