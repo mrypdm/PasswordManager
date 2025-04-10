@@ -20,7 +20,7 @@ namespace PasswordManager.Web.Tests;
 /// </summary>
 public class LogonApiControllerTests
 {
-    private readonly Mock<IMasterKeyService> _keyServiceMock = new();
+    private readonly Mock<IKeyService> _keyServiceMock = new();
     private readonly Mock<ICookieAuthorizationHelper> _cookieHelperMock = new();
     private readonly Mock<IWritableOptions<UserOptions>> _userOptionsMock = new();
     private readonly Mock<IOptions<ConnectionOptions>> _connectionOptionsMock = new();
@@ -49,7 +49,7 @@ public class LogonApiControllerTests
     }
 
     [Test]
-    public async Task SignIn_CommonWay_ShouldInitMasterKeyAndSignInAndReturnOk()
+    public async Task SignIn_CommonWay_ShouldInitKeyAndSignInAndReturnOk()
     {
         // arrange
         var request = new LoginRequest() { MasterPassword = "password" };
@@ -70,7 +70,7 @@ public class LogonApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
         _keyServiceMock.Verify(
-            m => m.InitMasterKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default),
+            m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default),
             Times.Once);
         _cookieHelperMock.Verify(m => m.SignInAsync(It.IsAny<HttpContext>(), connectionOptions), Times.Once);
     }
@@ -88,8 +88,8 @@ public class LogonApiControllerTests
             .Returns(userOptions);
 
         _keyServiceMock
-            .Setup(m => m.InitMasterKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default))
-            .ThrowsAsync(new InvalidMasterKeyException());
+            .Setup(m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default))
+            .ThrowsAsync(new InvalidKeyException());
 
         // act
         var res = await controller.SignInAsync(request, default);
@@ -97,7 +97,7 @@ public class LogonApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<UnauthorizedObjectResult>());
         _keyServiceMock.Verify(
-            m => m.InitMasterKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default),
+            m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default),
             Times.Once);
         _cookieHelperMock.Verify(
             m => m.SignInAsync(It.IsAny<HttpContext>(), It.IsAny<ConnectionOptions>()),
@@ -117,17 +117,20 @@ public class LogonApiControllerTests
             .Returns(userOptions);
 
         _keyServiceMock
-            .Setup(m => m.InitMasterKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default))
+            .Setup(m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default))
             .ThrowsAsync(new StorageBlockedException());
 
         // act
         var res = await controller.SignInAsync(request, default);
 
         // assert
-        Assert.That(res, Is.TypeOf<ObjectResult>());
-        Assert.That((res as ObjectResult).StatusCode, Is.EqualTo((int)HttpStatusCode.Forbidden));
+        Assert.Multiple(() =>
+        {
+            Assert.That(res, Is.TypeOf<ObjectResult>());
+            Assert.That((res as ObjectResult).StatusCode, Is.EqualTo((int)HttpStatusCode.Forbidden));
+        });
         _keyServiceMock.Verify(
-            m => m.InitMasterKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default),
+            m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default),
             Times.Once);
         _cookieHelperMock.Verify(
             m => m.SignInAsync(It.IsAny<HttpContext>(), It.IsAny<ConnectionOptions>()),
@@ -146,7 +149,7 @@ public class LogonApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
         _keyServiceMock.Verify(
-            m => m.ClearMasterKeyAsync(default),
+            m => m.ClearKeyAsync(default),
             Times.Once);
         _cookieHelperMock.Verify(
             m => m.SignOutAsync(It.IsAny<HttpContext>()),

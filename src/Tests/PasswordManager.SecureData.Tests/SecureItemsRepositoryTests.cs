@@ -7,9 +7,9 @@ using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.SecureData.Contexts;
 using PasswordManager.SecureData.Exceptions;
-using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.SecureData.Models;
 using PasswordManager.SecureData.Repositories;
+using PasswordManager.SecureData.Storages;
 
 namespace PasswordManager.SecureData.Tests;
 
@@ -19,7 +19,7 @@ namespace PasswordManager.SecureData.Tests;
 public class SecureItemsRepositoryTests : RepositoryTestsBase
 {
     private readonly Mock<ICrypto> _cryptoMock = new();
-    private readonly Mock<IMasterKeyStorage> _storageMock = new();
+    private readonly Mock<IKeyStorage> _storageMock = new();
 
     [SetUp]
     public void SetUp()

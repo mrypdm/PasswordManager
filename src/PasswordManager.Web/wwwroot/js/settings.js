@@ -1,15 +1,15 @@
 async function getSettings() {
     let timeoutBox = document.getElementById("session-timeout");
-    let saltBox = document.getElementById("master-key-salt");
-    let iterationsBox = document.getElementById("master-key-iterations");
+    let saltBox = document.getElementById("key-salt");
+    let iterationsBox = document.getElementById("key-iterations");
 
     try {
         let response = await send("/api/settings", "GET", null, getCsrfTokenHeader());
         response = await response.json();
 
         timeoutBox.value = response.sessionTimeout;
-        saltBox.value = response.masterKeySalt;
-        iterationsBox.value = response.masterKeyIterations;
+        saltBox.value = response.salt;
+        iterationsBox.value = response.iterations;
     } catch (response) {
         let text = await response.text();
         alert(text)
@@ -31,11 +31,11 @@ async function updateSessionTimeout() {
     }
 }
 
-async function updateMasterKeySettings() {
+async function updateKeySettings() {
     let passwordBox = document.getElementById("master-password");
     let newPasswordBox = document.getElementById("new-master-password");
-    let saltBox = document.getElementById("master-key-salt");
-    let iterationsBox = document.getElementById("master-key-iterations");
+    let saltBox = document.getElementById("key-salt");
+    let iterationsBox = document.getElementById("key-iterations");
 
     let data = {
         "MasterPassword": passwordBox.value,
@@ -45,7 +45,7 @@ async function updateMasterKeySettings() {
     };
 
     try {
-        await send("/api/settings/master-key", "PATCH", data, getCsrfTokenHeader())
+        await send("/api/settings/key", "PATCH", data, getCsrfTokenHeader())
         location.replace("/auth/login")
     } catch (response) {
         let text = await response.text();

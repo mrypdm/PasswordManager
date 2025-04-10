@@ -16,7 +16,7 @@ namespace PasswordManager.SecureData.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
 
-            modelBuilder.Entity("PasswordManager.SecureData.Models.MasterKeyDataDbModel", b =>
+            modelBuilder.Entity("PasswordManager.SecureData.Models.KeyDataDbModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,7 +38,7 @@ namespace PasswordManager.SecureData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MasterKeyData");
+                    b.ToTable("KeyData");
                 });
 
             modelBuilder.Entity("PasswordManager.SecureData.Models.SecureItemDbModel", b =>

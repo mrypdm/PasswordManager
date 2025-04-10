@@ -25,7 +25,7 @@ public class UserSettingsApiControllerTests
     private readonly Mock<ICookieAuthorizationHelper> _cookieHelperMock = new();
     private readonly Mock<IKeyGeneratorFactory> _generatorFactoryMock = new();
     private readonly Mock<IKeyGenerator> _generatorMock = new();
-    private readonly Mock<IMasterKeyService> _keyServiceMock = new();
+    private readonly Mock<IKeyService> _keyServiceMock = new();
 
     [SetUp]
     public void SetUp()
@@ -111,27 +111,27 @@ public class UserSettingsApiControllerTests
     }
 
     [Test]
-    public async Task ChangeMasterKeySettings_InvalidMasterPassword_ShouldReturnBadRequest()
+    public async Task ChangeKeySettings_InvalidMasterPassword_ShouldReturnBadRequest()
     {
         // arrange
-        var request = new ChangeMasterKeySettingsRequest
+        var request = new ChangeKeySettingsRequest
         {
             MasterPassword = ""
         };
         var controller = CreateController();
 
         // act
-        var res = await controller.ChangeMasterKeySettingsAsync(request, default);
+        var res = await controller.ChangeKeySettingsAsync(request, default);
 
         // assert
         Assert.That(res, Is.TypeOf<BadRequestObjectResult>());
     }
 
     [Test]
-    public async Task ChangeMasterKeySettings_InvalidIterationsCount_ShouldReturnBadRequest()
+    public async Task ChangeKeySettings_InvalidIterationsCount_ShouldReturnBadRequest()
     {
         // arrange
-        var request = new ChangeMasterKeySettingsRequest
+        var request = new ChangeKeySettingsRequest
         {
             MasterPassword = "1",
             Iterations = 0
@@ -139,17 +139,17 @@ public class UserSettingsApiControllerTests
         var controller = CreateController();
 
         // act
-        var res = await controller.ChangeMasterKeySettingsAsync(request, default);
+        var res = await controller.ChangeKeySettingsAsync(request, default);
 
         // assert
         Assert.That(res, Is.TypeOf<BadRequestObjectResult>());
     }
 
     [Test]
-    public async Task ChangeMasterKeySettings_InvalidSaltFormat_ShouldReturnBadRequest()
+    public async Task ChangeKeySettings_InvalidSaltFormat_ShouldReturnBadRequest()
     {
         // arrange
-        var request = new ChangeMasterKeySettingsRequest
+        var request = new ChangeKeySettingsRequest
         {
             MasterPassword = "1",
             Iterations = 1,
@@ -158,17 +158,17 @@ public class UserSettingsApiControllerTests
         var controller = CreateController();
 
         // act
-        var res = await controller.ChangeMasterKeySettingsAsync(request, default);
+        var res = await controller.ChangeKeySettingsAsync(request, default);
 
         // assert
         Assert.That(res, Is.TypeOf<BadRequestObjectResult>());
     }
 
     [Test]
-    public async Task ChangeMasterKeySettings_InvalidSaltSize_ShouldReturnBadRequest()
+    public async Task ChangeKeySettings_InvalidSaltSize_ShouldReturnBadRequest()
     {
         // arrange
-        var request = new ChangeMasterKeySettingsRequest
+        var request = new ChangeKeySettingsRequest
         {
             MasterPassword = "1",
             Iterations = 1,
@@ -177,17 +177,17 @@ public class UserSettingsApiControllerTests
         var controller = CreateController();
 
         // act
-        var res = await controller.ChangeMasterKeySettingsAsync(request, default);
+        var res = await controller.ChangeKeySettingsAsync(request, default);
 
         // assert
         Assert.That(res, Is.TypeOf<BadRequestObjectResult>());
     }
 
     [Test]
-    public async Task ChangeMasterKeySettings_InvalidNewMasterPassword_ShouldReturnBadRequest()
+    public async Task ChangeKeySettings_InvalidNewMasterPassword_ShouldReturnBadRequest()
     {
         // arrange
-        var request = new ChangeMasterKeySettingsRequest
+        var request = new ChangeKeySettingsRequest
         {
             MasterPassword = "1",
             Iterations = 1,
@@ -197,7 +197,7 @@ public class UserSettingsApiControllerTests
         var controller = CreateController();
 
         // act
-        var res = await controller.ChangeMasterKeySettingsAsync(request, default);
+        var res = await controller.ChangeKeySettingsAsync(request, default);
 
         // assert
         Assert.That(res, Is.TypeOf<BadRequestObjectResult>());
@@ -206,10 +206,10 @@ public class UserSettingsApiControllerTests
     [Test]
     [TestCase(null)]
     [TestCase("password")]
-    public async Task ChangeMasterKeySettings_ChangesAreNotNeeded_ShouldReturnOk(string newMasterPassword)
+    public async Task ChangeKeySettings_ChangesAreNotNeeded_ShouldReturnOk(string newMasterPassword)
     {
         // arrange
-        var request = new ChangeMasterKeySettingsRequest
+        var request = new ChangeKeySettingsRequest
         {
             MasterPassword = "password",
             NewMasterPassword = newMasterPassword
@@ -217,7 +217,7 @@ public class UserSettingsApiControllerTests
         var controller = CreateController();
 
         // act
-        var res = await controller.ChangeMasterKeySettingsAsync(request, default);
+        var res = await controller.ChangeKeySettingsAsync(request, default);
 
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
@@ -227,14 +227,14 @@ public class UserSettingsApiControllerTests
             m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
             Times.Never);
         _keyServiceMock.Verify(
-            m => m.ChangeMasterKeySettingsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IKeyGenerator>(),
+            m => m.ChangeKeySettingsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IKeyGenerator>(),
                 default),
             Times.Never);
     }
 
     [Test]
-    [TestCaseSource(nameof(ChangeMasterKeySettings_ChangesAreNeeded_ShouldChangeSettings_TestCaseSource))]
-    public async Task ChangeMasterKeySettings_ChangesAreNeeded_ShouldChangeSettings(
+    [TestCaseSource(nameof(ChangeKeySettings_ChangesAreNeeded_ShouldChangeSettings_TestCaseSource))]
+    public async Task ChangeKeySettings_ChangesAreNeeded_ShouldChangeSettings(
         string salt, string newSalt,
         int iterations, int newIterations,
         string masterPassword, string newMasterPassword)
@@ -242,8 +242,8 @@ public class UserSettingsApiControllerTests
         // arrange
         var options = new UserOptions()
         {
-            MasterKeySalt = salt,
-            MasterKeyIterations = iterations
+            Salt = salt,
+            Iterations = iterations
         };
         _userOptionsMock
             .Setup(m => m.Value)
@@ -255,7 +255,7 @@ public class UserSettingsApiControllerTests
                 act(options);
             });
 
-        var request = new ChangeMasterKeySettingsRequest
+        var request = new ChangeKeySettingsRequest
         {
             MasterPassword = masterPassword,
             NewMasterPassword = newMasterPassword,
@@ -265,27 +265,27 @@ public class UserSettingsApiControllerTests
         var controller = CreateController();
 
         // act
-        var res = await controller.ChangeMasterKeySettingsAsync(request, default);
+        var res = await controller.ChangeKeySettingsAsync(request, default);
 
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
         _cookieHelperMock.Verify(m => m.SignOutAsync(default), Times.Once);
         _generatorFactoryMock.Verify(
             m => m.Create(
-                request.SaltBytes ?? options.MasterKeySaltBytes,
-                request.Iterations ?? options.MasterKeyIterations),
+                request.SaltBytes ?? options.SaltBytes,
+                request.Iterations ?? options.Iterations),
             Times.Once);
         _userOptionsMock.Verify(
             m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
             Times.Once);
         _keyServiceMock.Verify(
-            m => m.ChangeMasterKeySettingsAsync(request.MasterPassword, request.NewMasterPassword,
+            m => m.ChangeKeySettingsAsync(request.MasterPassword, request.NewMasterPassword,
                 _generatorMock.Object, default),
             Times.Once);
         Assert.Multiple(() =>
         {
-            Assert.That(options.MasterKeySalt, Is.EqualTo(newSalt));
-            Assert.That(options.MasterKeyIterations, Is.EqualTo(newIterations));
+            Assert.That(options.Salt, Is.EqualTo(newSalt));
+            Assert.That(options.Iterations, Is.EqualTo(newIterations));
         });
     }
 
@@ -294,7 +294,7 @@ public class UserSettingsApiControllerTests
     {
         // arrange
         var salt = RandomNumberGenerator.GetHexString(32);
-        var options = new UserOptions() { MasterKeySalt = salt };
+        var options = new UserOptions() { Salt = salt };
         _userOptionsMock
             .Setup(m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default))
             .Callback((Action<UserOptions> act, CancellationToken _) =>
@@ -312,9 +312,9 @@ public class UserSettingsApiControllerTests
         _userOptionsMock.Verify(
             m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
             Times.Once);
-        _keyServiceMock.Verify(m => m.ClearMasterKeyDataAsync(default), Times.Once);
+        _keyServiceMock.Verify(m => m.ClearKeyDataAsync(default), Times.Once);
         _cookieHelperMock.Verify(m => m.SignOutAsync(default), Times.Once);
-        Assert.That(options.MasterKeySalt, Is.Not.EqualTo(salt));
+        Assert.That(options.Salt, Is.Not.EqualTo(salt));
     }
 
     private UserSettingsApiController CreateController()
@@ -323,9 +323,9 @@ public class UserSettingsApiControllerTests
             _keyServiceMock.Object);
     }
 
-    private static IEnumerable<TestCaseData> ChangeMasterKeySettings_ChangesAreNeeded_ShouldChangeSettings_TestCaseSource()
+    private static IEnumerable<TestCaseData> ChangeKeySettings_ChangesAreNeeded_ShouldChangeSettings_TestCaseSource()
     {
-        const string testName = nameof(ChangeMasterKeySettings_ChangesAreNeeded_ShouldChangeSettings);
+        const string testName = nameof(ChangeKeySettings_ChangesAreNeeded_ShouldChangeSettings);
 
         var salt = RandomNumberGenerator.GetHexString(32);
         var newSalt = RandomNumberGenerator.GetHexString(32);

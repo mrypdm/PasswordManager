@@ -11,20 +11,20 @@ namespace PasswordManager.Web.Options;
 public class UserOptions
 {
     /// <summary>
-    /// Salt for master key generation
+    /// Salt for key generation
     /// </summary>
-    public string MasterKeySalt { get; set; } = RandomNumberGenerator.GetHexString(AesConstants.BlockSize * 2);
+    public string Salt { get; set; } = RandomNumberGenerator.GetHexString(AesConstants.BlockSize * 2);
 
     /// <summary>
-    /// Salt for master key generation in bytes
+    /// Salt for key generation in bytes
     /// </summary>
     [JsonIgnore]
-    public byte[] MasterKeySaltBytes => Convert.FromHexString(MasterKeySalt);
+    public byte[] SaltBytes => Convert.FromHexString(Salt);
 
     /// <summary>
-    /// Count of iterations for master key generation
+    /// Count of iterations for key generation
     /// </summary>
-    public int MasterKeyIterations { get; set; } = 100;
+    public int Iterations { get; set; } = 100;
 
     /// <summary>
     /// Timeout of session

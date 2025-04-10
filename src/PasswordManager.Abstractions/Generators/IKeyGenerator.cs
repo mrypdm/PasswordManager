@@ -3,14 +3,14 @@ using System;
 namespace PasswordManager.Abstractions.Generators;
 
 /// <summary>
-/// Factory for master key
+/// Factory for key
 /// </summary>
 public interface IKeyGenerator
 {
     /// <summary>
-    /// Create master key by master password
+    /// Create key by password
     /// </summary>
-    /// <exception cref="ArgumentNullException">If <paramref name="masterPassword"/> is null</exception>
-    /// <exception cref="ArgumentException">If <paramref name="masterPassword"/> is whitespace</exception>
-    byte[] Generate(string masterPassword);
+    /// <exception cref="ArgumentNullException">If <paramref name="password"/> is null</exception>
+    /// <exception cref="ArgumentException">If <paramref name="password"/> is whitespace</exception>
+    byte[] Generate(string password);
 }

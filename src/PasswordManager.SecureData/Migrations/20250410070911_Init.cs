@@ -12,7 +12,7 @@ public partial class Init : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.CreateTable(
-            name: "MasterKeyData",
+            name: "KeyData",
             columns: table => new
             {
                 Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -23,7 +23,7 @@ public partial class Init : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_MasterKeyData", x => x.Id);
+                table.PrimaryKey("PK_KeyData", x => x.Id);
             });
 
         migrationBuilder.CreateTable(
@@ -48,7 +48,7 @@ public partial class Init : Migration
             column: "Name");
 
         migrationBuilder.AddVersionTrigger(
-            table: "MasterKeyData",
+            table: "KeyData",
             column: "Version");
 
         migrationBuilder.AddVersionTrigger(
@@ -60,7 +60,7 @@ public partial class Init : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropTable(
-            name: "MasterKeyData");
+            name: "KeyData");
 
         migrationBuilder.DropTable(
             name: "SecureItems");

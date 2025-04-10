@@ -4,12 +4,12 @@ using PasswordManager.SecureData.Services;
 namespace PasswordManager.SecureData.Options;
 
 /// <summary>
-/// Options for <see cref="MasterKeyService"/>
+/// Options for <see cref="KeyService"/>
 /// </summary>
-public class MasterKeyServiceOptions
+public class KeyServiceOptions
 {
     /// <summary>
-    /// Count of attempts to init master key
+    /// Count of attempts to init key
     /// </summary>
     public int MaxAttemptCounts { get; set; }
 

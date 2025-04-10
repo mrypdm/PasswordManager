@@ -6,14 +6,14 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using PasswordManager.SecureData.KeyStorage;
+using PasswordManager.SecureData.Storages;
 using PasswordManager.Web.Options;
 
 namespace PasswordManager.Web.Helpers;
 
 /// <inheritdoc />
 public class CookieAuthorizationHelper(
-    IMasterKeyStorage masterKeyStorage,
+    IKeyStorage keyStorage,
     IOptions<ConnectionOptions> connectionOptions) : ICookieAuthorizationHelper
 {
     private const string IpAddressClaim = "IpAddress";
@@ -37,7 +37,7 @@ public class CookieAuthorizationHelper(
     /// <inheritdoc />
     public bool ValidatePrincipal(CookieValidatePrincipalContext context)
     {
-        if (!masterKeyStorage.IsInitialized)
+        if (!keyStorage.IsInitialized)
         {
             return false;
         }

@@ -2,12 +2,12 @@ using System;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.SecureData.Exceptions;
 
-namespace PasswordManager.SecureData.KeyStorage;
+namespace PasswordManager.SecureData.Storages;
 
 /// <summary>
 /// Storage for key
 /// </summary>
-public interface IMasterKeyStorage
+public interface IKeyStorage
 {
     /// <summary>
     /// Current key

@@ -7,24 +7,24 @@ using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Exceptions;
-using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.SecureData.Options;
 using PasswordManager.SecureData.Repositories;
 using PasswordManager.SecureData.Services;
+using PasswordManager.SecureData.Storages;
 
 namespace PasswordManager.SecureData.Tests;
 
 /// <summary>
-/// Tests for <see cref="MasterKeyServiceService"/>
+/// Tests for <see cref="KeyService"/>
 /// </summary>
-public class MasterKeyServiceServiceTests
+public class KeyServiceTests
 {
-    private readonly Mock<IMasterKeyDataRepository> _repositoryMock = new();
-    private readonly Mock<IMasterKeyStorage> _storageMock = new();
+    private readonly Mock<IKeyDataRepository> _repositoryMock = new();
+    private readonly Mock<IKeyStorage> _storageMock = new();
     private readonly Mock<IKeyGenerator> _generatorMock = new();
     private readonly Mock<IKeyValidator> _validatorMock = new();
     private readonly Mock<ICounter> _counterMock = new();
-    private readonly Mock<IOptions<MasterKeyServiceOptions>> _optionsMock = new();
+    private readonly Mock<IOptions<KeyServiceOptions>> _optionsMock = new();
 
     [SetUp]
     public void SetUp()
@@ -37,7 +37,7 @@ public class MasterKeyServiceServiceTests
     }
 
     [Test]
-    public async Task InitMasterKey_MasterKeyDataNotExists_ShouldInitMasterKeyData()
+    public async Task InitKey_KeyDataNotExists_ShouldInitKeyData()
     {
         // arrange
         var password = "password";
@@ -46,25 +46,25 @@ public class MasterKeyServiceServiceTests
 
         _generatorMock.Setup(m => m.Generate(password)).Returns(key);
         _repositoryMock
-            .Setup(m => m.ValidateMasterKeyDataAsync(key, default))
-            .ThrowsAsync(new MasterKeyDataNotExistsException());
+            .Setup(m => m.ValidateKeyDataAsync(key, default))
+            .ThrowsAsync(new KeyDataNotExistsException());
 
         var service = CreateService();
 
         // act
-        await service.InitMasterKeyAsync(password, timeout, default);
+        await service.InitKeyAsync(password, timeout, default);
 
         // assert
 
         _generatorMock.Verify(m => m.Generate(password), Times.Once);
         _validatorMock.Verify(m => m.Validate(key), Times.Once);
-        _repositoryMock.Verify(m => m.ValidateMasterKeyDataAsync(key, default), Times.Once);
-        _repositoryMock.Verify(m => m.SetMasterKeyDataAsync(key, default), Times.Once);
+        _repositoryMock.Verify(m => m.ValidateKeyDataAsync(key, default), Times.Once);
+        _repositoryMock.Verify(m => m.SetKeyDataAsync(key, default), Times.Once);
         _storageMock.Verify(m => m.InitStorage(key, timeout), Times.Once);
     }
 
     [Test]
-    public async Task InitMasterKey_MasterKeyDataExists_ShouldValidateMasterKeyData()
+    public async Task InitKey_KeyDataExists_ShouldValidateKeyData()
     {
         // arrange
         var password = "password";
@@ -76,32 +76,32 @@ public class MasterKeyServiceServiceTests
         var service = CreateService();
 
         // act
-        await service.InitMasterKeyAsync(password, timeout, default);
+        await service.InitKeyAsync(password, timeout, default);
 
         // assert
 
         _generatorMock.Verify(m => m.Generate(password), Times.Once);
         _validatorMock.Verify(m => m.Validate(key), Times.Once);
-        _repositoryMock.Verify(m => m.ValidateMasterKeyDataAsync(key, default), Times.Once);
-        _repositoryMock.Verify(m => m.SetMasterKeyDataAsync(key, default), Times.Never);
+        _repositoryMock.Verify(m => m.ValidateKeyDataAsync(key, default), Times.Once);
+        _repositoryMock.Verify(m => m.SetKeyDataAsync(key, default), Times.Never);
         _storageMock.Verify(m => m.InitStorage(key, timeout), Times.Once);
     }
 
     [Test]
-    public void InitMasterKey_InvalidMasterKey_ShouldCount()
+    public void InitKey_InvalidKey_ShouldCount()
     {
         // arrange
         var password = "password";
         var timeout = TimeSpan.FromSeconds(10);
-        var options = new MasterKeyServiceOptions
+        var options = new KeyServiceOptions
         {
             MaxAttemptCounts = 5,
             BlockTimeout = TimeSpan.FromSeconds(5)
         };
 
         _repositoryMock
-            .Setup(m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), default))
-            .ThrowsAsync(new InvalidMasterKeyException());
+            .Setup(m => m.ValidateKeyDataAsync(It.IsAny<byte[]>(), default))
+            .ThrowsAsync(new InvalidKeyException());
         _optionsMock
             .Setup(m => m.Value)
             .Returns(options);
@@ -109,30 +109,30 @@ public class MasterKeyServiceServiceTests
         var service = CreateService();
 
         // act
-        Assert.ThrowsAsync<InvalidMasterKeyException>(() => service.InitMasterKeyAsync(password, timeout, default));
+        Assert.ThrowsAsync<InvalidKeyException>(() => service.InitKeyAsync(password, timeout, default));
 
         // assert
         _repositoryMock.Verify(
-            m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), default),
+            m => m.ValidateKeyDataAsync(It.IsAny<byte[]>(), default),
             Times.Once);
         _counterMock.Verify(m => m.Increment(), Times.Once);
     }
 
     [Test]
-    public void InitMasterKey_InvalidMasterKeyAndMaxAttempts_ShouldBlockStorage()
+    public void InitKey_InvalidKeyAndMaxAttempts_ShouldBlockStorage()
     {
         // arrange
         var password = "password";
         var timeout = TimeSpan.FromSeconds(10);
-        var options = new MasterKeyServiceOptions
+        var options = new KeyServiceOptions
         {
             MaxAttemptCounts = 5,
             BlockTimeout = TimeSpan.FromSeconds(5)
         };
 
         _repositoryMock
-            .Setup(m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), default))
-            .ThrowsAsync(new InvalidMasterKeyException());
+            .Setup(m => m.ValidateKeyDataAsync(It.IsAny<byte[]>(), default))
+            .ThrowsAsync(new InvalidKeyException());
         _counterMock
             .Setup(m => m.Count)
             .Returns(options.MaxAttemptCounts);
@@ -143,11 +143,11 @@ public class MasterKeyServiceServiceTests
         var service = CreateService();
 
         // act
-        Assert.ThrowsAsync<InvalidMasterKeyException>(() => service.InitMasterKeyAsync(password, timeout, default));
+        Assert.ThrowsAsync<InvalidKeyException>(() => service.InitKeyAsync(password, timeout, default));
 
         // assert
         _repositoryMock.Verify(
-            m => m.ValidateMasterKeyDataAsync(It.IsAny<byte[]>(), default),
+            m => m.ValidateKeyDataAsync(It.IsAny<byte[]>(), default),
             Times.Once);
         _counterMock.Verify(m => m.Increment(), Times.Once);
         _counterMock.Verify(m => m.Count, Times.Once);
@@ -155,7 +155,7 @@ public class MasterKeyServiceServiceTests
     }
 
     [Test]
-    public async Task InitMasterKey_StorageBlocked_ShouldThrow()
+    public async Task InitKey_StorageBlocked_ShouldThrow()
     {
         // arrange
         var password = "password";
@@ -163,14 +163,14 @@ public class MasterKeyServiceServiceTests
         var service = CreateService();
 
         // act
-        await service.InitMasterKeyAsync(password, timeout, default);
+        await service.InitKeyAsync(password, timeout, default);
 
         // assert
         _storageMock.Verify(m => m.ThrowIfBlocked(), Times.Once);
     }
 
     [Test]
-    public async Task ChangeMasterKeySettings_ShouldGenerateKeysAndReEncryptRepository()
+    public async Task ChangeKeySettings_ShouldGenerateKeysAndReEncryptRepository()
     {
         // arrange
         var oldPassword = "oldPassword";
@@ -185,20 +185,20 @@ public class MasterKeyServiceServiceTests
         var service = CreateService();
 
         // act
-        await service.ChangeMasterKeySettingsAsync(oldPassword, newPassword, newGeneratorMock.Object, default);
+        await service.ChangeKeySettingsAsync(oldPassword, newPassword, newGeneratorMock.Object, default);
 
         // assert
 
         _generatorMock.Verify(m => m.Generate(oldPassword), Times.Once);
         newGeneratorMock.Verify(m => m.Generate(newPassword), Times.Once);
         _validatorMock.Verify(m => m.Validate(oldKey), Times.Once);
-        _repositoryMock.Verify(m => m.ValidateMasterKeyDataAsync(oldKey, default), Times.Once);
-        _repositoryMock.Verify(m => m.ChangeMasterKeyDataAsync(newKey, default), Times.Once);
+        _repositoryMock.Verify(m => m.ValidateKeyDataAsync(oldKey, default), Times.Once);
+        _repositoryMock.Verify(m => m.ChangeKeyDataAsync(newKey, default), Times.Once);
         _storageMock.Verify(m => m.ClearKey(), Times.Once);
     }
 
     [Test]
-    public void ChangeMasterKeySettings_NullGenerator_ShouldThrow()
+    public void ChangeKeySettings_NullGenerator_ShouldThrow()
     {
         // arrange
         var service = CreateService();
@@ -206,20 +206,20 @@ public class MasterKeyServiceServiceTests
         // act
         // assert
         Assert.ThrowsAsync<ArgumentNullException>(
-            () => service.ChangeMasterKeySettingsAsync(null, null, null, default));
+            () => service.ChangeKeySettingsAsync(null, null, null, default));
     }
 
     [Test]
-    public async Task IsMasterKeyDataExists_ShouldCheckInRepository()
+    public async Task IsKeyDataExists_ShouldCheckInRepository()
     {
         // arrange
         var service = CreateService();
 
         // act
-        await service.IsMasterKeyDataExistsAsync(default);
+        await service.IsKeyDataExistAsync(default);
 
         // assert
-        _repositoryMock.Verify(m => m.IsMasterKeyDataExistsAsync(default), Times.Once);
+        _repositoryMock.Verify(m => m.IsKeyDataExistAsync(default), Times.Once);
     }
 
     [Test]
@@ -237,35 +237,35 @@ public class MasterKeyServiceServiceTests
     }
 
     [Test]
-    public async Task ClearMasterKeyData_ShouldClearStorageAndClearRepository()
+    public async Task ClearKeyData_ShouldClearStorageAndClearRepository()
     {
         // arrange
         var service = CreateService();
 
         // act
-        await service.ClearMasterKeyDataAsync(default);
+        await service.ClearKeyDataAsync(default);
 
         // assert
         _storageMock.Verify(m => m.ClearKey(), Times.Once);
-        _repositoryMock.Verify(m => m.DeleteMasterKeyDataAsync(default), Times.Once);
+        _repositoryMock.Verify(m => m.DeleteKeyDataAsync(default), Times.Once);
     }
 
     [Test]
-    public async Task ClearMasterKey_ShouldClearStorage()
+    public async Task ClearKey_ShouldClearStorage()
     {
         // arrange
         var service = CreateService();
 
         // act
-        await service.ClearMasterKeyAsync(default);
+        await service.ClearKeyAsync(default);
 
         // assert
         _storageMock.Verify(m => m.ClearKey(), Times.Once);
     }
 
-    private MasterKeyService CreateService()
+    private KeyService CreateService()
     {
-        return new MasterKeyService(_repositoryMock.Object, _storageMock.Object, _generatorMock.Object,
+        return new KeyService(_repositoryMock.Object, _storageMock.Object, _generatorMock.Object,
             _validatorMock.Object, _counterMock.Object, _optionsMock.Object);
     }
 }

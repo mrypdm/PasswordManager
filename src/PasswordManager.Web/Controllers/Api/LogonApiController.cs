@@ -20,7 +20,7 @@ namespace PasswordManager.Web.Controllers.Api;
 [AllowAnonymous]
 [Route("api/logon")]
 public class LogonApiController(
-    IMasterKeyService masterKeyService,
+    IKeyService keyService,
     ICookieAuthorizationHelper cookieAuthorizationHelper,
     IWritableOptions<UserOptions> userOptions,
     IOptions<ConnectionOptions> connectionOptions) : Controller
@@ -39,9 +39,9 @@ public class LogonApiController(
 
         try
         {
-            await masterKeyService.InitMasterKeyAsync(request.MasterPassword, userOptions.Value.SessionTimeout, token);
+            await keyService.InitKeyAsync(request.MasterPassword, userOptions.Value.SessionTimeout, token);
         }
-        catch (InvalidMasterKeyException)
+        catch (InvalidKeyException)
         {
             return Unauthorized("Master password is invalid");
         }
@@ -60,7 +60,7 @@ public class LogonApiController(
     [HttpDelete]
     public async Task<ActionResult> SignOutAsync(CancellationToken token)
     {
-        await masterKeyService.ClearMasterKeyAsync(token);
+        await keyService.ClearKeyAsync(token);
         await cookieAuthorizationHelper.SignOutAsync(HttpContext);
         return Ok();
     }

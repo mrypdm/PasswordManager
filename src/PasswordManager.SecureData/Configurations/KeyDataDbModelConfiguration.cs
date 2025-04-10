@@ -5,12 +5,12 @@ using PasswordManager.SecureData.Models;
 namespace PasswordManager.SecureData.Configurations;
 
 /// <summary>
-/// Configuration for <see cref="MasterKeyDataDbModel"/>
+/// Configuration for <see cref="KeyDataDbModel"/>
 /// </summary>
-public sealed class MasterKeyDataDbModelConfiguration : IEntityTypeConfiguration<MasterKeyDataDbModel>
+public sealed class KeyDataDbModelConfiguration : IEntityTypeConfiguration<KeyDataDbModel>
 {
     /// <inheritdoc />
-    public void Configure(EntityTypeBuilder<MasterKeyDataDbModel> builder)
+    public void Configure(EntityTypeBuilder<KeyDataDbModel> builder)
     {
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Id).ValueGeneratedOnAdd();

@@ -11,10 +11,10 @@ public sealed class AesKeyGenerator(byte[] salt, int iterations) : IKeyGenerator
     private readonly byte[] _salt = salt ?? throw new ArgumentNullException(nameof(salt));
 
     /// <inheritdoc />
-    public byte[] Generate(string masterPassword)
+    public byte[] Generate(string password)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(masterPassword);
-        return Rfc2898DeriveBytes.Pbkdf2(Encoding.ASCII.GetBytes(masterPassword), _salt, iterations,
+        ArgumentException.ThrowIfNullOrWhiteSpace(password);
+        return Rfc2898DeriveBytes.Pbkdf2(Encoding.ASCII.GetBytes(password), _salt, iterations,
             HashAlgorithmName.SHA256, AesConstants.KeySize);
     }
 }

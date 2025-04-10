@@ -3,17 +3,15 @@ using System.Runtime.Caching;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Exceptions;
 
-namespace PasswordManager.SecureData.KeyStorage;
+namespace PasswordManager.SecureData.Storages;
 
-/// <summary>
-/// Storage for master key
-/// </summary>
-public sealed class MasterKeyStorage(IKeyValidator keyValidator) : IMasterKeyStorage, IDisposable
+/// <inheritdoc cref="IKeyStorage"/>
+public sealed class KeyStorage(IKeyValidator keyValidator) : IKeyStorage, IDisposable
 {
     private const string KeyCacheKey = nameof(KeyCacheKey);
     private const string BlockStorageCacheKey = nameof(BlockStorageCacheKey);
 
-    private readonly MemoryCache _cache = new(nameof(MasterKeyStorage));
+    private readonly MemoryCache _cache = new(nameof(KeyStorage));
 
     /// <inheritdoc />
     public byte[] Key

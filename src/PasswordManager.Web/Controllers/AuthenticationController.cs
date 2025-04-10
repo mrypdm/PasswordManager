@@ -14,7 +14,7 @@ namespace PasswordManager.Web.Controllers;
 [AllowAnonymous]
 [Route("auth")]
 public class AuthenticationController(
-    IMasterKeyService masterKeyService,
+    IKeyService keyService,
     ICookieAuthorizationHelper cookieAuthorizationHelper) : Controller
 {
     /// <summary>
@@ -23,7 +23,7 @@ public class AuthenticationController(
     [HttpGet("login", Name = "Login")]
     public async Task<ActionResult> GetViewAsync([FromQuery] string returnUrl, CancellationToken token)
     {
-        var isKeyDataExist = await masterKeyService.IsMasterKeyDataExistsAsync(token);
+        var isKeyDataExist = await keyService.IsKeyDataExistAsync(token);
         return View("Login", new LoginModel(returnUrl, isKeyDataExist));
     }
 
@@ -33,7 +33,7 @@ public class AuthenticationController(
     [HttpGet("logout", Name = "Logout")]
     public async Task<ActionResult> LogoutAsync(CancellationToken token)
     {
-        await masterKeyService.ClearMasterKeyAsync(token);
+        await keyService.ClearKeyAsync(token);
         await cookieAuthorizationHelper.SignOutAsync(HttpContext);
         return Redirect("/auth/login");
     }

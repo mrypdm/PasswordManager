@@ -6,9 +6,9 @@ using PasswordManager.Aes;
 namespace PasswordManager.Web.Models.Requests;
 
 /// <summary>
-/// Request for changin master key parameters
+/// Request for changin key parameters
 /// </summary>
-public class ChangeMasterKeySettingsRequest : IRequest
+public class ChangeKeySettingsRequest : IRequest
 {
     /// <summary>
     /// Current master password
@@ -21,12 +21,12 @@ public class ChangeMasterKeySettingsRequest : IRequest
     public string NewMasterPassword { get; set; }
 
     /// <summary>
-    /// Salt for master key generation
+    /// Salt for key generation
     /// </summary>
     public string Salt { get; set; }
 
     /// <summary>
-    /// Salt for master key generation in bytes
+    /// Salt for key generation in bytes
     /// </summary>
     [JsonIgnore]
     public byte[] SaltBytes => Salt is null ? null : Convert.FromHexString(Salt);

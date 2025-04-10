@@ -3,7 +3,7 @@
 
 @model LoginModel
 @{
-    ViewData["Title"] = Model.IsMasterKeyDataExist ? "Login" : "Init";
+    ViewData["Title"] = Model.IsKeyDataExist ? "Login" : "Init";
 }
 
 @Html.AntiForgeryToken()
@@ -12,8 +12,8 @@
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("master-password", "password", "Master password")
 {
         NeedShow = true,
-        NeedVerify = !Model.IsMasterKeyDataExist
+        NeedVerify = !Model.IsKeyDataExist
     })
 
-    <input type="button" value="@(Model.IsMasterKeyDataExist ? "Login" : "Init")" onclick="logon('@(Model.ReturnUrl)')" />
+    <input type="button" value="@(Model.IsKeyDataExist ? "Login" : "Init")" onclick="logon('@(Model.ReturnUrl)')" />
 </div>

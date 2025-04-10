@@ -20,7 +20,7 @@ public class UserSettingsApiController(
     IWritableOptions<UserOptions> userOptions,
     ICookieAuthorizationHelper cookieAuthorizationHelper,
     IKeyGeneratorFactory keyGeneratorFactory,
-    IMasterKeyService masterKeyService) : Controller
+    IKeyService keyService) : Controller
 {
     /// <summary>
     /// Get current settings
@@ -44,15 +44,15 @@ public class UserSettingsApiController(
         }
 
         await userOptions.UpdateAsync(opt => opt.SessionTimeout = request.Timeout, token);
-        await masterKeyService.ChangeKeyTimeoutAsync(request.Timeout, token);
+        await keyService.ChangeKeyTimeoutAsync(request.Timeout, token);
         return Ok();
     }
 
     /// <summary>
-    /// Change master key parameters
+    /// Change key parameters
     /// </summary>
-    [HttpPatch("master-key")]
-    public async Task<ActionResult> ChangeMasterKeySettingsAsync([FromBody] ChangeMasterKeySettingsRequest request,
+    [HttpPatch("key")]
+    public async Task<ActionResult> ChangeKeySettingsAsync([FromBody] ChangeKeySettingsRequest request,
         CancellationToken token)
     {
         if (!request.Validate(out var error))
@@ -66,17 +66,17 @@ public class UserSettingsApiController(
         }
 
         var keyGenerator = keyGeneratorFactory.Create(
-            request.SaltBytes ?? userOptions.Value.MasterKeySaltBytes,
-            request.Iterations ?? userOptions.Value.MasterKeyIterations);
-        await masterKeyService.ChangeMasterKeySettingsAsync(
+            request.SaltBytes ?? userOptions.Value.SaltBytes,
+            request.Iterations ?? userOptions.Value.Iterations);
+        await keyService.ChangeKeySettingsAsync(
             request.MasterPassword,
             request.NewMasterPassword ?? request.MasterPassword,
             keyGenerator,
             token);
         await userOptions.UpdateAsync(opt =>
         {
-            opt.MasterKeySalt = request.Salt ?? opt.MasterKeySalt;
-            opt.MasterKeyIterations = request.Iterations ?? opt.MasterKeyIterations;
+            opt.Salt = request.Salt ?? opt.Salt;
+            opt.Iterations = request.Iterations ?? opt.Iterations;
         }, token);
 
         await cookieAuthorizationHelper.SignOutAsync(HttpContext);
@@ -90,10 +90,10 @@ public class UserSettingsApiController(
     [HttpDelete]
     public async Task<ActionResult> DeleteStorageAsync(CancellationToken token)
     {
-        await masterKeyService.ClearMasterKeyDataAsync(token);
+        await keyService.ClearKeyDataAsync(token);
         await userOptions.UpdateAsync(opt =>
         {
-            opt.MasterKeySalt = new UserOptions().MasterKeySalt;
+            opt.Salt = new UserOptions().Salt;
         }, token);
         await cookieAuthorizationHelper.SignOutAsync(HttpContext);
 

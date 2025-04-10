@@ -6,13 +6,16 @@ using Microsoft.EntityFrameworkCore;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.SecureData.Contexts;
 using PasswordManager.SecureData.Exceptions;
-using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.SecureData.Models;
+using PasswordManager.SecureData.Storages;
 
 namespace PasswordManager.SecureData.Repositories;
 
 /// <inheritdoc />
-public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypto, IMasterKeyStorage masterKeyStorage)
+public sealed class SecureItemsRepository(
+    SecureDbContext context,
+    ICrypto crypto,
+    IKeyStorage keyStorage)
     : ISecureItemsRepository
 {
     /// <inheritdoc />
@@ -20,7 +23,7 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     {
         ArgumentNullException.ThrowIfNull(data);
 
-        var encryptedData = crypto.EncryptJson(data, masterKeyStorage.Key);
+        var encryptedData = crypto.EncryptJson(data, keyStorage.Key);
 
         var secureItem = new SecureItemDbModel
         {
@@ -41,7 +44,7 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
         var secureItem = await context.SecureItems.SingleOrDefaultAsync(m => m.Id == id, token)
             ?? throw new ItemNotExistsException($"Item with id={id} not exists");
 
-        var encryptedData = crypto.EncryptJson(data, masterKeyStorage.Key);
+        var encryptedData = crypto.EncryptJson(data, keyStorage.Key);
         secureItem.Name = data.Name;
         secureItem.Salt = encryptedData.Salt;
         secureItem.Data = encryptedData.Data;
@@ -61,7 +64,7 @@ public sealed class SecureItemsRepository(SecureDbContext context, ICrypto crypt
     {
         var item = await context.SecureItems.AsNoTracking().SingleOrDefaultAsync(m => m.Id == id, token)
             ?? throw new ItemNotExistsException($"Item with id={id} not exists");
-        return crypto.DecryptJson<AccountData>(item, masterKeyStorage.Key);
+        return crypto.DecryptJson<AccountData>(item, keyStorage.Key);
     }
 
     /// <inheritdoc />

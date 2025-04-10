@@ -14,7 +14,7 @@ namespace PasswordManager.Web.Tests;
 /// </summary>
 public class AuthenticationControllerTests
 {
-    private readonly Mock<IMasterKeyService> _keyServiceMock = new();
+    private readonly Mock<IKeyService> _keyServiceMock = new();
     private readonly Mock<ICookieAuthorizationHelper> _cookieHelperMock = new();
 
     [SetUp]
@@ -36,19 +36,19 @@ public class AuthenticationControllerTests
         // assert
         Assert.That(res, Is.TypeOf<RedirectResult>());
         Assert.That((res as RedirectResult).Url, Is.EqualTo("/auth/login"));
-        _keyServiceMock.Verify(m => m.ClearMasterKeyAsync(default), Times.Once);
+        _keyServiceMock.Verify(m => m.ClearKeyAsync(default), Times.Once);
         _cookieHelperMock.Verify(m => m.SignOutAsync(It.IsAny<HttpContext>()), Times.Once);
     }
 
     [Test]
-    public async Task GetView_ShouldCheckMasterKeyDataExistance()
+    public async Task GetView_ShouldCheckKeyDataExistance()
     {
         // arrange
         var returnUrl = "/test";
-        var masterKeyDataExist = true;
+        var keyDataExist = true;
         _keyServiceMock
-            .Setup(m => m.IsMasterKeyDataExistsAsync(default))
-            .ReturnsAsync(masterKeyDataExist);
+            .Setup(m => m.IsKeyDataExistAsync(default))
+            .ReturnsAsync(keyDataExist);
 
         var controller = CreateController();
 
@@ -62,7 +62,7 @@ public class AuthenticationControllerTests
         Assert.Multiple(() =>
         {
             Assert.That(model.ReturnUrl, Is.EqualTo(returnUrl));
-            Assert.That(model.IsMasterKeyDataExist, Is.EqualTo(masterKeyDataExist));
+            Assert.That(model.IsKeyDataExist, Is.EqualTo(keyDataExist));
         });
     }
 

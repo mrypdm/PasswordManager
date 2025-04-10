@@ -15,10 +15,10 @@
 </div>
 
 <div>
-    <h2>Master key settings</h2>
+    <h2>Key settings</h2>
 
-    @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("master-key-salt", "text", "Salt"))
-    @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("master-key-iterations", "number", "Iterations"))
+    @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("key-salt", "text", "Salt"))
+    @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("key-iterations", "number", "Iterations"))
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("new-master-password", "password", "New master password")
 {
         NeedShow = true,
@@ -29,7 +29,7 @@
         NeedShow = true
     })
 
-    <input type="button" value="Update" onclick="updateMasterKeySettings()" />
+    <input type="button" value="Update" onclick="updateKeySettings()" />
     <br />
     <br />
     <input type="button" value="Delete storage" onclick="deleteStorage()" style="color: red" />

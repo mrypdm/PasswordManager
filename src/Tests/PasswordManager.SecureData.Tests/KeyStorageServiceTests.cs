@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using Moq;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Exceptions;
-using PasswordManager.SecureData.KeyStorage;
+using PasswordManager.SecureData.Storages;
 
 namespace PasswordManager.SecureData.Tests;
 
 /// <summary>
-/// Tests for <see cref="MasterKeyStorage"/>
+/// Tests for <see cref="Storages.KeyStorage"/>
 /// </summary>
-public class MasterKeyStorageServiceTests
+public class KeyStorageServiceTests
 {
     private readonly Mock<IKeyValidator> _validatorMock = new();
 
@@ -23,7 +23,7 @@ public class MasterKeyStorageServiceTests
     }
 
     [Test]
-    public void MasterKey_NotInitialized_ShouldThrow()
+    public void Key_NotInitialized_ShouldThrow()
     {
         // arrange
         using var storage = CreateStorage();
@@ -151,8 +151,8 @@ public class MasterKeyStorageServiceTests
         storage.ThrowIfBlocked();
     }
 
-    private MasterKeyStorage CreateStorage()
+    private KeyStorage CreateStorage()
     {
-        return new MasterKeyStorage(_validatorMock.Object);
+        return new KeyStorage(_validatorMock.Object);
     }
 }

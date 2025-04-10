@@ -19,10 +19,10 @@ using PasswordManager.Core.Factories;
 using PasswordManager.External.Factories;
 using PasswordManager.Options;
 using PasswordManager.SecureData.Contexts;
-using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.SecureData.Options;
 using PasswordManager.SecureData.Repositories;
 using PasswordManager.SecureData.Services;
+using PasswordManager.SecureData.Storages;
 using PasswordManager.UserSettings;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Options;
@@ -70,7 +70,7 @@ public static class WebApplicationBuilderExtensions
             {
                 var userOptions = services.GetRequiredService<IWritableOptions<UserOptions>>();
                 var factory = services.GetRequiredService<IKeyGeneratorFactory>();
-                return factory.Create(userOptions.Value.MasterKeySaltBytes, userOptions.Value.MasterKeyIterations);
+                return factory.Create(userOptions.Value.SaltBytes, userOptions.Value.Iterations);
             });
         return builder;
     }
@@ -105,12 +105,12 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services
             .AddSingleton<ICounter, Counter>()
-            .Configure<MasterKeyServiceOptions>(builder.Configuration.GetSection(nameof(MasterKeyServiceOptions)))
+            .Configure<KeyServiceOptions>(builder.Configuration.GetSection(nameof(KeyServiceOptions)))
             .AddDbContext<SecureDbContext>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("SecureDb")))
-            .AddSingleton<IMasterKeyStorage, MasterKeyStorage>()
+            .AddSingleton<IKeyStorage, KeyStorage>()
             .AddScoped<ISecureItemsRepository, SecureItemsRepository>()
-            .AddScoped<IMasterKeyDataRepository, MasterKeyDataRepository>()
-            .AddScoped<IMasterKeyService, MasterKeyService>();
+            .AddScoped<IKeyDataRepository, KeyDataRepository>()
+            .AddScoped<IKeyService, KeyService>();
         return builder;
     }
 

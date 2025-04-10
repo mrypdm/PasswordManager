@@ -3,7 +3,7 @@ namespace PasswordManager.Web.Views.Authentication;
 /// <summary>
 /// Model for login view
 /// </summary>
-public class LoginModel(string returnUrl, bool isMasterKeyDataExist)
+public class LoginModel(string returnUrl, bool isKeyDataExist)
 {
     /// <summary>
     /// URL for redirect after login
@@ -11,7 +11,7 @@ public class LoginModel(string returnUrl, bool isMasterKeyDataExist)
     public string ReturnUrl { get; } = returnUrl ?? "/";
 
     /// <summary>
-    /// If master key data exists
+    /// If key data exists
     /// </summary>
-    public bool IsMasterKeyDataExist { get; } = isMasterKeyDataExist;
+    public bool IsKeyDataExist { get; } = isKeyDataExist;
 }

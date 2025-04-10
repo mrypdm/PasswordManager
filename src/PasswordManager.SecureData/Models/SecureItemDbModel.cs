@@ -1,7 +1,7 @@
 namespace PasswordManager.SecureData.Models;
 
 /// <summary>
-/// Model for master key data
+/// Model for secure item
 /// </summary>
 public sealed class SecureItemDbModel : EncryptedDataDbModel
 {

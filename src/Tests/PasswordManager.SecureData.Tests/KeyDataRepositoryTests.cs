@@ -7,19 +7,19 @@ using PasswordManager.Abstractions.Models;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.SecureData.Contexts;
 using PasswordManager.SecureData.Exceptions;
-using PasswordManager.SecureData.KeyStorage;
 using PasswordManager.SecureData.Models;
 using PasswordManager.SecureData.Repositories;
+using PasswordManager.SecureData.Storages;
 
 namespace PasswordManager.SecureData.Tests;
 
 /// <summary>
-/// Tests for <see cref="MasterKeyDataRepository"/>
+/// Tests for <see cref="KeyDataRepository"/>
 /// </summary>
-public class MasterKeyDataRepositoryTests : RepositoryTestsBase
+public class KeyDataRepositoryTests : RepositoryTestsBase
 {
     private readonly Mock<ICrypto> _cryptoMock = new();
-    private readonly Mock<IMasterKeyStorage> _storageMock = new();
+    private readonly Mock<IKeyStorage> _storageMock = new();
     private readonly Mock<IKeyValidator> _validatorMock = new();
 
     [SetUp]
@@ -31,7 +31,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
     }
 
     [Test]
-    public async Task SetMasterKeyData_MasterKeyDataNotExists_ShouldEncryptMasterKeyWithItself()
+    public async Task SetKeyData_KeyDataNotExists_ShouldEncryptKeyWithItself()
     {
         // arrange
         var expectedId = 1;
@@ -45,7 +45,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            await repo.SetMasterKeyDataAsync(key, default);
+            await repo.SetKeyDataAsync(key, default);
         }
 
         // assert
@@ -54,7 +54,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
 
         using (var context = CreateDbContext())
         {
-            var dbData = context.MasterKeyData.SingleOrDefault();
+            var dbData = context.KeyData.SingleOrDefault();
             Assert.That(dbData, Is.Not.Null);
             Assert.Multiple(() =>
             {
@@ -67,12 +67,12 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
     }
 
     [Test]
-    public void SetMasterKeyData_MasterKeyDataExists_ShouldThrow()
+    public void SetKeyData_KeyDataExists_ShouldThrow()
     {
         // arrange
         using (var context = CreateDbContext())
         {
-            context.MasterKeyData.Add(new MasterKeyDataDbModel() { Data = [], Salt = [] });
+            context.KeyData.Add(new KeyDataDbModel() { Data = [], Salt = [] });
             context.SaveChanges();
         }
 
@@ -81,12 +81,12 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            Assert.ThrowsAsync<MasterKeyDataExistsException>(() => repo.SetMasterKeyDataAsync(null, default));
+            Assert.ThrowsAsync<KeyDataExistsException>(() => repo.SetKeyDataAsync(null, default));
         }
     }
 
     [Test]
-    public void ChangeMasterKeyData_MasterKeyDataNotExists_ShouldThrow()
+    public void ChangeKeyData_KeyDataNotExists_ShouldThrow()
     {
         // arrange
         using var context = CreateDbContext();
@@ -94,11 +94,11 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
 
         // act
         // assert
-        Assert.ThrowsAsync<MasterKeyDataNotExistsException>(() => repo.ChangeMasterKeyDataAsync(null, default));
+        Assert.ThrowsAsync<KeyDataNotExistsException>(() => repo.ChangeKeyDataAsync(null, default));
     }
 
     [Test]
-    public async Task ChangeMasterKeyData_CommonWay_ShouldReEncryptItems()
+    public async Task ChangeKeyData_CommonWay_ShouldReEncryptItems()
     {
         // arrange
         var expectedId = 1;
@@ -129,7 +129,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
 
         using (var context = CreateDbContext())
         {
-            context.MasterKeyData.Add(new MasterKeyDataDbModel() { Data = [], Salt = [] });
+            context.KeyData.Add(new KeyDataDbModel() { Data = [], Salt = [] });
             context.SecureItems.Add(encryptedOldItem);
             context.SaveChanges();
         }
@@ -138,7 +138,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            await repo.ChangeMasterKeyDataAsync(newKey, default);
+            await repo.ChangeKeyDataAsync(newKey, default);
         }
 
         // assert
@@ -154,7 +154,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
 
         using (var context = CreateDbContext())
         {
-            var dbKey = context.MasterKeyData.SingleOrDefault();
+            var dbKey = context.KeyData.SingleOrDefault();
             Assert.That(dbKey, Is.Not.Null);
             Assert.Multiple(() =>
             {
@@ -177,7 +177,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
     }
 
     [Test]
-    public void ValidateMasterKeyData_MasterKeyDataNotExists_ShouldThrow()
+    public void ValidateKeyData_KeyDataNotExists_ShouldThrow()
     {
         // arrange
         using var context = CreateDbContext();
@@ -185,24 +185,24 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
 
         // act
         // assert
-        Assert.ThrowsAsync<MasterKeyDataNotExistsException>(() => repo.ValidateMasterKeyDataAsync(null, default));
+        Assert.ThrowsAsync<KeyDataNotExistsException>(() => repo.ValidateKeyDataAsync(null, default));
     }
 
     [Test]
-    public async Task ValidateMasterKeyData_MasterKeyDataExists_ShouldValidateKeyAndDecrypData()
+    public async Task ValidateKeyData_KeyDataExists_ShouldValidateKeyAndDecrypData()
     {
         // arrange
         var expectedId = 1;
         var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new MasterKeyDataDbModel() { Data = [], Salt = [] };
+        var keyData = new KeyDataDbModel() { Data = [], Salt = [] };
 
         _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<MasterKeyDataDbModel>(m => m.Id == expectedId), key))
+            .Setup(m => m.Decrypt(It.Is<KeyDataDbModel>(m => m.Id == expectedId), key))
             .Returns(key);
 
         using (var context = CreateDbContext())
         {
-            context.MasterKeyData.Add(keyData);
+            context.KeyData.Add(keyData);
             context.SaveChanges();
         }
 
@@ -210,29 +210,29 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            await repo.ValidateMasterKeyDataAsync(key, default);
+            await repo.ValidateKeyDataAsync(key, default);
         }
 
         // assert
         _validatorMock.Verify(m => m.Validate(key), Times.Once);
-        _cryptoMock.Verify(m => m.Decrypt(It.Is<MasterKeyDataDbModel>(m => m.Id == expectedId), key), Times.Once);
+        _cryptoMock.Verify(m => m.Decrypt(It.Is<KeyDataDbModel>(m => m.Id == expectedId), key), Times.Once);
     }
 
     [Test]
-    public void ValidateMasterKeyData_CryptoExceptionThrown_ShouldThrow()
+    public void ValidateKeyData_CryptoExceptionThrown_ShouldThrow()
     {
         // arrange
         var expectedId = 1;
         var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new MasterKeyDataDbModel() { Data = [], Salt = [] };
+        var keyData = new KeyDataDbModel() { Data = [], Salt = [] };
 
         _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<MasterKeyDataDbModel>(m => m.Id == expectedId), key))
+            .Setup(m => m.Decrypt(It.Is<KeyDataDbModel>(m => m.Id == expectedId), key))
             .Throws(new CryptographicException());
 
         using (var context = CreateDbContext())
         {
-            context.MasterKeyData.Add(keyData);
+            context.KeyData.Add(keyData);
             context.SaveChanges();
         }
 
@@ -241,25 +241,25 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            Assert.ThrowsAsync<InvalidMasterKeyException>(() => repo.ValidateMasterKeyDataAsync(key, default));
+            Assert.ThrowsAsync<InvalidKeyException>(() => repo.ValidateKeyDataAsync(key, default));
         }
     }
 
     [Test]
-    public void ValidateMasterKeyData_DifferentKey_ShouldThrow()
+    public void ValidateKeyData_DifferentKey_ShouldThrow()
     {
         // arrange
         var expectedId = 1;
         var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new MasterKeyDataDbModel() { Data = [], Salt = [] };
+        var keyData = new KeyDataDbModel() { Data = [], Salt = [] };
 
         _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<MasterKeyDataDbModel>(m => m.Id == expectedId), key))
+            .Setup(m => m.Decrypt(It.Is<KeyDataDbModel>(m => m.Id == expectedId), key))
             .Returns([]);
 
         using (var context = CreateDbContext())
         {
-            context.MasterKeyData.Add(keyData);
+            context.KeyData.Add(keyData);
             context.SaveChanges();
         }
 
@@ -268,17 +268,17 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            Assert.ThrowsAsync<InvalidMasterKeyException>(() => repo.ValidateMasterKeyDataAsync(key, default));
+            Assert.ThrowsAsync<InvalidKeyException>(() => repo.ValidateKeyDataAsync(key, default));
         }
     }
 
     [Test]
-    public async Task IsMasterKeyDataExistsAsync_MasterKeyDataExists_ShouldReturnTrue()
+    public async Task IsKeyDataExistAsync_KeyDataExists_ShouldReturnTrue()
     {
         // arrange
         using (var context = CreateDbContext())
         {
-            context.MasterKeyData.Add(new MasterKeyDataDbModel() { Data = [], Salt = [] });
+            context.KeyData.Add(new KeyDataDbModel() { Data = [], Salt = [] });
             context.SaveChanges();
         }
 
@@ -287,32 +287,32 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            var res = await repo.IsMasterKeyDataExistsAsync(default);
+            var res = await repo.IsKeyDataExistAsync(default);
             Assert.That(res, Is.True);
         }
     }
 
     [Test]
-    public async Task IsMasterKeyDataExistsAsync_MasterKeyDataNotExists_ShouldReturnFalse()
+    public async Task IsKeyDataExistAsync_KeyDataNotExists_ShouldReturnFalse()
     {
         // arrange
         using var context = CreateDbContext();
         var repo = CreateRepository(context);
 
         // act
-        var res = await repo.IsMasterKeyDataExistsAsync(default);
+        var res = await repo.IsKeyDataExistAsync(default);
 
         // assert
         Assert.That(res, Is.False);
     }
 
     [Test]
-    public async Task DeleteMasterKeyData_ShouldReCreateDatabase()
+    public async Task DeleteKeyData_ShouldReCreateDatabase()
     {
         // arrange
         using (var context = CreateDbContext())
         {
-            context.MasterKeyData.Add(new MasterKeyDataDbModel() { Data = [], Salt = [] });
+            context.KeyData.Add(new KeyDataDbModel() { Data = [], Salt = [] });
             context.SaveChanges();
         }
 
@@ -320,7 +320,7 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            await repo.DeleteMasterKeyDataAsync(default);
+            await repo.DeleteKeyDataAsync(default);
         }
 
         // assert
@@ -330,8 +330,8 @@ public class MasterKeyDataRepositoryTests : RepositoryTestsBase
         }
     }
 
-    private MasterKeyDataRepository CreateRepository(SecureDbContext context)
+    private KeyDataRepository CreateRepository(SecureDbContext context)
     {
-        return new MasterKeyDataRepository(context, _cryptoMock.Object, _storageMock.Object, _validatorMock.Object);
+        return new KeyDataRepository(context, _cryptoMock.Object, _storageMock.Object, _validatorMock.Object);
     }
 }
