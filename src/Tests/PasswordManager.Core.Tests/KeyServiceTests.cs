@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
+using PasswordManager.Abstractions.Contexts;
 using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Exceptions;
@@ -22,6 +23,7 @@ public class KeyServiceTests
 {
     private readonly Mock<IKeyDataRepository> _keyRepositoryMock = new();
     private readonly Mock<ISecureItemsRepository> _itemsRepositoryMock = new();
+    private readonly Mock<IDataContext> _dataContextMock = new();
     private readonly Mock<ICrypto> _cryptoMock = new();
     private readonly Mock<IKeyStorage> _storageMock = new();
     private readonly Mock<IKeyValidatorFactory> _validatorFactoryMock = new();
@@ -34,6 +36,7 @@ public class KeyServiceTests
     {
         _keyRepositoryMock.Reset();
         _itemsRepositoryMock.Reset();
+        _dataContextMock.Reset();
         _cryptoMock.Reset();
         _storageMock.Reset();
         _validatorFactoryMock.Reset();
@@ -70,6 +73,7 @@ public class KeyServiceTests
         _cryptoMock.Verify(m => m.Encrypt(key, key), Times.Once);
         _keyRepositoryMock.Verify(m => m.SetKeyDataAsync(keyData, default), Times.Once);
         _storageMock.Verify(m => m.InitStorage(key, timeout), Times.Once);
+        _dataContextMock.Verify(m => m.SaveChangesAsync(default), Times.Once);
     }
 
     [Test]
@@ -223,6 +227,7 @@ public class KeyServiceTests
             m => m.UpdateDataAsync(itemData.Id, itemData.Name, encryptedData, default),
             Times.Once);
         _storageMock.Verify(m => m.ClearKey(), Times.Once);
+        _dataContextMock.Verify(m => m.SaveChangesAsync(default), Times.Once);
     }
 
     [Test]
@@ -330,7 +335,7 @@ public class KeyServiceTests
     private KeyService CreateService()
     {
         return new KeyService(
-            _keyRepositoryMock.Object, _itemsRepositoryMock.Object, _cryptoMock.Object,
+            _keyRepositoryMock.Object, _itemsRepositoryMock.Object, _dataContextMock.Object, _cryptoMock.Object,
             _storageMock.Object, _validatorFactoryMock.Object, _counterMock.Object, _optionsMock.Object);
     }
 }

@@ -314,6 +314,10 @@ public class UserSettingsApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
         _cookieHelperMock.Verify(m => m.SignOutAsync(default), Times.Once);
+        _generatorMock
+            .Verify(m => m.Generate(masterPassword), Times.Between(1, 2, Moq.Range.Inclusive));
+        _generatorMock
+            .Verify(m => m.Generate(newMasterPassword), Times.Between(1, 2, Moq.Range.Inclusive));
         _generatorFactoryMock.Verify(
             m => m.Create(request.SaltBytes, request.Iterations.Value),
             Times.Between(1, 2, Moq.Range.Inclusive));

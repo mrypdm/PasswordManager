@@ -2,15 +2,17 @@
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
     "Web (Development)": {
+      "comment": "HTTP and Swagger",
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:5000;https://localhost:5001",
+      "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "Web (Staging)": {
+      "comment": "HTTPS without Swagger",
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

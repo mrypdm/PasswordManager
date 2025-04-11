@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using PasswordManager.Abstractions.Contexts;
 using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Exceptions;
@@ -18,6 +19,7 @@ namespace PasswordManager.Core.Services;
 public sealed class KeyService(
     IKeyDataRepository keyDataRepository,
     ISecureItemsRepository secureItemsRepository,
+    IDataContext dataContext,
     ICrypto crypto,
     IKeyStorage keyStorage,
     IKeyValidatorFactory keyValidatorFactory,
@@ -37,6 +39,7 @@ public sealed class KeyService(
         catch (KeyDataNotExistsException)
         {
             await SetKeyDataAsync(key, update: false, token);
+            await dataContext.SaveChangesAsync(token);
         }
         catch (KeyValidationException)
         {
@@ -64,6 +67,7 @@ public sealed class KeyService(
             await secureItemsRepository.UpdateDataAsync(item.Id, item.Name, encryptedData, token);
         }
 
+        await dataContext.SaveChangesAsync(token);
         keyStorage.ClearKey();
     }
 

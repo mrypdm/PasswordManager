@@ -72,7 +72,7 @@ public class UserSettingsApiController(
             request.Iterations ?? userOptions.Value.Iterations);
 
         var oldKey = oldKeyGenerator.Generate(request.MasterPassword);
-        var newKey = newKeyGenerator.Generate(request.NewMasterPassword);
+        var newKey = newKeyGenerator.Generate(request.NewMasterPassword ?? request.MasterPassword);
 
         if (oldKey.SequenceEqual(newKey))
         {

@@ -43,6 +43,7 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
         {
             var repo = CreateRepository(context);
             await repo.SetKeyDataAsync(keyData, default);
+            context.SaveChanges();
         }
 
         // assert
@@ -115,12 +116,12 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
         // arrange
         var expectedId = 1;
         var expectedVersion = 1;
-        var keyData = new EncryptedData { Data = [11], Salt = [12] };
+        var keyData = new KeyDataDbModel { Data = [11], Salt = [12] };
         var newKeyData = new EncryptedData { Data = [13], Salt = [14] };
         using (var context = CreateDbContext())
         {
-            var repo = CreateRepository(context);
-            await repo.SetKeyDataAsync(keyData, default);
+            context.KeyData.Add(keyData);
+            context.SaveChanges();
         }
 
         // act
@@ -128,6 +129,7 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
         {
             var repo = CreateRepository(context);
             await repo.UpdateKeyDataAsync(newKeyData, default);
+            context.SaveChanges();
         }
 
         // assert
@@ -219,11 +221,11 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
     public async Task GetKeyData_CommonWay_ShouldReturnData()
     {
         // arrange
-        var keyData = new EncryptedData { Data = [11], Salt = [12] };
+        var keyData = new KeyDataDbModel { Data = [11], Salt = [12] };
         using (var context = CreateDbContext())
         {
-            var repo = CreateRepository(context);
-            await repo.SetKeyDataAsync(keyData, default);
+            context.KeyData.Add(keyData);
+            context.SaveChanges();
         }
 
         // act

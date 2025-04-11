@@ -15,7 +15,7 @@ namespace PasswordManager.Data.Repositories;
 public sealed class SecureItemsRepository(SecureDbContext context) : ISecureItemsRepository
 {
     /// <inheritdoc />
-    public async Task<int> AddDataAsync(string name, EncryptedData data, CancellationToken token)
+    public async Task<IItem> AddDataAsync(string name, EncryptedData data, CancellationToken token)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(data);
@@ -30,9 +30,7 @@ public sealed class SecureItemsRepository(SecureDbContext context) : ISecureItem
         };
 
         await context.SecureItems.AddAsync(secureItem, token);
-        await context.SaveChangesAsync(token);
-
-        return secureItem.Id;
+        return secureItem;
     }
 
     /// <inheritdoc />
@@ -51,7 +49,6 @@ public sealed class SecureItemsRepository(SecureDbContext context) : ISecureItem
         secureItem.Data = data.Data;
 
         context.Update(secureItem);
-        await context.SaveChangesAsync(token);
     }
 
     /// <inheritdoc />

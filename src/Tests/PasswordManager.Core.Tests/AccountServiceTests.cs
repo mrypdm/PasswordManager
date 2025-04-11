@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Moq;
+using PasswordManager.Abstractions.Contexts;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Models;
@@ -13,6 +14,7 @@ namespace PasswordManager.Core.Tests;
 public class AccountServiceTests
 {
     private readonly Mock<ISecureItemsRepository> _repositoryMock = new();
+    private readonly Mock<IDataContext> _dataContextMock = new();
     private readonly Mock<ICrypto> _cryptoMock = new();
     private readonly Mock<IKeyStorage> _storageMock = new();
 
@@ -20,6 +22,7 @@ public class AccountServiceTests
     public void SetUp()
     {
         _repositoryMock.Reset();
+        _dataContextMock.Reset();
         _cryptoMock.Reset();
         _storageMock.Reset();
     }
@@ -43,6 +46,10 @@ public class AccountServiceTests
         var account = new AccountData() { Name = "name" };
         var data = new EncryptedData() { Data = [], Salt = [] };
         var expectedId = 123;
+        var item = new Mock<IItem>();
+        item
+            .Setup(m => m.Id)
+            .Returns(expectedId);
 
         _storageMock
             .Setup(m => m.Key)
@@ -52,7 +59,7 @@ public class AccountServiceTests
             .Returns(data);
         _repositoryMock
             .Setup(m => m.AddDataAsync(account.Name, data, default))
-            .ReturnsAsync(expectedId);
+            .ReturnsAsync(item.Object);
         var service = CreateService();
 
         // act
@@ -63,6 +70,7 @@ public class AccountServiceTests
         _storageMock.Verify(m => m.Key, Times.Once);
         _cryptoMock.Verify(m => m.EncryptJson(account, key), Times.Once);
         _repositoryMock.Verify(m => m.AddDataAsync(account.Name, data, default), Times.Once);
+        _dataContextMock.Verify(m => m.SaveChangesAsync(default), Times.Once);
     }
 
     [Test]
@@ -115,6 +123,7 @@ public class AccountServiceTests
         _storageMock.Verify(m => m.Key, Times.Once);
         _cryptoMock.Verify(m => m.EncryptJson(account, key), Times.Once);
         _repositoryMock.Verify(m => m.UpdateDataAsync(expectedId, account.Name, data, default), Times.Once);
+        _dataContextMock.Verify(m => m.SaveChangesAsync(default), Times.Once);
     }
 
     [Test]
@@ -214,6 +223,7 @@ public class AccountServiceTests
 
     private AccountService CreateService()
     {
-        return new AccountService(_repositoryMock.Object, _cryptoMock.Object, _storageMock.Object);
+        return new AccountService(_repositoryMock.Object, _dataContextMock.Object, _cryptoMock.Object,
+            _storageMock.Object);
     }
 }

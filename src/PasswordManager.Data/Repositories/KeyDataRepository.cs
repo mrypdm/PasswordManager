@@ -32,7 +32,6 @@ public class KeyDataRepository(SecureDbContext context) : IKeyDataRepository
         };
 
         await context.KeyData.AddAsync(keyData, token);
-        await context.SaveChangesAsync(token);
     }
 
     /// <inheritdoc />
@@ -48,7 +47,6 @@ public class KeyDataRepository(SecureDbContext context) : IKeyDataRepository
         keyData.Data = data.Data;
 
         context.Update(keyData);
-        await context.SaveChangesAsync(token);
     }
 
     /// <inheritdoc />

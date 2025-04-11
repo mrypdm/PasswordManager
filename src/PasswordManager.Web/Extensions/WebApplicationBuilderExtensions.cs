@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PasswordManager.Abstractions.Contexts;
 using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Factories;
@@ -110,12 +111,22 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddSecureDb(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddSingleton<ICounter, Counter>()
-            .Configure<KeyServiceOptions>(builder.Configuration.GetSection(nameof(KeyServiceOptions)))
+            .AddScoped<IDataContext, DataContext>()
             .AddDbContext<SecureDbContext>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("SecureDb")))
-            .AddSingleton<IKeyStorage, KeyStorage>()
             .AddScoped<ISecureItemsRepository, SecureItemsRepository>()
-            .AddScoped<IKeyDataRepository, KeyDataRepository>()
+            .AddScoped<IKeyDataRepository, KeyDataRepository>();
+        return builder;
+    }
+
+    /// <summary>
+    /// Add core services
+    /// </summary>
+    public static WebApplicationBuilder AddCore(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .Configure<KeyServiceOptions>(builder.Configuration.GetSection(nameof(KeyServiceOptions)))
+            .AddSingleton<ICounter, Counter>()
+            .AddSingleton<IKeyStorage, KeyStorage>()
             .AddScoped<IKeyService, KeyService>()
             .AddScoped<IAccountService, AccountService>();
         return builder;

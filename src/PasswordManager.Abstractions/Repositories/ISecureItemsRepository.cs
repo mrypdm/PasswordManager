@@ -12,12 +12,12 @@ namespace PasswordManager.Abstractions.Repositories;
 public interface ISecureItemsRepository
 {
     /// <summary>
-    /// Add <paramref name="data"/> with <paramref name="name"/> to repository and return its ID
+    /// Add <paramref name="data"/> with <paramref name="name"/> to repository and return added item
     /// </summary>
     /// <exception cref="ArgumentException">If <paramref name="name"/> is whitespace</exception>
     /// <exception cref="ArgumentNullException">If <paramref name="name"/> is null</exception>
     /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null</exception>
-    Task<int> AddDataAsync(string name, EncryptedData data, CancellationToken token);
+    Task<IItem> AddDataAsync(string name, EncryptedData data, CancellationToken token);
 
     /// <summary>
     /// Update data with <paramref name="id"/> with

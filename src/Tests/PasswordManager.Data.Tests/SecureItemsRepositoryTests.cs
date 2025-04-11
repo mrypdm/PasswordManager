@@ -50,6 +50,7 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         {
             var repo = CreateRepository(context);
             await repo.AddDataAsync(expectedName, data, default);
+            context.SaveChanges();
         }
 
         // assert
@@ -120,6 +121,7 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         {
             var repo = CreateRepository(context);
             await repo.UpdateDataAsync(expectedId, expecetedName, expectedData, default);
+            context.SaveChanges();
         }
 
         // assert
