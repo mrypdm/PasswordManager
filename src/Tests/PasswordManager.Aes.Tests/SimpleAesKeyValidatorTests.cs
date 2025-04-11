@@ -7,7 +7,7 @@ namespace PasswordManager.Aes.Tests;
 /// <summary>
 /// Tests for <see cref="SimpleAesKeyValidator"/>
 /// </summary>
-public class AesKeyValidatorTests
+public class SimpleAesKeyValidatorTests
 {
     [Test]
     public void Validate_CommonWay_ShouldNotThrow()
