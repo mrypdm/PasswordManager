@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
 using PasswordManager.Abstractions.Exceptions;
+using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Services;
 using PasswordManager.UserSettings;
 using PasswordManager.Web.Controllers.Api;
@@ -21,6 +22,7 @@ namespace PasswordManager.Web.Tests;
 public class LogonApiControllerTests
 {
     private readonly Mock<IKeyService> _keyServiceMock = new();
+    private readonly Mock<IKeyGenerator> _keyGeneratorMock = new();
     private readonly Mock<ICookieAuthorizationHelper> _cookieHelperMock = new();
     private readonly Mock<IWritableOptions<UserOptions>> _userOptionsMock = new();
     private readonly Mock<IOptions<ConnectionOptions>> _connectionOptionsMock = new();
@@ -29,6 +31,7 @@ public class LogonApiControllerTests
     public void SetUp()
     {
         _keyServiceMock.Reset();
+        _keyGeneratorMock.Reset();
         _cookieHelperMock.Reset();
         _userOptionsMock.Reset();
         _connectionOptionsMock.Reset();
@@ -52,11 +55,15 @@ public class LogonApiControllerTests
     public async Task SignIn_CommonWay_ShouldInitKeyAndSignInAndReturnOk()
     {
         // arrange
+        var key = Array.Empty<byte>();
         var request = new LoginRequest() { MasterPassword = "password" };
         var userOptions = new UserOptions() { SessionTimeout = TimeSpan.FromSeconds(1) };
         var connectionOptions = new ConnectionOptions() { IsProxyUsed = false };
         var controller = CreateController();
 
+        _keyGeneratorMock
+            .Setup(m => m.Generate(request.MasterPassword))
+            .Returns(key);
         _userOptionsMock
             .Setup(m => m.Value)
             .Returns(userOptions);
@@ -70,26 +77,25 @@ public class LogonApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
         _keyServiceMock.Verify(
-            m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default),
+            m => m.InitKeyAsync(key, userOptions.SessionTimeout, default),
             Times.Once);
         _cookieHelperMock.Verify(m => m.SignInAsync(It.IsAny<HttpContext>(), connectionOptions), Times.Once);
     }
 
     [Test]
-    public async Task SignIn_InvalidMasterPassword_ShouldReturnUnauthroized()
+    public async Task SignIn_InvalidKey_ShouldReturnUnauthroized()
     {
         // arrange
         var request = new LoginRequest() { MasterPassword = "password" };
         var userOptions = new UserOptions() { SessionTimeout = TimeSpan.FromSeconds(1) };
-        var controller = CreateController();
-
         _userOptionsMock
             .Setup(m => m.Value)
             .Returns(userOptions);
-
         _keyServiceMock
-            .Setup(m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default))
+            .Setup(m => m.InitKeyAsync(It.IsAny<byte[]>(), userOptions.SessionTimeout, default))
             .ThrowsAsync(new KeyValidationException());
+
+        var controller = CreateController();
 
         // act
         var res = await controller.SignInAsync(request, default);
@@ -97,7 +103,7 @@ public class LogonApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<UnauthorizedObjectResult>());
         _keyServiceMock.Verify(
-            m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default),
+            m => m.InitKeyAsync(It.IsAny<byte[]>(), userOptions.SessionTimeout, default),
             Times.Once);
         _cookieHelperMock.Verify(
             m => m.SignInAsync(It.IsAny<HttpContext>(), It.IsAny<ConnectionOptions>()),
@@ -117,7 +123,7 @@ public class LogonApiControllerTests
             .Returns(userOptions);
 
         _keyServiceMock
-            .Setup(m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default))
+            .Setup(m => m.InitKeyAsync(It.IsAny<byte[]>(), userOptions.SessionTimeout, default))
             .ThrowsAsync(new StorageBlockedException());
 
         // act
@@ -130,7 +136,7 @@ public class LogonApiControllerTests
             Assert.That((res as ObjectResult).StatusCode, Is.EqualTo((int)HttpStatusCode.Forbidden));
         });
         _keyServiceMock.Verify(
-            m => m.InitKeyAsync(request.MasterPassword, userOptions.SessionTimeout, default),
+            m => m.InitKeyAsync(It.IsAny<byte[]>(), userOptions.SessionTimeout, default),
             Times.Once);
         _cookieHelperMock.Verify(
             m => m.SignInAsync(It.IsAny<HttpContext>(), It.IsAny<ConnectionOptions>()),
@@ -158,7 +164,7 @@ public class LogonApiControllerTests
 
     private LogonApiController CreateController()
     {
-        return new LogonApiController(_keyServiceMock.Object, _cookieHelperMock.Object, _userOptionsMock.Object,
-            _connectionOptionsMock.Object);
+        return new LogonApiController(_keyServiceMock.Object, _keyGeneratorMock.Object, _cookieHelperMock.Object,
+            _userOptionsMock.Object, _connectionOptionsMock.Object);
     }
 }

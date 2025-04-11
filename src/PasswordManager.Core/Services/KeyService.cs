@@ -6,7 +6,6 @@ using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Factories;
-using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Abstractions.Services;
@@ -21,18 +20,15 @@ public sealed class KeyService(
     ISecureItemsRepository secureItemsRepository,
     ICrypto crypto,
     IKeyStorage keyStorage,
-    IKeyGenerator keyGenerator,
     IKeyValidatorFactory keyValidatorFactory,
     ICounter counter,
     IOptions<KeyServiceOptions> options) : IKeyService
 {
     /// <inheritdoc />
-    public async Task InitKeyAsync(string password, TimeSpan sessionTimeout,
+    public async Task InitKeyAsync(byte[] key, TimeSpan sessionTimeout,
         CancellationToken token)
     {
         keyStorage.ThrowIfBlocked();
-
-        var key = keyGenerator.Generate(password);
 
         try
         {
@@ -40,7 +36,7 @@ public sealed class KeyService(
         }
         catch (KeyDataNotExistsException)
         {
-            await InitKeyDataAsync(key, token);
+            await SetKeyDataAsync(key, update: false, token);
         }
         catch (KeyValidationException)
         {
@@ -53,23 +49,17 @@ public sealed class KeyService(
     }
 
     /// <inheritdoc />
-    public async Task ChangeKeySettingsAsync(string oldPassword, string newPassword,
-        IKeyGenerator newKeyGenerator, CancellationToken token)
+    public async Task ChangeKeySettingsAsync(byte[] oldKey, byte[] newKey, CancellationToken token)
     {
-        ArgumentNullException.ThrowIfNull(newKeyGenerator);
-        var key = keyGenerator.Generate(oldPassword);
-        await ValidateKeyAsync(key, token);
+        keyStorage.ThrowIfBlocked();
 
-        // seting up new key data
-        var newKey = newKeyGenerator.Generate(newPassword);
-        var newKeyData = crypto.Encrypt(newKey, newKey);
-        await keyDataRepository.UpdateKeyDataAsync(newKeyData, token);
+        await ValidateKeyAsync(oldKey, token);
+        await SetKeyDataAsync(newKey, update: true, token);
 
-        // re-encrypting accounts
         var encryptedItems = await secureItemsRepository.GetDataAsync(token);
         foreach (var item in encryptedItems)
         {
-            var decryptedData = crypto.DecryptJson<AccountData>(item, key);
+            var decryptedData = crypto.DecryptJson<AccountData>(item, oldKey);
             var encryptedData = crypto.EncryptJson(decryptedData, newKey);
             await secureItemsRepository.UpdateDataAsync(item.Id, item.Name, encryptedData, token);
         }
@@ -111,10 +101,21 @@ public sealed class KeyService(
         validator.Validate(key);
     }
 
-    private async Task InitKeyDataAsync(byte[] key, CancellationToken token)
+    private async Task SetKeyDataAsync(byte[] key, bool update, CancellationToken token)
     {
+        var validator = keyValidatorFactory.Create(null);
+        validator.Validate(key);
+
         var encryptedData = crypto.Encrypt(key, key);
-        await keyDataRepository.SetKeyDataAsync(encryptedData, token);
+
+        if (update)
+        {
+            await keyDataRepository.UpdateKeyDataAsync(encryptedData, token);
+        }
+        else
+        {
+            await keyDataRepository.SetKeyDataAsync(encryptedData, token);
+        }
     }
 
     private void CountInvalidAttempt()

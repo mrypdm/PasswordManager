@@ -6,7 +6,6 @@ using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Factories;
-using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Abstractions.Storages;
@@ -25,7 +24,6 @@ public class KeyServiceTests
     private readonly Mock<ISecureItemsRepository> _itemsRepositoryMock = new();
     private readonly Mock<ICrypto> _cryptoMock = new();
     private readonly Mock<IKeyStorage> _storageMock = new();
-    private readonly Mock<IKeyGenerator> _generatorMock = new();
     private readonly Mock<IKeyValidatorFactory> _validatorFactoryMock = new();
     private readonly Mock<IKeyValidator> _validatorMock = new();
     private readonly Mock<ICounter> _counterMock = new();
@@ -38,7 +36,6 @@ public class KeyServiceTests
         _itemsRepositoryMock.Reset();
         _cryptoMock.Reset();
         _storageMock.Reset();
-        _generatorMock.Reset();
         _validatorFactoryMock.Reset();
         _validatorMock.Reset();
         _counterMock.Reset();
@@ -52,14 +49,10 @@ public class KeyServiceTests
     public async Task InitKey_KeyDataNotExists_ShouldAddEncryptedKeyToRepoAndInitStorage()
     {
         // arrange
-        var password = "password";
         var timeout = TimeSpan.FromSeconds(10);
         var key = Array.Empty<byte>();
         var keyData = new EncryptedData { Data = [], Salt = [] };
 
-        _generatorMock
-            .Setup(m => m.Generate(password))
-            .Returns(key);
         _cryptoMock
             .Setup(m => m.Encrypt(key, key))
             .Returns(keyData);
@@ -70,10 +63,9 @@ public class KeyServiceTests
         var service = CreateService();
 
         // act
-        await service.InitKeyAsync(password, timeout, default);
+        await service.InitKeyAsync(key, timeout, default);
 
         // assert
-        _generatorMock.Verify(m => m.Generate(password), Times.Once);
         _keyRepositoryMock.Verify(m => m.GetKeyDataAsync(default), Times.Once);
         _cryptoMock.Verify(m => m.Encrypt(key, key), Times.Once);
         _keyRepositoryMock.Verify(m => m.SetKeyDataAsync(keyData, default), Times.Once);
@@ -84,14 +76,10 @@ public class KeyServiceTests
     public async Task InitKey_KeyDataExists_ShouldValidateKeyAndInitStorage()
     {
         // arrange
-        var password = "password";
         var timeout = TimeSpan.FromSeconds(10);
         var key = Array.Empty<byte>();
         var keyData = new EncryptedData();
 
-        _generatorMock
-            .Setup(m => m.Generate(password))
-            .Returns(key);
         _keyRepositoryMock
             .Setup(m => m.GetKeyDataAsync(default))
             .ReturnsAsync(keyData);
@@ -99,11 +87,9 @@ public class KeyServiceTests
         var service = CreateService();
 
         // act
-        await service.InitKeyAsync(password, timeout, default);
+        await service.InitKeyAsync(key, timeout, default);
 
         // assert
-
-        _generatorMock.Verify(m => m.Generate(password), Times.Once);
         _keyRepositoryMock.Verify(m => m.GetKeyDataAsync(default), Times.Once);
         _validatorFactoryMock.Verify(m => m.Create(keyData), Times.Once);
         _validatorMock.Verify(m => m.Validate(key), Times.Once);
@@ -114,7 +100,7 @@ public class KeyServiceTests
     public void InitKey_InvalidKey_ShouldCountAndThrow()
     {
         // arrange
-        var password = "password";
+        var key = Array.Empty<byte>();
         var timeout = TimeSpan.FromSeconds(10);
         var options = new KeyServiceOptions
         {
@@ -123,7 +109,7 @@ public class KeyServiceTests
         };
 
         _validatorMock
-            .Setup(m => m.Validate(It.IsAny<byte[]>()))
+            .Setup(m => m.Validate(key))
             .Throws(new KeyValidationException());
         _optionsMock
             .Setup(m => m.Value)
@@ -132,11 +118,11 @@ public class KeyServiceTests
         var service = CreateService();
 
         // act
-        Assert.ThrowsAsync<KeyValidationException>(() => service.InitKeyAsync(password, timeout, default));
+        Assert.ThrowsAsync<KeyValidationException>(() => service.InitKeyAsync(key, timeout, default));
 
         // assert
         _validatorFactoryMock.Verify(m => m.Create(It.IsAny<EncryptedData>()), Times.Once);
-        _validatorMock.Verify(m => m.Validate(It.IsAny<byte[]>()), Times.Once);
+        _validatorMock.Verify(m => m.Validate(key), Times.Once);
         _counterMock.Verify(m => m.Increment(), Times.Once);
     }
 
@@ -144,7 +130,7 @@ public class KeyServiceTests
     public void InitKey_InvalidKeyAndMaxAttempts_ShouldBlockStorage()
     {
         // arrange
-        var password = "password";
+        var key = Array.Empty<byte>();
         var timeout = TimeSpan.FromSeconds(10);
         var options = new KeyServiceOptions
         {
@@ -165,7 +151,7 @@ public class KeyServiceTests
         var service = CreateService();
 
         // act
-        Assert.ThrowsAsync<KeyValidationException>(() => service.InitKeyAsync(password, timeout, default));
+        Assert.ThrowsAsync<KeyValidationException>(() => service.InitKeyAsync(key, timeout, default));
 
         // assert
         _counterMock.Verify(m => m.Increment(), Times.Once);
@@ -174,39 +160,38 @@ public class KeyServiceTests
     }
 
     [Test]
-    public void ChangeKeySettings_NullNewGenerator_ShouldThrow()
+    public async Task InitKey_ShouldCheckForBlockedStorage()
     {
         // arrange
+        var key = Array.Empty<byte>();
+        var timeout = TimeSpan.FromSeconds(10);
         var service = CreateService();
 
         // act
+        await service.InitKeyAsync(key, timeout, default);
+
         // assert
-        Assert.ThrowsAsync<ArgumentNullException>(() => service.ChangeKeySettingsAsync("", "", null, default));
+        _storageMock.Verify(m => m.ThrowIfBlocked(), Times.Once);
     }
 
     [Test]
-    public async Task ChangeKeySettings_CommonWay_ShouldValidateKeyAndUpdateKeyDataAndReEncryptItems()
+    public async Task ChangeKeySettings_CommonWay_ShouldValidateKeysAndUpdateKeyDataAndReEncryptItems()
     {
         // arrange
-        var oldPassword = "old";
         var oldKey = new byte[] { 1 };
-        var newPassword = "new";
+        var oldKeyData = new EncryptedData();
         var newKey = new byte[] { 2 };
         var newKeyData = new EncryptedData();
         var itemData = new EncryptedItem() { Id = 12, Name = "name" };
         var account = new AccountData();
         var encryptedData = new EncryptedData();
 
-        var newGenerator = new Mock<IKeyGenerator>();
-        newGenerator
-            .Setup(m => m.Generate(newPassword))
-            .Returns(newKey);
-        _generatorMock
-            .Setup(m => m.Generate(oldPassword))
-            .Returns(oldKey);
         _cryptoMock
             .Setup(m => m.Encrypt(newKey, newKey))
             .Returns(newKeyData);
+        _keyRepositoryMock
+            .Setup(m => m.GetKeyDataAsync(default))
+            .ReturnsAsync(oldKeyData);
         _itemsRepositoryMock
             .Setup(m => m.GetDataAsync(default))
             .ReturnsAsync([itemData]);
@@ -220,14 +205,15 @@ public class KeyServiceTests
         var service = CreateService();
 
         // act
-        await service.ChangeKeySettingsAsync(oldPassword, newPassword, newGenerator.Object, default);
+        await service.ChangeKeySettingsAsync(oldKey, newKey, default);
 
         // assert
-        _generatorMock.Verify(m => m.Generate(oldPassword), Times.Once);
+        _storageMock.Verify(m => m.ThrowIfBlocked(), Times.Once);
         _keyRepositoryMock.Verify(m => m.GetKeyDataAsync(default), Times.Once);
-        _validatorFactoryMock.Verify(m => m.Create(It.IsAny<EncryptedData>()), Times.Once);
+        _validatorFactoryMock.Verify(m => m.Create(oldKeyData), Times.Once);
+        _validatorFactoryMock.Verify(m => m.Create(null), Times.Once);
         _validatorMock.Verify(m => m.Validate(oldKey), Times.Once);
-        newGenerator.Verify(m => m.Generate(newPassword), Times.Once);
+        _validatorMock.Verify(m => m.Validate(newKey), Times.Once);
         _cryptoMock.Verify(m => m.Encrypt(newKey, newKey), Times.Once);
         _keyRepositoryMock.Verify(m => m.UpdateKeyDataAsync(newKeyData, default), Times.Once);
         _itemsRepositoryMock.Verify(m => m.GetDataAsync(default), Times.Once);
@@ -240,18 +226,51 @@ public class KeyServiceTests
     }
 
     [Test]
-    public async Task InitKey_ShouldCheckForBlockedStorage()
+    public void ChangeKeySettings_InvalidOldKey_ShouldThrow()
     {
         // arrange
-        var password = "password";
-        var timeout = TimeSpan.FromSeconds(10);
+        var oldKey = new byte[] { 1 };
+        var oldKeyData = new EncryptedData();
+
+        _keyRepositoryMock
+            .Setup(m => m.GetKeyDataAsync(default))
+            .ReturnsAsync(oldKeyData);
+        _validatorMock
+            .Setup(m => m.Validate(oldKey))
+            .Throws(new KeyValidationException());
+
         var service = CreateService();
 
         // act
-        await service.InitKeyAsync(password, timeout, default);
+        Assert.ThrowsAsync<KeyValidationException>(() => service.ChangeKeySettingsAsync(oldKey, [], default));
 
         // assert
-        _storageMock.Verify(m => m.ThrowIfBlocked(), Times.Once);
+        _keyRepositoryMock.Verify(m => m.GetKeyDataAsync(default), Times.Once);
+        _validatorFactoryMock.Verify(m => m.Create(oldKeyData), Times.Once);
+        _validatorMock.Verify(m => m.Validate(oldKey), Times.Once);
+    }
+
+    [Test]
+    public void ChangeKeySettings_InvalidNewKey_ShouldThrow()
+    {
+        // arrange
+        var newKey = new byte[] { 1 };
+        _keyRepositoryMock
+            .Setup(m => m.GetKeyDataAsync(default))
+            .ReturnsAsync(new EncryptedData());
+        _validatorMock
+            .Setup(m => m.Validate(newKey))
+            .Throws(new KeyValidationException());
+
+        var service = CreateService();
+
+        // act
+        Assert.ThrowsAsync<KeyValidationException>(() => service.ChangeKeySettingsAsync([], newKey, default));
+
+        // assert
+        _keyRepositoryMock.Verify(m => m.GetKeyDataAsync(default), Times.Once);
+        _validatorFactoryMock.Verify(m => m.Create(null), Times.Once);
+        _validatorMock.Verify(m => m.Validate(newKey), Times.Once);
     }
 
     [Test]
@@ -312,7 +331,6 @@ public class KeyServiceTests
     {
         return new KeyService(
             _keyRepositoryMock.Object, _itemsRepositoryMock.Object, _cryptoMock.Object,
-            _storageMock.Object, _generatorMock.Object, _validatorFactoryMock.Object, _counterMock.Object,
-            _optionsMock.Object);
+            _storageMock.Object, _validatorFactoryMock.Object, _counterMock.Object, _optionsMock.Object);
     }
 }

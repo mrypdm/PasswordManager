@@ -206,7 +206,7 @@ public class UserSettingsApiControllerTests
     [Test]
     [TestCase(null)]
     [TestCase("password")]
-    public async Task ChangeKeySettings_ChangesAreNotNeeded_ShouldReturnOk(string newMasterPassword)
+    public async Task ChangeKeySettings_ChangesAreNotNeeded_ShouldOnlyReturnOk(string newMasterPassword)
     {
         // arrange
         var request = new ChangeKeySettingsRequest
@@ -227,8 +227,46 @@ public class UserSettingsApiControllerTests
             m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
             Times.Never);
         _keyServiceMock.Verify(
-            m => m.ChangeKeySettingsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IKeyGenerator>(),
-                default),
+            m => m.ChangeKeySettingsAsync(It.IsAny<byte[]>(), It.IsAny<byte[]>(), default),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task ChangeKeySettings_KeyNotChanged_ShouldOnlyReturnOk()
+    {
+        // arrange
+        var request = new ChangeKeySettingsRequest
+        {
+            MasterPassword = "password",
+            NewMasterPassword = "new_password"
+        };
+        var options = new UserOptions()
+        {
+            Salt = string.Empty,
+            Iterations = 0
+        };
+
+        _generatorMock
+            .Setup(m => m.Generate(It.IsAny<string>()))
+            .Returns([]);
+        _userOptionsMock
+            .Setup(m => m.Value)
+            .Returns(options);
+
+        var controller = CreateController();
+
+        // act
+        var res = await controller.ChangeKeySettingsAsync(request, default);
+
+        // assert
+        Assert.That(res, Is.TypeOf<OkResult>());
+        _generatorFactoryMock.Verify(m => m.Create(It.IsAny<byte[]>(), It.IsAny<int>()), Times.Exactly(2));
+        _cookieHelperMock.Verify(m => m.SignOutAsync(default), Times.Never);
+        _userOptionsMock.Verify(
+            m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
+            Times.Never);
+        _keyServiceMock.Verify(
+            m => m.ChangeKeySettingsAsync(It.IsAny<byte[]>(), It.IsAny<byte[]>(), default),
             Times.Never);
     }
 
@@ -240,6 +278,8 @@ public class UserSettingsApiControllerTests
         string masterPassword, string newMasterPassword)
     {
         // arrange
+        var oldKey = RandomNumberGenerator.GetBytes(32);
+        var newKey = RandomNumberGenerator.GetBytes(32);
         var options = new UserOptions()
         {
             Salt = salt,
@@ -254,6 +294,10 @@ public class UserSettingsApiControllerTests
             {
                 act(options);
             });
+        _generatorMock
+            .SetupSequence(m => m.Generate(It.IsAny<string>()))
+            .Returns(oldKey)
+            .Returns(newKey);
 
         var request = new ChangeKeySettingsRequest
         {
@@ -271,17 +315,15 @@ public class UserSettingsApiControllerTests
         Assert.That(res, Is.TypeOf<OkResult>());
         _cookieHelperMock.Verify(m => m.SignOutAsync(default), Times.Once);
         _generatorFactoryMock.Verify(
-            m => m.Create(
-                request.SaltBytes ?? options.SaltBytes,
-                request.Iterations ?? options.Iterations),
-            Times.Once);
+            m => m.Create(request.SaltBytes, request.Iterations.Value),
+            Times.Between(1, 2, Moq.Range.Inclusive));
+        _generatorFactoryMock.Verify(
+            m => m.Create(options.SaltBytes, options.Iterations),
+            Times.Between(1, 2, Moq.Range.Inclusive));
         _userOptionsMock.Verify(
             m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
             Times.Once);
-        _keyServiceMock.Verify(
-            m => m.ChangeKeySettingsAsync(request.MasterPassword, request.NewMasterPassword,
-                _generatorMock.Object, default),
-            Times.Once);
+        _keyServiceMock.Verify(m => m.ChangeKeySettingsAsync(oldKey, newKey, default), Times.Once);
         Assert.Multiple(() =>
         {
             Assert.That(options.Salt, Is.EqualTo(newSalt));

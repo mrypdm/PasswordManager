@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -65,14 +66,20 @@ public class UserSettingsApiController(
             return Ok();
         }
 
-        var keyGenerator = keyGeneratorFactory.Create(
+        var oldKeyGenerator = keyGeneratorFactory.Create(userOptions.Value.SaltBytes, userOptions.Value.Iterations);
+        var newKeyGenerator = keyGeneratorFactory.Create(
             request.SaltBytes ?? userOptions.Value.SaltBytes,
             request.Iterations ?? userOptions.Value.Iterations);
-        await keyService.ChangeKeySettingsAsync(
-            request.MasterPassword,
-            request.NewMasterPassword ?? request.MasterPassword,
-            keyGenerator,
-            token);
+
+        var oldKey = oldKeyGenerator.Generate(request.MasterPassword);
+        var newKey = newKeyGenerator.Generate(request.NewMasterPassword);
+
+        if (oldKey.SequenceEqual(newKey))
+        {
+            return Ok();
+        }
+
+        await keyService.ChangeKeySettingsAsync(oldKey, newKey, token);
         await userOptions.UpdateAsync(opt =>
         {
             opt.Salt = request.Salt ?? opt.Salt;
