@@ -2,8 +2,8 @@ using System;
 using System.Text;
 using System.Text.Json;
 using PasswordManager.Abstractions.Crypto;
-using PasswordManager.Abstractions.Extensions;
 using PasswordManager.Abstractions.Models;
+using PasswordManager.Aes.Extensions;
 using PasswordManager.Aes.Generators;
 using PasswordManager.Aes.Validators;
 
