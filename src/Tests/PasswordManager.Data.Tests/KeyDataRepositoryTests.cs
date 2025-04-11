@@ -115,12 +115,12 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
             .Setup(m => m.Encrypt(newKey, newKey))
             .Returns(encryptedNewKey);
 
-        var encryptedOldItem = new SecureItemDbModel() { Name = expectedName, Data = [], Salt = [] };
+        var encryptedOldItem = new SecureItemDbModel() { Name = expectedName, Data = [12], Salt = [13] };
         var decrypted = new AccountData();
         var encryptedNewItem = new EncryptedData() { Data = [14], Salt = [15] };
         _cryptoMock
             .Setup(m => m.DecryptJson<AccountData>(
-                It.Is<SecureItemDbModel>(t => t.Name == expectedName),
+                It.Is<EncryptedData>(t => t.Data.SequenceEqual(encryptedOldItem.Data)),
                 oldKey))
             .Returns(decrypted);
         _cryptoMock
@@ -147,7 +147,7 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
         _storageMock.Verify(m => m.Key, Times.Once);
         _cryptoMock.Verify(m =>
             m.DecryptJson<AccountData>(
-                It.Is<SecureItemDbModel>(t => t.Name == expectedName),
+                It.Is<EncryptedData>(t => t.Data.SequenceEqual(encryptedOldItem.Data)),
                 oldKey),
             Times.Once);
         _cryptoMock.Verify(m => m.EncryptJson(decrypted, newKey), Times.Once);
@@ -192,12 +192,11 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
     public async Task ValidateKeyData_KeyDataExists_ShouldValidateKeyAndDecrypData()
     {
         // arrange
-        var expectedId = 1;
         var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new KeyDataDbModel() { Data = [], Salt = [] };
+        var keyData = new KeyDataDbModel() { Data = [11], Salt = [12] };
 
         _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<KeyDataDbModel>(m => m.Id == expectedId), key))
+            .Setup(m => m.Decrypt(It.Is<EncryptedData>(m => m.Data.SequenceEqual(keyData.Data)), key))
             .Returns(key);
 
         using (var context = CreateDbContext())
@@ -215,19 +214,20 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
 
         // assert
         _validatorMock.Verify(m => m.Validate(key), Times.Once);
-        _cryptoMock.Verify(m => m.Decrypt(It.Is<KeyDataDbModel>(m => m.Id == expectedId), key), Times.Once);
+        _cryptoMock.Verify(
+            m => m.Decrypt(It.Is<EncryptedData>(m => m.Data.SequenceEqual(keyData.Data)), key),
+            Times.Once);
     }
 
     [Test]
     public void ValidateKeyData_CryptoExceptionThrown_ShouldThrow()
     {
         // arrange
-        var expectedId = 1;
         var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new KeyDataDbModel() { Data = [], Salt = [] };
+        var keyData = new KeyDataDbModel() { Data = [11], Salt = [12] };
 
         _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<KeyDataDbModel>(m => m.Id == expectedId), key))
+            .Setup(m => m.Decrypt(It.Is<EncryptedData>(m => m.Data.SequenceEqual(keyData.Data)), key))
             .Throws(new CryptographicException());
 
         using (var context = CreateDbContext())
@@ -249,12 +249,11 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
     public void ValidateKeyData_DifferentKey_ShouldThrow()
     {
         // arrange
-        var expectedId = 1;
         var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new KeyDataDbModel() { Data = [], Salt = [] };
+        var keyData = new KeyDataDbModel() { Data = [11], Salt = [12] };
 
         _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<KeyDataDbModel>(m => m.Id == expectedId), key))
+            .Setup(m => m.Decrypt(It.Is<EncryptedData>(m => m.Data.SequenceEqual(keyData.Data)), key))
             .Returns([]);
 
         using (var context = CreateDbContext())

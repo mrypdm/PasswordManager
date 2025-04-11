@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Models;
-using PasswordManager.Abstractions.Repositories;
+using PasswordManager.Abstractions.Services;
 using PasswordManager.Web.Controllers.Api;
 using PasswordManager.Web.Models.Requests;
 
@@ -14,12 +14,12 @@ namespace PasswordManager.Web.Tests;
 /// </summary>
 public class AccountsApiControllerTests
 {
-    private readonly Mock<ISecureItemsRepository> _repositoryMock = new();
+    private readonly Mock<IAccountService> _serviceMock = new();
 
     [SetUp]
     public void SetUp()
     {
-        _repositoryMock.Reset();
+        _serviceMock.Reset();
     }
 
     [Test]
@@ -27,7 +27,7 @@ public class AccountsApiControllerTests
     {
         // arrange
         var id = 10;
-        _repositoryMock
+        _serviceMock
             .Setup(m => m.GetAccountByIdAsync(id, default))
             .ThrowsAsync(new ItemNotExistsException(null));
 
@@ -46,7 +46,7 @@ public class AccountsApiControllerTests
         // arrange
         var account = new AccountData();
         var id = 10;
-        _repositoryMock
+        _serviceMock
             .Setup(m => m.GetAccountByIdAsync(id, default))
             .ReturnsAsync(account);
 
@@ -57,17 +57,17 @@ public class AccountsApiControllerTests
 
         // assert
         Assert.That(res.Value, Is.EqualTo(account));
-        _repositoryMock.Verify(m => m.GetAccountByIdAsync(id, default), Times.Once);
+        _serviceMock.Verify(m => m.GetAccountByIdAsync(id, default), Times.Once);
     }
 
     [Test]
     public async Task GetAllHeaders_CommonWay_ShouldReturnHeaders()
     {
         // arrange
-        var item0 = new ItemHeader() { Id = 1, Name = "0" };
-        var item1 = new ItemHeader() { Id = 1, Name = "1" };
-        _repositoryMock
-            .Setup(m => m.GetItemHeadersAsync(default))
+        var item0 = new AccountHeader { Id = 0, Name = "name0" };
+        var item1 = new AccountHeader { Id = 1, Name = "name1" };
+        _serviceMock
+            .Setup(m => m.GetAccountHeadersAsync(default))
             .ReturnsAsync([item0, item1]);
 
         var controller = CreateController();
@@ -85,7 +85,7 @@ public class AccountsApiControllerTests
             Assert.That(res.Value[1].Id, Is.EqualTo(item1.Id));
             Assert.That(res.Value[1].Name, Is.EqualTo(item1.Name));
         });
-        _repositoryMock.Verify(m => m.GetItemHeadersAsync(default), Times.Once);
+        _serviceMock.Verify(m => m.GetAccountHeadersAsync(default), Times.Once);
     }
 
     [Test]
@@ -154,7 +154,7 @@ public class AccountsApiControllerTests
             Password = "1"
         };
 
-        _repositoryMock
+        _serviceMock
             .Setup(m => m.AddAccountAsync(It.Is<AccountData>(m => CheckAccount(m, request)), default))
             .ReturnsAsync(id);
 
@@ -166,7 +166,7 @@ public class AccountsApiControllerTests
         // assert
         Assert.That(res.Value, Is.Not.Null);
         Assert.That(res.Value.Id, Is.EqualTo(id));
-        _repositoryMock.Verify(
+        _serviceMock.Verify(
             m => m.AddAccountAsync(It.Is<AccountData>(m => CheckAccount(m, request)), default),
             Times.Once);
     }
@@ -237,7 +237,7 @@ public class AccountsApiControllerTests
             Password = "1"
         };
 
-        _repositoryMock
+        _serviceMock
             .Setup(m => m.UpdateAccountAsync(id, It.Is<AccountData>(m => CheckAccount(m, request)), default))
             .ThrowsAsync(new ItemNotExistsException(null));
 
@@ -248,7 +248,7 @@ public class AccountsApiControllerTests
 
         // assert
         Assert.That(res, Is.TypeOf<NotFoundObjectResult>());
-        _repositoryMock.Verify(
+        _serviceMock.Verify(
             m => m.UpdateAccountAsync(id, It.Is<AccountData>(m => CheckAccount(m, request)), default),
             Times.Once);
     }
@@ -272,7 +272,7 @@ public class AccountsApiControllerTests
 
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
-        _repositoryMock.Verify(
+        _serviceMock.Verify(
             m => m.UpdateAccountAsync(id, It.Is<AccountData>(m => CheckAccount(m, request)), default),
             Times.Once);
     }
@@ -289,14 +289,14 @@ public class AccountsApiControllerTests
 
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
-        _repositoryMock.Verify(
+        _serviceMock.Verify(
             m => m.DeleteAccountAsync(id, default),
             Times.Once);
     }
 
     private AccountsApiController CreateController()
     {
-        return new AccountsApiController(_repositoryMock.Object);
+        return new AccountsApiController(_serviceMock.Object);
     }
 
     private static bool CheckAccount(AccountData actual, UploadAccountRequest expected)

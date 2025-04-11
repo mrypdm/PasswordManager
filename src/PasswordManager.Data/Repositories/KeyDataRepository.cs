@@ -60,10 +60,16 @@ public class KeyDataRepository(
         var items = await context.SecureItems.ToArrayAsync(token);
         foreach (var item in items)
         {
-            var decrypted = crypto.DecryptJson<AccountData>(item, keyStorage.Key);
-            var encrypted = crypto.EncryptJson(decrypted, newKey);
-            item.Salt = encrypted.Salt;
-            item.Data = encrypted.Data;
+            var encryptedData = new EncryptedData
+            {
+                Data = item.Data,
+                Salt = item.Salt
+            };
+
+            var decryptedData = crypto.DecryptJson<AccountData>(encryptedData, keyStorage.Key);
+            var reEncryptedData = crypto.EncryptJson(decryptedData, newKey);
+            item.Salt = reEncryptedData.Salt;
+            item.Data = reEncryptedData.Data;
             context.SecureItems.Update(item);
         }
 
@@ -78,9 +84,15 @@ public class KeyDataRepository(
         var keyData = await GetKeyDataInternalAsync(token)
             ?? throw new KeyDataNotExistsException();
 
+        var encryptedData = new EncryptedData
+        {
+            Data = keyData.Data,
+            Salt = keyData.Salt
+        };
+
         try
         {
-            var decryptedData = crypto.Decrypt(keyData, key);
+            var decryptedData = crypto.Decrypt(encryptedData, key);
             if (key.SequenceEqual(decryptedData))
             {
                 return;

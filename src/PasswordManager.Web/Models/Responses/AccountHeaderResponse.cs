@@ -1,17 +1,17 @@
-namespace PasswordManager.Abstractions.Models;
+namespace PasswordManager.Web.Models.Responses;
 
 /// <summary>
-/// Header of item
+/// Reponse for account headers
 /// </summary>
-public class ItemHeader
+public class AccountHeaderResponse
 {
     /// <summary>
-    /// Item id
+    /// Account ID
     /// </summary>
     public int Id { get; set; }
 
     /// <summary>
-    /// Item name
+    /// Account name
     /// </summary>
     public string Name { get; set; }
 }

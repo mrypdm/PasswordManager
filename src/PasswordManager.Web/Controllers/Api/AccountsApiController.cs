@@ -1,9 +1,10 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Models;
-using PasswordManager.Abstractions.Repositories;
+using PasswordManager.Abstractions.Services;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Models.Responses;
 
@@ -12,11 +13,10 @@ namespace PasswordManager.Web.Controllers.Api;
 /// <summary>
 /// Controller for account manipulation
 /// </summary>
-/// <param name="secureItemsRepository"></param>
 [ApiController]
 [Route("api/account")]
 [ValidateAntiForgeryToken]
-public class AccountsApiController(ISecureItemsRepository secureItemsRepository) : Controller
+public class AccountsApiController(IAccountService accountService) : Controller
 {
     /// <summary>
     /// Get account data by id
@@ -26,7 +26,7 @@ public class AccountsApiController(ISecureItemsRepository secureItemsRepository)
     {
         try
         {
-            return await secureItemsRepository.GetAccountByIdAsync(accountId, token);
+            return await accountService.GetAccountByIdAsync(accountId, token);
         }
         catch (ItemNotExistsException)
         {
@@ -38,9 +38,10 @@ public class AccountsApiController(ISecureItemsRepository secureItemsRepository)
     /// Get all items headers in storage
     /// </summary>
     [HttpGet("headers")]
-    public async Task<ActionResult<ItemHeader[]>> GetAllHeadersAsync(CancellationToken token)
+    public async Task<ActionResult<AccountHeaderResponse[]>> GetAllHeadersAsync(CancellationToken token)
     {
-        return await secureItemsRepository.GetItemHeadersAsync(token);
+        var names = await accountService.GetAccountHeadersAsync(token);
+        return names.Select(m => new AccountHeaderResponse { Id = m.Id, Name = m.Name }).ToArray();
     }
 
     /// <summary>
@@ -61,7 +62,7 @@ public class AccountsApiController(ISecureItemsRepository secureItemsRepository)
             Login = request.Login,
             Password = request.Password
         };
-        var id = await secureItemsRepository.AddAccountAsync(account, token);
+        var id = await accountService.AddAccountAsync(account, token);
         return new AddAccountDataResponse
         {
             Id = id
@@ -89,7 +90,7 @@ public class AccountsApiController(ISecureItemsRepository secureItemsRepository)
 
         try
         {
-            await secureItemsRepository.UpdateAccountAsync(accountId, account, token);
+            await accountService.UpdateAccountAsync(accountId, account, token);
             return Ok();
         }
         catch (ItemNotExistsException)
@@ -104,7 +105,7 @@ public class AccountsApiController(ISecureItemsRepository secureItemsRepository)
     [HttpDelete("{accountId}")]
     public async Task<ActionResult> DeleteAccountAsync(int accountId, CancellationToken token)
     {
-        await secureItemsRepository.DeleteAccountAsync(accountId, token);
+        await accountService.DeleteAccountAsync(accountId, token);
         return Ok();
     }
 }

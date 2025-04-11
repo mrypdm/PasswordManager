@@ -12,31 +12,36 @@ namespace PasswordManager.Abstractions.Repositories;
 public interface ISecureItemsRepository
 {
     /// <summary>
-    /// Add new account data to repository and return its ID
+    /// Add <paramref name="data"/> with <paramref name="name"/> to repository and return its ID
     /// </summary>
+    /// <exception cref="ArgumentException">If <paramref name="name"/> is whitespace</exception>
+    /// <exception cref="ArgumentNullException">If <paramref name="name"/> is null</exception>
     /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null</exception>
-    Task<int> AddAccountAsync(AccountData data, CancellationToken token);
+    Task<int> AddDataAsync(string name, EncryptedData data, CancellationToken token);
 
     /// <summary>
-    /// Updates item with <paramref name="id"/> with new <paramref name="data"/>
+    /// Update data with <paramref name="id"/> with
+    /// new <paramref name="data"/> and new <paramref name="name"/>
     /// </summary>
+    /// <exception cref="ArgumentException">If <paramref name="name"/> is whitespace</exception>
+    /// <exception cref="ArgumentNullException">If <paramref name="name"/> is null</exception>
     /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null</exception>
     /// <exception cref="ItemNotExistsException">If item with <paramref name="id"/> not exists</exception>
-    Task UpdateAccountAsync(int id, AccountData data, CancellationToken token);
+    Task UpdateDataAsync(int id, string name, EncryptedData data, CancellationToken token);
 
     /// <summary>
-    /// Deletes account by <paramref name="id"/>
+    /// Delete data by <paramref name="id"/>
     /// </summary>
-    Task DeleteAccountAsync(int id, CancellationToken token);
+    Task DeleteDataAsync(int id, CancellationToken token);
 
     /// <summary>
-    /// Get account data from repository by id
+    /// Get data by <paramref name="id"/>
     /// </summary>
     /// <exception cref="ItemNotExistsException">If item with <paramref name="id"/> not exists</exception>
-    Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token);
+    Task<EncryptedData> GetDataByIdAsync(int id, CancellationToken token);
 
     /// <summary>
-    /// Get items headers from repository
+    /// Get all items
     /// </summary>
-    Task<ItemHeader[]> GetItemHeadersAsync(CancellationToken token);
+    Task<IItem[]> GetItemsAsync(CancellationToken token);
 }

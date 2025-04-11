@@ -3,7 +3,7 @@ namespace PasswordManager.Abstractions.Models;
 /// <summary>
 /// Secured data
 /// </summary>
-public class EncryptedData
+public sealed class EncryptedData
 {
     /// <summary>
     /// Salt of encrypted data

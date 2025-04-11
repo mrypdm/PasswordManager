@@ -113,7 +113,8 @@ public static class WebApplicationBuilderExtensions
             .AddSingleton<IKeyStorage, KeyStorage>()
             .AddScoped<ISecureItemsRepository, SecureItemsRepository>()
             .AddScoped<IKeyDataRepository, KeyDataRepository>()
-            .AddScoped<IKeyService, KeyService>();
+            .AddScoped<IKeyService, KeyService>()
+            .AddScoped<IAccountService, AccountService>();
         return builder;
     }
 
