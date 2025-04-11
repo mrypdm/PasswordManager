@@ -1,12 +1,8 @@
+using System;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Moq;
-using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Models;
-using PasswordManager.Abstractions.Storages;
-using PasswordManager.Abstractions.Validators;
 using PasswordManager.Data.Contexts;
 using PasswordManager.Data.Models;
 using PasswordManager.Data.Repositories;
@@ -18,40 +14,38 @@ namespace PasswordManager.Data.Tests;
 /// </summary>
 public class KeyDataRepositoryTests : RepositoryTestsBase
 {
-    private readonly Mock<ICrypto> _cryptoMock = new();
-    private readonly Mock<IKeyStorage> _storageMock = new();
-    private readonly Mock<IKeyValidator> _validatorMock = new();
-
-    [SetUp]
-    public void SetUp()
+    [Test]
+    public void SetKeyData_NullData_ShouldThrow()
     {
-        _cryptoMock.Reset();
-        _storageMock.Reset();
-        _validatorMock.Reset();
+        // arrange
+        using var context = CreateDbContext();
+        var repo = CreateRepository(context);
+
+        // act
+        // assert
+        Assert.ThrowsAsync<ArgumentNullException>(() => repo.SetKeyDataAsync(null, default));
+        Assert.ThrowsAsync<ArgumentNullException>(
+            () => repo.SetKeyDataAsync(new() { Data = null, Salt = [] }, default));
+        Assert.ThrowsAsync<ArgumentNullException>(
+            () => repo.SetKeyDataAsync(new() { Data = [], Salt = null }, default));
     }
 
     [Test]
-    public async Task SetKeyData_KeyDataNotExists_ShouldEncryptKeyWithItself()
+    public async Task SetKeyData_KeyDataNotExists_ShouldAddDataToDb()
     {
         // arrange
         var expectedId = 1;
         var expectedVersion = 0;
-        var key = RandomNumberGenerator.GetBytes(32);
         var keyData = new EncryptedData { Data = [11], Salt = [12] };
-
-        _cryptoMock.Setup(m => m.Encrypt(key, key)).Returns(keyData);
 
         // act
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            await repo.SetKeyDataAsync(key, default);
+            await repo.SetKeyDataAsync(keyData, default);
         }
 
         // assert
-        _validatorMock.Verify(m => m.Validate(key), Times.Once);
-        _cryptoMock.Verify(m => m.Encrypt(key, key), Times.Once);
-
         using (var context = CreateDbContext())
         {
             var dbData = context.KeyData.SingleOrDefault();
@@ -81,12 +75,13 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            Assert.ThrowsAsync<KeyDataExistsException>(() => repo.SetKeyDataAsync(null, default));
+            Assert.ThrowsAsync<KeyDataExistsException>(
+                () => repo.SetKeyDataAsync(new() { Data = [], Salt = [] }, default));
         }
     }
 
     [Test]
-    public void ChangeKeyData_KeyDataNotExists_ShouldThrow()
+    public void UpdateKeyData_NullData_ShouldThrow()
     {
         // arrange
         using var context = CreateDbContext();
@@ -94,180 +89,59 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
 
         // act
         // assert
-        Assert.ThrowsAsync<KeyDataNotExistsException>(() => repo.ChangeKeyDataAsync(null, default));
+        Assert.ThrowsAsync<ArgumentNullException>(() => repo.SetKeyDataAsync(null, default));
+        Assert.ThrowsAsync<ArgumentNullException>(
+            () => repo.SetKeyDataAsync(new() { Data = null, Salt = [] }, default));
+        Assert.ThrowsAsync<ArgumentNullException>(
+            () => repo.SetKeyDataAsync(new() { Data = [], Salt = null }, default));
     }
 
     [Test]
-    public async Task ChangeKeyData_CommonWay_ShouldReEncryptItems()
+    public void UpdateKeyData_KeyDataNotExists_ShouldThrow()
+    {
+        // arrange
+        using var context = CreateDbContext();
+        var repo = CreateRepository(context);
+
+        // act
+        // assert
+        Assert.ThrowsAsync<KeyDataNotExistsException>(
+            () => repo.UpdateKeyDataAsync(new() { Data = [], Salt = [] }, default));
+    }
+
+    [Test]
+    public async Task UpdateKeyData_CommonWay_ShouldUpdateData()
     {
         // arrange
         var expectedId = 1;
         var expectedVersion = 1;
-        var expectedName = "encryptedOldItem";
-
-        var oldKey = RandomNumberGenerator.GetBytes(32);
-        var newKey = RandomNumberGenerator.GetBytes(32);
-
-        _storageMock.Setup(m => m.Key).Returns(oldKey);
-
-        var encryptedNewKey = new EncryptedData() { Data = [10], Salt = [11] };
-        _cryptoMock
-            .Setup(m => m.Encrypt(newKey, newKey))
-            .Returns(encryptedNewKey);
-
-        var encryptedOldItem = new SecureItemDbModel() { Name = expectedName, Data = [12], Salt = [13] };
-        var decrypted = new AccountData();
-        var encryptedNewItem = new EncryptedData() { Data = [14], Salt = [15] };
-        _cryptoMock
-            .Setup(m => m.DecryptJson<AccountData>(
-                It.Is<EncryptedData>(t => t.Data.SequenceEqual(encryptedOldItem.Data)),
-                oldKey))
-            .Returns(decrypted);
-        _cryptoMock
-            .Setup(m => m.EncryptJson(decrypted, newKey))
-            .Returns(encryptedNewItem);
-
+        var keyData = new EncryptedData { Data = [11], Salt = [12] };
+        var newKeyData = new EncryptedData { Data = [13], Salt = [14] };
         using (var context = CreateDbContext())
         {
-            context.KeyData.Add(new KeyDataDbModel() { Data = [], Salt = [] });
-            context.SecureItems.Add(encryptedOldItem);
-            context.SaveChanges();
+            var repo = CreateRepository(context);
+            await repo.SetKeyDataAsync(keyData, default);
         }
 
         // act
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            await repo.ChangeKeyDataAsync(newKey, default);
+            await repo.UpdateKeyDataAsync(newKeyData, default);
         }
 
         // assert
-        _validatorMock.Verify(m => m.Validate(newKey), Times.Once);
-        _cryptoMock.Verify(m => m.Encrypt(newKey, newKey), Times.Once);
-        _storageMock.Verify(m => m.Key, Times.Once);
-        _cryptoMock.Verify(m =>
-            m.DecryptJson<AccountData>(
-                It.Is<EncryptedData>(t => t.Data.SequenceEqual(encryptedOldItem.Data)),
-                oldKey),
-            Times.Once);
-        _cryptoMock.Verify(m => m.EncryptJson(decrypted, newKey), Times.Once);
-
         using (var context = CreateDbContext())
         {
-            var dbKey = context.KeyData.SingleOrDefault();
-            Assert.That(dbKey, Is.Not.Null);
+            var dbData = context.KeyData.SingleOrDefault();
+            Assert.That(dbData, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(dbKey.Data.SequenceEqual(encryptedNewKey.Data), Is.True, "Data in db and local must be same");
-                Assert.That(dbKey.Salt.SequenceEqual(encryptedNewKey.Salt), Is.True, "Salt in db and local must be same");
-                Assert.That(dbKey.Id, Is.EqualTo(expectedId));
-                Assert.That(dbKey.Version, Is.EqualTo(expectedVersion));
+                Assert.That(dbData.Data.SequenceEqual(newKeyData.Data), Is.True, "Data in db and local must be same");
+                Assert.That(dbData.Salt.SequenceEqual(newKeyData.Salt), Is.True, "Salt in db and local must be same");
+                Assert.That(dbData.Id, Is.EqualTo(expectedId));
+                Assert.That(dbData.Version, Is.EqualTo(expectedVersion));
             });
-
-            var dbItem = context.SecureItems.SingleOrDefault();
-            Assert.That(dbItem, Is.Not.Null);
-            Assert.Multiple(() =>
-            {
-                Assert.That(dbItem.Data.SequenceEqual(encryptedNewItem.Data), Is.True, "Data in db and local must be same");
-                Assert.That(dbItem.Salt.SequenceEqual(encryptedNewItem.Salt), Is.True, "Salt in db and local must be same");
-                Assert.That(dbItem.Id, Is.EqualTo(expectedId));
-                Assert.That(dbItem.Version, Is.EqualTo(expectedVersion));
-            });
-        }
-    }
-
-    [Test]
-    public void ValidateKeyData_KeyDataNotExists_ShouldThrow()
-    {
-        // arrange
-        using var context = CreateDbContext();
-        var repo = CreateRepository(context);
-
-        // act
-        // assert
-        Assert.ThrowsAsync<KeyDataNotExistsException>(() => repo.ValidateKeyDataAsync(null, default));
-    }
-
-    [Test]
-    public async Task ValidateKeyData_KeyDataExists_ShouldValidateKeyAndDecrypData()
-    {
-        // arrange
-        var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new KeyDataDbModel() { Data = [11], Salt = [12] };
-
-        _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<EncryptedData>(m => m.Data.SequenceEqual(keyData.Data)), key))
-            .Returns(key);
-
-        using (var context = CreateDbContext())
-        {
-            context.KeyData.Add(keyData);
-            context.SaveChanges();
-        }
-
-        // act
-        using (var context = CreateDbContext())
-        {
-            var repo = CreateRepository(context);
-            await repo.ValidateKeyDataAsync(key, default);
-        }
-
-        // assert
-        _validatorMock.Verify(m => m.Validate(key), Times.Once);
-        _cryptoMock.Verify(
-            m => m.Decrypt(It.Is<EncryptedData>(m => m.Data.SequenceEqual(keyData.Data)), key),
-            Times.Once);
-    }
-
-    [Test]
-    public void ValidateKeyData_CryptoExceptionThrown_ShouldThrow()
-    {
-        // arrange
-        var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new KeyDataDbModel() { Data = [11], Salt = [12] };
-
-        _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<EncryptedData>(m => m.Data.SequenceEqual(keyData.Data)), key))
-            .Throws(new CryptographicException());
-
-        using (var context = CreateDbContext())
-        {
-            context.KeyData.Add(keyData);
-            context.SaveChanges();
-        }
-
-        // act
-        // assert
-        using (var context = CreateDbContext())
-        {
-            var repo = CreateRepository(context);
-            Assert.ThrowsAsync<KeyValidationException>(() => repo.ValidateKeyDataAsync(key, default));
-        }
-    }
-
-    [Test]
-    public void ValidateKeyData_DifferentKey_ShouldThrow()
-    {
-        // arrange
-        var key = RandomNumberGenerator.GetBytes(32);
-        var keyData = new KeyDataDbModel() { Data = [11], Salt = [12] };
-
-        _cryptoMock
-            .Setup(m => m.Decrypt(It.Is<EncryptedData>(m => m.Data.SequenceEqual(keyData.Data)), key))
-            .Returns([]);
-
-        using (var context = CreateDbContext())
-        {
-            context.KeyData.Add(keyData);
-            context.SaveChanges();
-        }
-
-        // act
-        // assert
-        using (var context = CreateDbContext())
-        {
-            var repo = CreateRepository(context);
-            Assert.ThrowsAsync<KeyValidationException>(() => repo.ValidateKeyDataAsync(key, default));
         }
     }
 
@@ -329,8 +203,47 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
         }
     }
 
-    private KeyDataRepository CreateRepository(SecureDbContext context)
+    [Test]
+    public void GetKeyData_KeyDataNotExists_ShouldThrow()
     {
-        return new KeyDataRepository(context, _cryptoMock.Object, _storageMock.Object, _validatorMock.Object);
+        // arrange
+        using var context = CreateDbContext();
+        var repo = CreateRepository(context);
+
+        // act
+        // assert
+        Assert.ThrowsAsync<KeyDataNotExistsException>(() => repo.GetKeyDataAsync(default));
+    }
+
+    [Test]
+    public async Task GetKeyData_CommonWay_ShouldReturnData()
+    {
+        // arrange
+        var keyData = new EncryptedData { Data = [11], Salt = [12] };
+        using (var context = CreateDbContext())
+        {
+            var repo = CreateRepository(context);
+            await repo.SetKeyDataAsync(keyData, default);
+        }
+
+        // act
+        using (var context = CreateDbContext())
+        {
+            var repo = CreateRepository(context);
+            var data = await repo.GetKeyDataAsync(default);
+
+            // assert
+            Assert.That(data, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(data.Data.SequenceEqual(keyData.Data), Is.True, "Data in db and local must be same");
+                Assert.That(data.Salt.SequenceEqual(keyData.Salt), Is.True, "Salt in db and local must be same");
+            });
+        }
+    }
+
+    private static KeyDataRepository CreateRepository(SecureDbContext context)
+    {
+        return new KeyDataRepository(context);
     }
 }

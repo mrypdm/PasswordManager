@@ -1,7 +1,7 @@
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Validators;
 
-namespace PasswordManager.Aes;
+namespace PasswordManager.Aes.Validators;
 
 /// <inheritdoc />
 public sealed class AesSaltValidator : ISaltValidator

@@ -1,10 +1,11 @@
 using System;
 using PasswordManager.Abstractions.Exceptions;
+using PasswordManager.Aes.Validators;
 
 namespace PasswordManager.Aes.Tests;
 
 /// <summary>
-/// Tests for <see cref="AesKeyValidator"/>
+/// Tests for <see cref="SimpleAesKeyValidator"/>
 /// </summary>
 public class AesKeyValidatorTests
 {
@@ -13,7 +14,7 @@ public class AesKeyValidatorTests
     {
         // arrange
         var key = (byte[])Array.CreateInstance(typeof(byte), AesConstants.KeySize);
-        var validator = new AesKeyValidator();
+        var validator = new SimpleAesKeyValidator();
 
         // act
         // assert
@@ -24,7 +25,7 @@ public class AesKeyValidatorTests
     public void Validate_Null_ShouldThrow()
     {
         // arrange
-        var validator = new AesKeyValidator();
+        var validator = new SimpleAesKeyValidator();
 
         // act
         // assert
@@ -36,7 +37,7 @@ public class AesKeyValidatorTests
     {
         // arrange
         var key = (byte[])Array.CreateInstance(typeof(byte), AesConstants.KeySize - 1);
-        var validator = new AesKeyValidator();
+        var validator = new SimpleAesKeyValidator();
 
         // act
         // assert

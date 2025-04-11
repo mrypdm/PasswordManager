@@ -2,9 +2,12 @@ using System;
 using System.Text;
 using System.Text.Json;
 using PasswordManager.Abstractions.Crypto;
+using PasswordManager.Abstractions.Extensions;
 using PasswordManager.Abstractions.Models;
+using PasswordManager.Aes.Generators;
+using PasswordManager.Aes.Validators;
 
-namespace PasswordManager.Aes;
+namespace PasswordManager.Aes.Crypto;
 
 /// <summary>
 /// Crypt with <see cref="Aes"/>
@@ -12,7 +15,7 @@ namespace PasswordManager.Aes;
 public sealed class AesCrypto : ICrypto
 {
     private readonly AesSaltGenerator saltGenerator = new();
-    private readonly AesKeyValidator keyValidator = new();
+    private readonly SimpleAesKeyValidator keyValidator = new();
     private readonly AesSaltValidator saltValidator = new();
 
     /// <inheritdoc />

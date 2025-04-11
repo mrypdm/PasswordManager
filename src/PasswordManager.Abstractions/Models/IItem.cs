@@ -6,12 +6,12 @@ namespace PasswordManager.Abstractions.Models;
 public interface IItem
 {
     /// <summary>
-    /// Item ID
+    /// Id of item
     /// </summary>
     int Id { get; set; }
 
     /// <summary>
-    /// Item name
+    /// Name of item
     /// </summary>
     string Name { get; set; }
 }

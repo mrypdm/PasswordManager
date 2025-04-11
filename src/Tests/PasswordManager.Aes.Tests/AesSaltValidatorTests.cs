@@ -1,5 +1,6 @@
 using System;
 using PasswordManager.Abstractions.Exceptions;
+using PasswordManager.Aes.Validators;
 
 namespace PasswordManager.Aes.Tests;
 

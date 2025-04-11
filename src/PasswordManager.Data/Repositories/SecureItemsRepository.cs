@@ -78,4 +78,12 @@ public sealed class SecureItemsRepository(SecureDbContext context) : ISecureItem
     {
         return await context.SecureItems.AsNoTracking().ToArrayAsync(token);
     }
+
+    /// <inheritdoc />
+    public async Task<EncryptedItem[]> GetDataAsync(CancellationToken token)
+    {
+        return await context.SecureItems.AsNoTracking()
+            .Select(m => new EncryptedItem { Id = m.Id, Name = m.Name, Data = m.Data, Salt = m.Salt })
+            .ToArrayAsync(token);
+    }
 }

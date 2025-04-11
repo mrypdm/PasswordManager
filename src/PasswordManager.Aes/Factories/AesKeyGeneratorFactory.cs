@@ -1,7 +1,8 @@
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Generators;
+using PasswordManager.Aes.Generators;
 
-namespace PasswordManager.Aes;
+namespace PasswordManager.Aes.Factories;
 
 /// <summary>
 /// Factory for <see cref="AesKeyGenerator"/>

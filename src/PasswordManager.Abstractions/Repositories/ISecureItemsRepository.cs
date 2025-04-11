@@ -44,4 +44,9 @@ public interface ISecureItemsRepository
     /// Get all items
     /// </summary>
     Task<IItem[]> GetItemsAsync(CancellationToken token);
+
+    /// <summary>
+    /// Get all data
+    /// </summary>
+    Task<EncryptedItem[]> GetDataAsync(CancellationToken token);
 }

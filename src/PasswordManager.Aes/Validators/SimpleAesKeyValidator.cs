@@ -1,12 +1,12 @@
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Validators;
 
-namespace PasswordManager.Aes;
+namespace PasswordManager.Aes.Validators;
 
 /// <summary>
 /// Validator for AES keys
 /// </summary>
-public sealed class AesKeyValidator : IKeyValidator
+public sealed class SimpleAesKeyValidator : IKeyValidator
 {
     /// <inheritdoc />
     public void Validate(byte[] key)

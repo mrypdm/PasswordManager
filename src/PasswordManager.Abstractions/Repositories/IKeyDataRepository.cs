@@ -1,6 +1,8 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using PasswordManager.Abstractions.Exceptions;
+using PasswordManager.Abstractions.Models;
 
 namespace PasswordManager.Abstractions.Repositories;
 
@@ -12,23 +14,22 @@ public interface IKeyDataRepository
     /// <summary>
     /// Set key data
     /// </summary>
+    /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null</exception>
     /// <exception cref="KeyDataExistsException">If key data already exist</exception>
-    /// <exception cref="KeyValidationException">If <paramref name="key"/> is invalid</exception>
-    Task SetKeyDataAsync(byte[] key, CancellationToken token);
+    Task SetKeyDataAsync(EncryptedData data, CancellationToken token);
 
     /// <summary>
-    /// Change key data and re-encrypt all items repository
+    /// Get key data
     /// </summary>
     /// <exception cref="KeyDataNotExistsException">If key data not exists</exception>
-    /// <exception cref="KeyValidationException">If <paramref name="newKey"/> is invalid</exception>
-    Task ChangeKeyDataAsync(byte[] newKey, CancellationToken token);
+    Task<EncryptedData> GetKeyDataAsync(CancellationToken token);
 
     /// <summary>
-    /// Validates <paramref name="key"/> with key data
+    /// Update key data
     /// </summary>
+    /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null</exception>
     /// <exception cref="KeyDataNotExistsException">If key data not exists</exception>
-    /// <exception cref="KeyValidationException">If <paramref name="key"/> is invalid</exception>
-    Task ValidateKeyDataAsync(byte[] key, CancellationToken token);
+    Task UpdateKeyDataAsync(EncryptedData data, CancellationToken token);
 
     /// <summary>
     /// Check if key data exists

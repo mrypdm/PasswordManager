@@ -16,7 +16,9 @@ using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Abstractions.Services;
 using PasswordManager.Abstractions.Storages;
 using PasswordManager.Abstractions.Validators;
-using PasswordManager.Aes;
+using PasswordManager.Aes.Crypto;
+using PasswordManager.Aes.Factories;
+using PasswordManager.Aes.Validators;
 using PasswordManager.Core.Counters;
 using PasswordManager.Core.Factories;
 using PasswordManager.Core.Options;
@@ -67,7 +69,8 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services
             .AddSingleton<IKeyGeneratorFactory, AesKeyGeneratorFactory>()
-            .AddSingleton<IKeyValidator, AesKeyValidator>()
+            .AddSingleton<IKeyValidatorFactory, AesKeyValidatorFactory>()
+            .AddSingleton<IKeyValidator, SimpleAesKeyValidator>()
             .AddSingleton<ICrypto, AesCrypto>()
             .AddScoped(services =>
             {

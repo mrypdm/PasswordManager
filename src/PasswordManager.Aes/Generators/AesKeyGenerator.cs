@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using PasswordManager.Abstractions.Generators;
 
-namespace PasswordManager.Aes;
+namespace PasswordManager.Aes.Generators;
 
 /// <inheritdoc />
 public sealed class AesKeyGenerator(byte[] salt, int iterations) : IKeyGenerator

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Models;
+using PasswordManager.Aes.Crypto;
 
 namespace PasswordManager.Aes.Tests;
 
