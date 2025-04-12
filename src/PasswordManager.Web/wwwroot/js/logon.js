@@ -1,6 +1,6 @@
 async function logout() {
-    await send("/api/logon", "DELETE");
-    location.replace("/login");
+    await send("/api/logon", "DELETE", null, getCsrfTokenHeader());
+    location.replace("/auth/login");
 }
 
 async function logon(redirect) {
