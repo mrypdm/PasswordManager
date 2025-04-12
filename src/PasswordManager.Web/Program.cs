@@ -3,17 +3,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PasswordManager.Web.Extensions;
 
-var builder = await WebApplication
+var builder = WebApplication
     .CreateBuilder(args)
-    .ConfigureConnectionOptions()
+    .AddUserOptions()
+    .AddConnectionOptions()
     .AddCore()
     .AddAesCrypto()
     .AddPasswordCheckers()
     .AddPasswordGeneratorFactory()
     .AddSecureDb()
     .AddCookieAuthentication()
-    .AddControllers()
-    .AddUserOptionsAsync();
+    .AddControllers();
 
 if (builder.Environment.IsDevelopment())
 {
@@ -32,14 +32,16 @@ if (builder.Environment.IsDevelopment())
     application
         .UseSwagger()
         .UseSwaggerUI();
-    application.MapSwagger();
+    application
+        .MapSwagger();
 }
 
 application
     .UseAuthentication()
     .UseAuthorization();
 
-application.MapControllers();
+application
+    .MapControllers();
 
 await application.MigrateDatabaseAsync(application.Lifetime.ApplicationStopping);
 

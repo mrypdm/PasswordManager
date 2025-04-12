@@ -1,8 +1,6 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using PasswordManager.Abstractions.Options;
 
 namespace PasswordManager.Core.Options;
@@ -27,11 +25,11 @@ public sealed class JsonWriteableOptions<TOptions> : IWritableOptions<TOptions> 
     public TOptions Value { get; }
 
     /// <inheritdoc />
-    public async Task UpdateAsync(Action<TOptions> updateAction, CancellationToken token)
+    public void Update(Action<TOptions> updateAction)
     {
         ArgumentNullException.ThrowIfNull(updateAction);
         updateAction(Value);
-        await Value.DumpToDiskAsync(_filePath, token);
+        Value.DumpToDisk(_filePath);
     }
 }
 
@@ -50,34 +48,31 @@ public static class JsonWriteableOptions
     /// <summary>
     /// Create options from settings file or create new if file does not exists
     /// </summary>
-    public static async Task<JsonWriteableOptions<TOptions>> CreateAsync<TOptions>(string settingsFilePath,
-        CancellationToken token)
+    public static JsonWriteableOptions<TOptions> Create<TOptions>(string settingsFilePath)
         where TOptions : class, new()
     {
-        var settings = await ReadSettingsFromFile<TOptions>(settingsFilePath, token);
+        var settings = ReadSettingsFromFile<TOptions>(settingsFilePath);
         if (settings is null)
         {
             settings = new();
-            await settings.DumpToDiskAsync(settingsFilePath, token);
+            settings.DumpToDisk(settingsFilePath);
         }
 
         return new JsonWriteableOptions<TOptions>(settings, settingsFilePath);
     }
 
-    internal static async Task DumpToDiskAsync<TOptions>(this TOptions options, string path,
-        CancellationToken token)
+    internal static void DumpToDisk<TOptions>(this TOptions options, string path)
     {
         using var fileStream = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.Read);
-        await JsonSerializer.SerializeAsync(fileStream, options, JsonOptions, token);
+        JsonSerializer.Serialize(fileStream, options, JsonOptions);
     }
 
-    private static async Task<TOptions> ReadSettingsFromFile<TOptions>(string settingsFilePath,
-        CancellationToken token)
+    private static TOptions ReadSettingsFromFile<TOptions>(string settingsFilePath)
     {
         try
         {
             using var fileStream = File.OpenRead(settingsFilePath);
-            return await JsonSerializer.DeserializeAsync<TOptions>(fileStream, JsonOptions, token);
+            return JsonSerializer.Deserialize<TOptions>(fileStream, JsonOptions);
         }
         catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException or JsonException)
         {

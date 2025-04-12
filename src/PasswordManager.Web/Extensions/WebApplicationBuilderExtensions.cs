@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -42,12 +41,10 @@ public static class WebApplicationBuilderExtensions
     /// <summary>
     /// Add user options to web application
     /// </summary>
-    public static async Task<WebApplicationBuilder> AddUserOptionsAsync(this WebApplicationBuilder builder,
-        int secondsTimeout = 10)
+    public static WebApplicationBuilder AddUserOptions(this WebApplicationBuilder builder)
     {
-        using var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(secondsTimeout));
-        var uesrOptionsPath = builder.Configuration.GetValue<string>("UserOptionsPath");
-        var userSettings = await JsonWriteableOptions.CreateAsync<UserOptions>(uesrOptionsPath, cancellation.Token);
+        var userOptionsPath = builder.Configuration.GetValue<string>("UserOptionsPath");
+        var userSettings = JsonWriteableOptions.Create<UserOptions>(userOptionsPath);
         builder.Services.AddSingleton<IWritableOptions<UserOptions>>(userSettings);
         return builder;
     }
@@ -55,7 +52,7 @@ public static class WebApplicationBuilderExtensions
     /// <summary>
     /// Add connection options to web application
     /// </summary>
-    public static WebApplicationBuilder ConfigureConnectionOptions(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddConnectionOptions(this WebApplicationBuilder builder)
     {
         builder.Services
             .Configure<ConnectionOptions>(builder.Configuration.GetSection(nameof(ConnectionOptions)));

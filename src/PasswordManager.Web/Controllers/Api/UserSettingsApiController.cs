@@ -45,8 +45,8 @@ public class UserSettingsApiController(
             return BadRequest(error);
         }
 
-        await userOptions.UpdateAsync(opt => opt.SessionTimeout = request.Timeout, token);
         await keyService.ChangeKeyTimeoutAsync(request.Timeout, token);
+        userOptions.Update(opt => opt.SessionTimeout = request.Timeout);
         return Ok();
     }
 
@@ -62,34 +62,27 @@ public class UserSettingsApiController(
             return BadRequest(error);
         }
 
-        if (!request.HasSense())
-        {
-            return Ok();
-        }
+        var newOptions = ToUserOptions(request);
+        var oldKey = keyGeneratorFactory
+            .Create(userOptions.Value)
+            .Generate(request.MasterPassword);
+        var newKey = keyGeneratorFactory
+            .Create(newOptions)
+            .Generate(request.NewMasterPassword ?? request.MasterPassword);
 
-        var oldKeyGenerator = keyGeneratorFactory.Create(userOptions.Value);
-        var newKeyGenerator = keyGeneratorFactory.Create(new UserOptions
-        {
-            Salt = request.Salt ?? userOptions.Value.Salt,
-            Iterations = request.Iterations ?? userOptions.Value.Iterations
-        });
-
-        var oldKey = oldKeyGenerator.Generate(request.MasterPassword);
-        var newKey = newKeyGenerator.Generate(request.NewMasterPassword ?? request.MasterPassword);
-
+        // we got same key, so there is no sense to change it
         if (oldKey.SequenceEqual(newKey))
         {
             return Ok();
         }
 
         await keyService.ChangeKeySettingsAsync(oldKey, newKey, token);
-        await userOptions.UpdateAsync(opt =>
-        {
-            opt.Salt = request.Salt ?? opt.Salt;
-            opt.Iterations = request.Iterations ?? opt.Iterations;
-        }, token);
-
         await cookieAuthorizationHelper.SignOutAsync(HttpContext);
+        userOptions.Update(opt =>
+        {
+            opt.Salt = newOptions.Salt;
+            opt.Iterations = newOptions.Iterations;
+        });
 
         return Ok();
     }
@@ -101,12 +94,21 @@ public class UserSettingsApiController(
     public async Task<ActionResult> DeleteStorageAsync(CancellationToken token)
     {
         await keyService.ClearKeyDataAsync(token);
-        await userOptions.UpdateAsync(opt =>
+        await cookieAuthorizationHelper.SignOutAsync(HttpContext);
+        userOptions.Update(opt =>
         {
             opt.Salt = new UserOptions().Salt;
-        }, token);
-        await cookieAuthorizationHelper.SignOutAsync(HttpContext);
+        });
 
         return Ok();
+    }
+
+    private UserOptions ToUserOptions(ChangeKeySettingsRequest request)
+    {
+        return new UserOptions
+        {
+            Salt = request.Salt ?? userOptions.Value.Salt,
+            Iterations = request.Iterations ?? userOptions.Value.Iterations
+        };
     }
 }

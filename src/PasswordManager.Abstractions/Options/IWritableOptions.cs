@@ -1,6 +1,4 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 
 namespace PasswordManager.Abstractions.Options;
@@ -15,5 +13,5 @@ public interface IWritableOptions<TOptions> : IOptions<TOptions>
     /// <summary>
     /// Update options
     /// </summary>
-    Task UpdateAsync(Action<TOptions> updateAction, CancellationToken token);
+    void Update(Action<TOptions> updateAction);
 }

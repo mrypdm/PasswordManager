@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using PasswordManager.Core.Options;
 
 namespace PasswordManager.Core.Tests.Options;
@@ -16,13 +15,13 @@ public class JsonWriteableOptionsTests
     }
 
     [Test]
-    public async Task WithoutFile_ShouldCreateFile()
+    public void WithoutFile_ShouldCreateFile()
     {
         // arrange
         using var file = new TempFile("not-exist");
 
         // act
-        var settings = await JsonWriteableOptions.CreateAsync<ExampleOptions>(file.FilePath, default);
+        var settings = JsonWriteableOptions.Create<ExampleOptions>(file.FilePath);
 
         // assert
         var content = file.Read().Replace("\r\n", "\n");
@@ -40,7 +39,7 @@ public class JsonWriteableOptionsTests
     }
 
     [Test]
-    public async Task BadJson_ShouldReturnNewValue()
+    public void BadJson_ShouldReturnNewValue()
     {
         // arrange
         using var file = new TempFile();
@@ -51,14 +50,14 @@ public class JsonWriteableOptionsTests
             """);
 
         // act
-        var settings = await JsonWriteableOptions.CreateAsync<ExampleOptions>(file.FilePath, default);
+        var settings = JsonWriteableOptions.Create<ExampleOptions>(file.FilePath);
 
         // assert
         Assert.That(settings.Value.Number, Is.EqualTo(DefaultNumber));
     }
 
     [Test]
-    public async Task WithFile_ShouldReadFromFile()
+    public void WithFile_ShouldReadFromFile()
     {
         // arrange
         const int number = 321;
@@ -71,22 +70,22 @@ public class JsonWriteableOptionsTests
             """);
 
         // act
-        var settings = await JsonWriteableOptions.CreateAsync<ExampleOptions>(file.FilePath, default);
+        var settings = JsonWriteableOptions.Create<ExampleOptions>(file.FilePath);
 
         // assert
         Assert.That(settings.Value.Number, Is.EqualTo(number));
     }
 
     [Test]
-    public async Task Update_ShouldStoreNewValue()
+    public void Update_ShouldStoreNewValue()
     {
         // arrange
         const int newNumber = 234;
         using var file = new TempFile();
 
         // act
-        var settings = await JsonWriteableOptions.CreateAsync<ExampleOptions>(file.FilePath, default);
-        await settings.UpdateAsync(o => o.Number = newNumber, default);
+        var settings = JsonWriteableOptions.Create<ExampleOptions>(file.FilePath);
+        settings.Update(o => o.Number = newNumber);
 
         // assert
         var content = file.Read().Replace("\r\n", "\n");

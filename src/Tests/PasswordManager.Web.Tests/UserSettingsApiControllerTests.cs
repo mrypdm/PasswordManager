@@ -86,7 +86,7 @@ public class UserSettingsApiControllerTests
             .Returns(options);
 
         _userOptionsMock
-            .Setup(m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default))
+            .Setup(m => m.Update(It.IsAny<Action<UserOptions>>()))
             .Callback((Action<UserOptions> act, CancellationToken _) =>
             {
                 act(options);
@@ -104,7 +104,7 @@ public class UserSettingsApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
         _userOptionsMock.Verify(
-            m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
+            m => m.Update(It.IsAny<Action<UserOptions>>()),
             Times.Once);
         _keyServiceMock.Verify(m => m.ChangeKeyTimeoutAsync(request.Timeout, default), Times.Once);
         Assert.That(options.SessionTimeout, Is.EqualTo(request.Timeout));
@@ -184,34 +184,6 @@ public class UserSettingsApiControllerTests
     }
 
     [Test]
-    [TestCase(null)]
-    [TestCase("password")]
-    public async Task ChangeKeySettings_ChangesAreNotNeeded_ShouldOnlyReturnOk(string newMasterPassword)
-    {
-        // arrange
-        var request = new ChangeKeySettingsRequest
-        {
-            MasterPassword = "password",
-            NewMasterPassword = newMasterPassword
-        };
-        var controller = CreateController();
-
-        // act
-        var res = await controller.ChangeKeySettingsAsync(request, default);
-
-        // assert
-        Assert.That(res, Is.TypeOf<OkResult>());
-        _cookieHelperMock.Verify(m => m.SignOutAsync(default), Times.Never);
-        _generatorFactoryMock.Verify(m => m.Create(It.IsAny<IKeyGeneratorOptions>()), Times.Never);
-        _userOptionsMock.Verify(
-            m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
-            Times.Never);
-        _keyServiceMock.Verify(
-            m => m.ChangeKeySettingsAsync(It.IsAny<byte[]>(), It.IsAny<byte[]>(), default),
-            Times.Never);
-    }
-
-    [Test]
     public async Task ChangeKeySettings_KeyNotChanged_ShouldOnlyReturnOk()
     {
         // arrange
@@ -243,7 +215,7 @@ public class UserSettingsApiControllerTests
         _generatorFactoryMock.Verify(m => m.Create(It.IsAny<IKeyGeneratorOptions>()), Times.Exactly(2));
         _cookieHelperMock.Verify(m => m.SignOutAsync(default), Times.Never);
         _userOptionsMock.Verify(
-            m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
+            m => m.Update(It.IsAny<Action<UserOptions>>()),
             Times.Never);
         _keyServiceMock.Verify(
             m => m.ChangeKeySettingsAsync(It.IsAny<byte[]>(), It.IsAny<byte[]>(), default),
@@ -269,7 +241,7 @@ public class UserSettingsApiControllerTests
             .Setup(m => m.Value)
             .Returns(options);
         _userOptionsMock
-            .Setup(m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default))
+            .Setup(m => m.Update(It.IsAny<Action<UserOptions>>()))
             .Callback((Action<UserOptions> act, CancellationToken _) =>
             {
                 act(options);
@@ -301,7 +273,7 @@ public class UserSettingsApiControllerTests
         _generatorFactoryMock.Verify(m => m.Create(It.IsAny<IKeyGeneratorOptions>()), Times.Exactly(2));
         _generatorFactoryMock.Verify(m => m.Create(options), Times.Once);
         _userOptionsMock.Verify(
-            m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
+            m => m.Update(It.IsAny<Action<UserOptions>>()),
             Times.Once);
         _keyServiceMock.Verify(m => m.ChangeKeySettingsAsync(oldKey, newKey, default), Times.Once);
         Assert.Multiple(() =>
@@ -318,7 +290,7 @@ public class UserSettingsApiControllerTests
         var salt = RandomNumberGenerator.GetBytes(32);
         var options = new UserOptions() { Salt = salt };
         _userOptionsMock
-            .Setup(m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default))
+            .Setup(m => m.Update(It.IsAny<Action<UserOptions>>()))
             .Callback((Action<UserOptions> act, CancellationToken _) =>
             {
                 act(options);
@@ -332,7 +304,7 @@ public class UserSettingsApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
         _userOptionsMock.Verify(
-            m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
+            m => m.Update(It.IsAny<Action<UserOptions>>()),
             Times.Once);
         _keyServiceMock.Verify(m => m.ClearKeyDataAsync(default), Times.Once);
         _cookieHelperMock.Verify(m => m.SignOutAsync(default), Times.Once);
