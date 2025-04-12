@@ -26,8 +26,8 @@ public class PasswordsApiController(
     /// </summary>
     [HttpPost("verify")]
     [AllowAnonymous]
-    public async Task<ActionResult<PasswordVerifyReponse>> VerifyPasswordAsync([FromBody] VerifyPasswordRequest request,
-        CancellationToken token)
+    public async Task<ActionResult<PasswordVerifyReponse>> VerifyPasswordAsync(
+        [FromBody] VerifyPasswordRequest request, CancellationToken token)
     {
         if (!request.Validate(out var error))
         {
@@ -35,7 +35,7 @@ public class PasswordsApiController(
         }
 
         var result = await VerifyPasswordAsync(request.Password, Alphabet.Empty, token);
-        return Map(result);
+        return ToVerifyResponse(result);
     }
 
     /// <summary>
@@ -51,15 +51,13 @@ public class PasswordsApiController(
         }
 
         var alphabet = SetupAlphabet(request);
-        var generator = passwordGeneratorFactory.Create(alphabet);
-
-        var password = generator.Generate(request.Length);
+        var password = passwordGeneratorFactory.Create(alphabet).Generate(request.Length);
         var checkResult = await VerifyPasswordAsync(password, alphabet, token);
 
         return new PasswordGenerateResponse
         {
             Password = password,
-            CheckStatus = Map(checkResult)
+            CheckStatus = ToVerifyResponse(checkResult)
         };
     }
 
@@ -69,7 +67,7 @@ public class PasswordsApiController(
         return await passwordCheckerFactory.Create(alphabet).CheckAsync(password, token);
     }
 
-    private static PasswordVerifyReponse Map(PasswordCheckStatus checkStatus)
+    private static PasswordVerifyReponse ToVerifyResponse(PasswordCheckStatus checkStatus)
     {
         return new PasswordVerifyReponse
         {
