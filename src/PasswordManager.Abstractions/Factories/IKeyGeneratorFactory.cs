@@ -1,4 +1,6 @@
+using System;
 using PasswordManager.Abstractions.Generators;
+using PasswordManager.Abstractions.Options;
 
 namespace PasswordManager.Abstractions.Factories;
 
@@ -10,5 +12,6 @@ public interface IKeyGeneratorFactory
     /// <summary>
     /// Create key generator
     /// </summary>
-    IKeyGenerator Create(byte[] salt, int iterations);
+    /// <exception cref="ArgumentNullException">If <paramref name="options"/> is null</exception>
+    IKeyGenerator Create(IKeyGeneratorOptions options);
 }

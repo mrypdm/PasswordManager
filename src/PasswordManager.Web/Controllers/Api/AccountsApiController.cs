@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Abstractions.Services;
+using PasswordManager.Web.Filters;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Models.Responses;
 
@@ -13,8 +14,8 @@ namespace PasswordManager.Web.Controllers.Api;
 /// <summary>
 /// Controller for account manipulation
 /// </summary>
-[ApiController]
 [Route("api/account")]
+[ValidateModelState]
 [ValidateAntiForgeryToken]
 public class AccountsApiController(IAccountService accountService) : Controller
 {

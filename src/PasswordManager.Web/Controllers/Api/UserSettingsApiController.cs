@@ -5,17 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Options;
 using PasswordManager.Abstractions.Services;
+using PasswordManager.Core.Options;
+using PasswordManager.Web.Filters;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Models.Requests;
-using PasswordManager.Web.Options;
 
 namespace PasswordManager.Web.Controllers.Api;
 
 /// <summary>
 /// Controller for use settings
 /// </summary>
-[ApiController]
 [Route("api/settings")]
+[ValidateModelState]
 [ValidateAntiForgeryToken]
 public class UserSettingsApiController(
     IWritableOptions<UserOptions> userOptions,
@@ -66,10 +67,12 @@ public class UserSettingsApiController(
             return Ok();
         }
 
-        var oldKeyGenerator = keyGeneratorFactory.Create(userOptions.Value.SaltBytes, userOptions.Value.Iterations);
-        var newKeyGenerator = keyGeneratorFactory.Create(
-            request.SaltBytes ?? userOptions.Value.SaltBytes,
-            request.Iterations ?? userOptions.Value.Iterations);
+        var oldKeyGenerator = keyGeneratorFactory.Create(userOptions.Value);
+        var newKeyGenerator = keyGeneratorFactory.Create(new UserOptions
+        {
+            Salt = request.Salt ?? userOptions.Value.Salt,
+            Iterations = request.Iterations ?? userOptions.Value.Iterations
+        });
 
         var oldKey = oldKeyGenerator.Generate(request.MasterPassword);
         var newKey = newKeyGenerator.Generate(request.NewMasterPassword ?? request.MasterPassword);

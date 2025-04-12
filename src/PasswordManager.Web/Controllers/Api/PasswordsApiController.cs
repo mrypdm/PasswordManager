@@ -6,6 +6,7 @@ using PasswordManager.Abstractions.Alphabets;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Core.Alphabets;
+using PasswordManager.Web.Filters;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Models.Responses;
 
@@ -14,8 +15,8 @@ namespace PasswordManager.Web.Controllers.Api;
 /// <summary>
 /// Controller for password manipulations
 /// </summary>
-[ApiController]
 [Route("api/password")]
+[ValidateModelState]
 [ValidateAntiForgeryToken]
 public class PasswordsApiController(
     IPasswordGeneratorFactory passwordGeneratorFactory,

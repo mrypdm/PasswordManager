@@ -1,7 +1,7 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using PasswordManager.Aes;
+using PasswordManager.Core.Converters;
 
 namespace PasswordManager.Web.Models.Requests;
 
@@ -23,13 +23,8 @@ public class ChangeKeySettingsRequest : IRequest
     /// <summary>
     /// Salt for key generation
     /// </summary>
-    public string Salt { get; set; }
-
-    /// <summary>
-    /// Salt for key generation in bytes
-    /// </summary>
-    [JsonIgnore]
-    public byte[] SaltBytes => Salt is null ? null : Convert.FromHexString(Salt);
+    [JsonConverter(typeof(JsonStringBytesConverter))]
+    public byte[] Salt { get; set; }
 
     /// <summary>
     /// Count of iterations for key generation
@@ -50,21 +45,9 @@ public class ChangeKeySettingsRequest : IRequest
             errorMessage = "Iterations parameter cannot be zero or negative";
         }
 
-        if (Salt is not null)
+        if (Salt is not null && Salt.Length != AesConstants.BlockSize)
         {
-            try
-            {
-                Convert.FromHexString(Salt);
-            }
-            catch (FormatException)
-            {
-                errorMessage = "Salt parameter is not HEX string";
-            }
-
-            if (Salt.Length != AesConstants.BlockSize * 2)
-            {
-                errorMessage = $"Salt parameters is wrong size {Salt.Length}. Must be {AesConstants.BlockSize * 2}";
-            }
+            errorMessage = $"Salt parameter has wrong size {Salt.Length}. Must be {AesConstants.BlockSize}";
         }
 
         if (NewMasterPassword is not null && string.IsNullOrWhiteSpace(NewMasterPassword))

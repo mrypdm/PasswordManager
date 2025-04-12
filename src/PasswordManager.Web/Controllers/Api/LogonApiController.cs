@@ -8,6 +8,8 @@ using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Options;
 using PasswordManager.Abstractions.Services;
+using PasswordManager.Core.Options;
+using PasswordManager.Web.Filters;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Options;
@@ -17,9 +19,10 @@ namespace PasswordManager.Web.Controllers.Api;
 /// <summary>
 /// Controller for logon
 /// </summary>
-[ApiController]
 [AllowAnonymous]
 [Route("api/logon")]
+[ValidateModelState]
+[ValidateAntiForgeryToken]
 public class LogonApiController(
     IKeyService keyService,
     IKeyGeneratorFactory keyGeneratorFactory,
@@ -31,7 +34,6 @@ public class LogonApiController(
     /// Sign in user with cookie
     /// </summary>
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<ActionResult> SignInAsync([FromBody] LoginRequest request, CancellationToken token)
     {
         if (!request.Validate(out var error))
@@ -42,7 +44,7 @@ public class LogonApiController(
         try
         {
             var key = keyGeneratorFactory
-                .Create(userOptions.Value.SaltBytes, userOptions.Value.Iterations)
+                .Create(userOptions.Value)
                 .Generate(request.MasterPassword);
             await keyService.InitKeyAsync(key, userOptions.Value.SessionTimeout, token);
         }

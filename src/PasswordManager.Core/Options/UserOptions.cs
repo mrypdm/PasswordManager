@@ -1,25 +1,21 @@
 using System;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
-using PasswordManager.Aes;
+using PasswordManager.Abstractions.Options;
+using PasswordManager.Core.Converters;
 
-namespace PasswordManager.Web.Options;
+namespace PasswordManager.Core.Options;
 
 /// <summary>
 /// User options
 /// </summary>
-public class UserOptions
+public class UserOptions : IKeyGeneratorOptions
 {
-    /// <summary>
-    /// Salt for key generation
-    /// </summary>
-    public string Salt { get; set; } = RandomNumberGenerator.GetHexString(AesConstants.BlockSize * 2);
-
     /// <summary>
     /// Salt for key generation in bytes
     /// </summary>
-    [JsonIgnore]
-    public byte[] SaltBytes => Convert.FromHexString(Salt);
+    [JsonConverter(typeof(JsonStringBytesConverter))]
+    public byte[] Salt { get; set; } = RandomNumberGenerator.GetBytes(16);
 
     /// <summary>
     /// Count of iterations for key generation

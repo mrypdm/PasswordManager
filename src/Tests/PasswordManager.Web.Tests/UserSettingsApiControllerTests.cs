@@ -9,10 +9,10 @@ using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Options;
 using PasswordManager.Abstractions.Services;
+using PasswordManager.Core.Options;
 using PasswordManager.Web.Controllers.Api;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Models.Requests;
-using PasswordManager.Web.Options;
 
 namespace PasswordManager.Web.Tests;
 
@@ -37,7 +37,7 @@ public class UserSettingsApiControllerTests
         _generatorMock.Reset();
 
         _generatorFactoryMock
-            .Setup(m => m.Create(It.IsAny<byte[]>(), It.IsAny<int>()))
+            .Setup(m => m.Create(It.IsAny<IKeyGeneratorOptions>()))
             .Returns(_generatorMock.Object);
     }
 
@@ -146,25 +146,6 @@ public class UserSettingsApiControllerTests
     }
 
     [Test]
-    public async Task ChangeKeySettings_InvalidSaltFormat_ShouldReturnBadRequest()
-    {
-        // arrange
-        var request = new ChangeKeySettingsRequest
-        {
-            MasterPassword = "1",
-            Iterations = 1,
-            Salt = "not hex"
-        };
-        var controller = CreateController();
-
-        // act
-        var res = await controller.ChangeKeySettingsAsync(request, default);
-
-        // assert
-        Assert.That(res, Is.TypeOf<BadRequestObjectResult>());
-    }
-
-    [Test]
     public async Task ChangeKeySettings_InvalidSaltSize_ShouldReturnBadRequest()
     {
         // arrange
@@ -172,7 +153,7 @@ public class UserSettingsApiControllerTests
         {
             MasterPassword = "1",
             Iterations = 1,
-            Salt = "FF"
+            Salt = []
         };
         var controller = CreateController();
 
@@ -191,7 +172,6 @@ public class UserSettingsApiControllerTests
         {
             MasterPassword = "1",
             Iterations = 1,
-            Salt = "not hex",
             NewMasterPassword = ""
         };
         var controller = CreateController();
@@ -222,7 +202,7 @@ public class UserSettingsApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
         _cookieHelperMock.Verify(m => m.SignOutAsync(default), Times.Never);
-        _generatorFactoryMock.Verify(m => m.Create(It.IsAny<byte[]>(), It.IsAny<int>()), Times.Never);
+        _generatorFactoryMock.Verify(m => m.Create(It.IsAny<IKeyGeneratorOptions>()), Times.Never);
         _userOptionsMock.Verify(
             m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
             Times.Never);
@@ -242,7 +222,7 @@ public class UserSettingsApiControllerTests
         };
         var options = new UserOptions()
         {
-            Salt = string.Empty,
+            Salt = [],
             Iterations = 0
         };
 
@@ -260,7 +240,7 @@ public class UserSettingsApiControllerTests
 
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
-        _generatorFactoryMock.Verify(m => m.Create(It.IsAny<byte[]>(), It.IsAny<int>()), Times.Exactly(2));
+        _generatorFactoryMock.Verify(m => m.Create(It.IsAny<IKeyGeneratorOptions>()), Times.Exactly(2));
         _cookieHelperMock.Verify(m => m.SignOutAsync(default), Times.Never);
         _userOptionsMock.Verify(
             m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
@@ -273,7 +253,7 @@ public class UserSettingsApiControllerTests
     [Test]
     [TestCaseSource(nameof(ChangeKeySettings_ChangesAreNeeded_ShouldChangeSettings_TestCaseSource))]
     public async Task ChangeKeySettings_ChangesAreNeeded_ShouldChangeSettings(
-        string salt, string newSalt,
+        byte[] salt, byte[] newSalt,
         int iterations, int newIterations,
         string masterPassword, string newMasterPassword)
     {
@@ -318,12 +298,8 @@ public class UserSettingsApiControllerTests
             .Verify(m => m.Generate(masterPassword), Times.Between(1, 2, Moq.Range.Inclusive));
         _generatorMock
             .Verify(m => m.Generate(newMasterPassword), Times.Between(1, 2, Moq.Range.Inclusive));
-        _generatorFactoryMock.Verify(
-            m => m.Create(request.SaltBytes, request.Iterations.Value),
-            Times.Between(1, 2, Moq.Range.Inclusive));
-        _generatorFactoryMock.Verify(
-            m => m.Create(options.SaltBytes, options.Iterations),
-            Times.Between(1, 2, Moq.Range.Inclusive));
+        _generatorFactoryMock.Verify(m => m.Create(It.IsAny<IKeyGeneratorOptions>()), Times.Exactly(2));
+        _generatorFactoryMock.Verify(m => m.Create(options), Times.Once);
         _userOptionsMock.Verify(
             m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default),
             Times.Once);
@@ -339,7 +315,7 @@ public class UserSettingsApiControllerTests
     public async Task DeleteStorage_CommonWay_ShouldClearKeyDataAndChangeSaltAndLogout()
     {
         // arrange
-        var salt = RandomNumberGenerator.GetHexString(32);
+        var salt = RandomNumberGenerator.GetBytes(32);
         var options = new UserOptions() { Salt = salt };
         _userOptionsMock
             .Setup(m => m.UpdateAsync(It.IsAny<Action<UserOptions>>(), default))
@@ -373,8 +349,8 @@ public class UserSettingsApiControllerTests
     {
         const string testName = nameof(ChangeKeySettings_ChangesAreNeeded_ShouldChangeSettings);
 
-        var salt = RandomNumberGenerator.GetHexString(32);
-        var newSalt = RandomNumberGenerator.GetHexString(32);
+        var salt = RandomNumberGenerator.GetBytes(16);
+        var newSalt = RandomNumberGenerator.GetBytes(16);
         var iterations = 1;
         var newIterations = 2;
         var masterPassword = "password";
