@@ -3,13 +3,14 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using PasswordManager.Abstractions.Options;
 
-namespace PasswordManager.Options;
+namespace PasswordManager.Core.Options;
 
 /// <summary>
 /// Writeable options in JSON format
 /// </summary>
-public sealed class JsonWriteableOptions<TOptions> : IWritableOptions<TOptions> where TOptions : class, new()
+public sealed class JsonWriteableOptions<TOptions> : IWritableOptions<TOptions> where TOptions : class
 {
     private readonly string _filePath;
 

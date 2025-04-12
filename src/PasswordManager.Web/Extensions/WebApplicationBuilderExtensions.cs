@@ -13,6 +13,7 @@ using PasswordManager.Abstractions.Contexts;
 using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Factories;
+using PasswordManager.Abstractions.Options;
 using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Abstractions.Services;
 using PasswordManager.Abstractions.Storages;
@@ -28,7 +29,6 @@ using PasswordManager.Core.Storages;
 using PasswordManager.Data.Contexts;
 using PasswordManager.Data.Repositories;
 using PasswordManager.External.Factories;
-using PasswordManager.Options;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Options;
 

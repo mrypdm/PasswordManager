@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 
-namespace PasswordManager.Options.Tests;
+namespace PasswordManager.Core.Tests;
 
 /// <summary>
-/// Temporary file which be deleted after dispose
+/// Temporary file which will be deleted after dispose
 /// </summary>
 public sealed class TempFile(string path = null) : IDisposable
 {

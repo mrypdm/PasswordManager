@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
+using PasswordManager.Core.Options;
 
-namespace PasswordManager.Options.Tests;
+namespace PasswordManager.Core.Tests.Options;
 
 /// <summary>
 /// Tests for <see cref="JsonWriteableOptions{TOptions}"/>
