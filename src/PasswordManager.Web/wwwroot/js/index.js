@@ -30,7 +30,7 @@ async function getHeaders() {
 async function getAccountDataAndCopy(accountId, property) {
     try {
         let response = await getAccountDataRaw(accountId);
-        navigator.clipboard.writeText(response[property]);
+        navigator.clipboard.writeText(response.data[property]);
     } catch (response) {
         let text = await response.text();
         alert(text);

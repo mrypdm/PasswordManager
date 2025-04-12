@@ -15,9 +15,9 @@ async function getAccountData(accountId) {
     try {
         response = await getAccountDataRaw(accountId)
         nameBox.value = response.name;
-        loginBox.value = response.login;
+        loginBox.value = response.data.login;
         passwordBox.type = "password";
-        passwordBox.value = response.password;
+        passwordBox.value = response.data.password;
         document.title = `Password Manager - ${response.name}`;
     } catch (response) {
         if (response.status == 404) {

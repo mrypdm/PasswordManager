@@ -15,14 +15,14 @@ public interface IAccountService
     /// Add new account to repository and return its ID
     /// </summary>
     /// <exception cref="ArgumentNullException">If <paramref name="account"/> is null</exception>
-    Task<int> AddAccountAsync(AccountData account, CancellationToken token);
+    Task<int> AddAccountAsync(Account account, CancellationToken token);
 
     /// <summary>
     /// Update account
     /// </summary>
     /// <exception cref="ArgumentNullException">If <paramref name="account"/> is null</exception>
     /// <exception cref="AccountNotExistsException">If account with <paramref name="id"/> not exists</exception>
-    Task UpdateAccountAsync(AccountData account, CancellationToken token);
+    Task UpdateAccountAsync(Account account, CancellationToken token);
 
     /// <summary>
     /// Delete account by <paramref name="id"/>
@@ -33,7 +33,7 @@ public interface IAccountService
     /// Get account from repository by id
     /// </summary>
     /// <exception cref="AccountNotExistsException">If account with <paramref name="id"/> not exists</exception>
-    Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token);
+    Task<Account> GetAccountByIdAsync(int id, CancellationToken token);
 
     /// <summary>
     /// Get account headers from repository

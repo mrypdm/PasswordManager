@@ -20,10 +20,10 @@ namespace PasswordManager.Web.Controllers.Api;
 public class AccountsApiController(IAccountService accountService) : Controller
 {
     /// <summary>
-    /// Get account data by id
+    /// Get account by id
     /// </summary>
     [HttpPost("{accountId}")]
-    public async Task<ActionResult<AccountData>> GetAccountByIdAsync(int accountId, CancellationToken token)
+    public async Task<ActionResult<Account>> GetAccountByIdAsync(int accountId, CancellationToken token)
     {
         try
         {
@@ -57,11 +57,14 @@ public class AccountsApiController(IAccountService accountService) : Controller
             return BadRequest(error);
         }
 
-        var account = new AccountData
+        var account = new Account
         {
             Name = request.Name,
-            Login = request.Login,
-            Password = request.Password
+            Data = new AccountData
+            {
+                Login = request.Login,
+                Password = request.Password
+            }
         };
         var id = await accountService.AddAccountAsync(account, token);
         return new AddAccountDataResponse
@@ -82,12 +85,15 @@ public class AccountsApiController(IAccountService accountService) : Controller
             return BadRequest(error);
         }
 
-        var account = new AccountData
+        var account = new Account
         {
             Id = accountId,
             Name = request.Name,
-            Login = request.Login,
-            Password = request.Password
+            Data = new AccountData
+            {
+                Login = request.Login,
+                Password = request.Password
+            }
         };
 
         try

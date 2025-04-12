@@ -21,11 +21,11 @@ public class AccountService(
     : IAccountService
 {
     /// <inheritdoc />
-    public async Task<int> AddAccountAsync(AccountData account, CancellationToken token)
+    public async Task<int> AddAccountAsync(Account account, CancellationToken token)
     {
         ArgumentNullException.ThrowIfNull(account);
 
-        var encryptedData = crypto.EncryptJson(account, keyStorage.Key);
+        var encryptedData = crypto.EncryptJson(account.Data, keyStorage.Key);
         var encryptedItem = new EncryptedItem
         {
             Name = account.Name,
@@ -39,10 +39,10 @@ public class AccountService(
     }
 
     /// <inheritdoc />
-    public async Task UpdateAccountAsync(AccountData account, CancellationToken token)
+    public async Task UpdateAccountAsync(Account account, CancellationToken token)
     {
         ArgumentNullException.ThrowIfNull(account);
-        var encryptedData = crypto.EncryptJson(account, keyStorage.Key);
+        var encryptedData = crypto.EncryptJson(account.Data, keyStorage.Key);
         try
         {
             var item = new EncryptedItem
@@ -68,14 +68,18 @@ public class AccountService(
     }
 
     /// <inheritdoc />
-    public async Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token)
+    public async Task<Account> GetAccountByIdAsync(int id, CancellationToken token)
     {
         try
         {
             var encryptedData = await repository.GetItemByIdAsync(id, token);
             var decryptedAccount = crypto.DecryptJson<AccountData>(encryptedData, keyStorage.Key);
-            decryptedAccount.Id = id;
-            return decryptedAccount;
+            return new Account
+            {
+                Id = id,
+                Name = encryptedData.Name,
+                Data = decryptedAccount
+            };
         }
         catch (ItemNotExistsException)
         {

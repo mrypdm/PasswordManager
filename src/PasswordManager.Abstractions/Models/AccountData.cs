@@ -3,7 +3,7 @@ namespace PasswordManager.Abstractions.Models;
 /// <summary>
 /// Account data
 /// </summary>
-public sealed class AccountData : AccountHeader
+public sealed class AccountData
 {
     /// <summary>
     /// User login

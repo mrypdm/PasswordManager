@@ -204,7 +204,6 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         // arrange
         var expectedId = 3;
         var key = RandomNumberGenerator.GetBytes(32);
-        var expectedAccount = new AccountData();
         var item = new EncryptedItemDbModel
         {
             Name = "needed",

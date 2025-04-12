@@ -44,8 +44,8 @@ public class AccountServiceTests
     {
         // arrange
         var key = Array.Empty<byte>();
-        var account = new AccountData() { Name = "name" };
-        var data = new EncryptedItem() { Name = account.Name, Data = [], Salt = [] };
+        var account = new Account() { Name = "name", Data = new AccountData() };
+        var encryptedData = new EncryptedItem() { Name = account.Name, Data = [], Salt = [] };
         var expectedId = 123;
         var item = new Mock<IItem>();
         item
@@ -55,10 +55,10 @@ public class AccountServiceTests
             .Setup(m => m.Key)
             .Returns(key);
         _cryptoMock
-            .Setup(m => m.EncryptJson(account, key))
-            .Returns(data);
+            .Setup(m => m.EncryptJson(account.Data, key))
+            .Returns(encryptedData);
         _repositoryMock
-            .Setup(m => m.AddItemAsync(It.Is<EncryptedItem>(m => CheckItem(m, data)), default))
+            .Setup(m => m.AddItemAsync(It.Is<EncryptedItem>(m => CheckItem(m, encryptedData)), default))
             .ReturnsAsync(item.Object);
         var service = CreateService();
 
@@ -68,9 +68,9 @@ public class AccountServiceTests
         // assert
         Assert.That(id, Is.EqualTo(expectedId));
         _storageMock.Verify(m => m.Key, Times.Once);
-        _cryptoMock.Verify(m => m.EncryptJson(account, key), Times.Once);
+        _cryptoMock.Verify(m => m.EncryptJson(account.Data, key), Times.Once);
         _repositoryMock.Verify(
-            m => m.AddItemAsync(It.Is<EncryptedItem>(m => CheckItem(m, data)), default),
+            m => m.AddItemAsync(It.Is<EncryptedItem>(m => CheckItem(m, encryptedData)), default),
             Times.Once);
         _dataContextMock.Verify(m => m.SaveChangesAsync(default), Times.Once);
     }
@@ -109,22 +109,22 @@ public class AccountServiceTests
     {
         // arrange
         var key = Array.Empty<byte>();
-        var account = new AccountData() { Id = 123, Name = "name" };
-        var data = new EncryptedData() { Data = [], Salt = [] };
+        var account = new Account() { Id = 123, Name = "name", Data = new AccountData() };
+        var encryptedData = new EncryptedData() { Data = [], Salt = [] };
         var expectedItem = new EncryptedItem
         {
             Id = account.Id,
             Name = account.Name,
-            Data = data.Data,
-            Salt = data.Salt
+            Data = encryptedData.Data,
+            Salt = encryptedData.Salt
         };
 
         _storageMock
             .Setup(m => m.Key)
             .Returns(key);
         _cryptoMock
-            .Setup(m => m.EncryptJson(account, key))
-            .Returns(data);
+            .Setup(m => m.EncryptJson(account.Data, key))
+            .Returns(encryptedData);
         var service = CreateService();
 
         // act
@@ -132,7 +132,7 @@ public class AccountServiceTests
 
         // assert
         _storageMock.Verify(m => m.Key, Times.Once);
-        _cryptoMock.Verify(m => m.EncryptJson(account, key), Times.Once);
+        _cryptoMock.Verify(m => m.EncryptJson(account.Data, key), Times.Once);
         _repositoryMock.Verify(
             m => m.UpdateItemAsync(It.Is<EncryptedItem>(m => CheckItem(m, expectedItem)), default),
             Times.Once);
@@ -172,30 +172,33 @@ public class AccountServiceTests
     {
         // arrange
         var key = Array.Empty<byte>();
-        var expectedAccount = new AccountData();
-        var item = new EncryptedItem() { Data = [], Salt = [] };
-        var expectedId = 123;
+        var expectedData = new AccountData();
+        var item = new EncryptedItem() { Id = 123, Name = "name", Data = [], Salt = [] };
 
         _repositoryMock
-            .Setup(m => m.GetItemByIdAsync(expectedId, default))
+            .Setup(m => m.GetItemByIdAsync(item.Id, default))
             .ReturnsAsync(item);
         _storageMock
             .Setup(m => m.Key)
             .Returns(key);
         _cryptoMock
             .Setup(m => m.DecryptJson<AccountData>(item, key))
-            .Returns(expectedAccount);
+            .Returns(expectedData);
         var service = CreateService();
 
         // act
-        var account = await service.GetAccountByIdAsync(expectedId, default);
+        var account = await service.GetAccountByIdAsync(item.Id, default);
 
         // assert
-        Assert.That(account, Is.EqualTo(expectedAccount));
-        Assert.That(account.Id, Is.EqualTo(expectedId));
+        Assert.Multiple(() =>
+        {
+            Assert.That(account.Id, Is.EqualTo(item.Id));
+            Assert.That(account.Name, Is.EqualTo(item.Name));
+            Assert.That(account.Data, Is.EqualTo(expectedData));
+        });
         _storageMock.Verify(m => m.Key, Times.Once);
         _cryptoMock.Verify(m => m.DecryptJson<AccountData>(item, key), Times.Once);
-        _repositoryMock.Verify(m => m.GetItemByIdAsync(expectedId, default), Times.Once);
+        _repositoryMock.Verify(m => m.GetItemByIdAsync(item.Id, default), Times.Once);
     }
 
     [Test]
