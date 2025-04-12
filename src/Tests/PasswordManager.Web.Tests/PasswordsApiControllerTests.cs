@@ -3,10 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PasswordManager.Abstractions.Alphabets;
-using PasswordManager.Abstractions.Checkers;
-using PasswordManager.Abstractions.Factories;
-using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Models;
+using PasswordManager.Abstractions.Services;
 using PasswordManager.Core.Alphabets;
 using PasswordManager.Web.Controllers.Api;
 using PasswordManager.Web.Models.Requests;
@@ -18,29 +16,16 @@ namespace PasswordManager.Web.Tests;
 /// </summary>
 public class PasswordsApiControllerTests
 {
-    private readonly Mock<IPasswordGeneratorFactory> _generatorFactoryMock = new();
-    private readonly Mock<IPasswordGenerator> _generatorMock = new();
-    private readonly Mock<IPasswordCheckerFactory> _checkerFactoryMock = new();
-    private readonly Mock<IPasswordChecker> _checkerMock = new();
+    private readonly Mock<IPasswordService> _serviceMock = new();
 
     [SetUp]
     public void SetUp()
     {
-        _generatorFactoryMock.Reset();
-        _generatorMock.Reset();
-        _checkerFactoryMock.Reset();
-        _checkerMock.Reset();
-
-        _generatorFactoryMock
-            .Setup(m => m.Create(It.IsAny<IAlphabet>()))
-            .Returns(_generatorMock.Object);
-        _checkerFactoryMock
-            .Setup(m => m.Create(It.IsAny<IAlphabet>()))
-            .Returns(_checkerMock.Object);
+        _serviceMock.Reset();
     }
 
     [Test]
-    public async Task Generate_ZeroLength_ShouldReturnBadRequest()
+    public async Task GeneratePassword_ZeroLength_ShouldReturnBadRequest()
     {
         // arrange
         var request = new GeneratePasswordRequest()
@@ -57,7 +42,7 @@ public class PasswordsApiControllerTests
     }
 
     [Test]
-    public async Task Generate_EmptyAlphabet_ShouldReturnBadRequest()
+    public async Task GeneratePassword_EmptyAlphabet_ShouldReturnBadRequest()
     {
         // arrange
         var request = new GeneratePasswordRequest()
@@ -74,7 +59,7 @@ public class PasswordsApiControllerTests
     }
 
     [Test]
-    public async Task Generate_CommonWay_ShouldGeneratePasswordAndCheckIt()
+    public async Task GeneratePassword_CommonWay_ShouldGeneratePasswordAndCheckIt()
     {
         // arrange
         var request = new GeneratePasswordRequest()
@@ -86,11 +71,11 @@ public class PasswordsApiControllerTests
         var password = "0123456789abcdef";
         var alphabet = new Alphabet().WithNumbers().WithLowerLetters();
 
-        _generatorMock
-            .Setup(m => m.Generate(request.Length))
+        _serviceMock
+            .Setup(m => m.GeneratePassword(request.Length, It.Is<IAlphabet>(m => CheckAlphabet(m, alphabet))))
             .Returns(password);
-        _checkerMock
-            .Setup(m => m.CheckAsync(password, default))
+        _serviceMock
+            .Setup(m => m.CheckPasswordAsync(password, It.Is<IAlphabet>(m => CheckAlphabet(m, alphabet)), default))
             .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow));
 
         var controller = CreateController();
@@ -106,14 +91,16 @@ public class PasswordsApiControllerTests
             Assert.That(res.Value.CheckStatus.IsCompomised, Is.True);
             Assert.That(res.Value.CheckStatus.Strength, Is.EqualTo("very low"));
         });
-        _generatorFactoryMock.Verify(m => m.Create(It.Is<IAlphabet>(m => CheckAlphabet(m, alphabet))), Times.Once);
-        _generatorMock.Verify(m => m.Generate(request.Length), Times.Once);
-        _checkerFactoryMock.Verify(m => m.Create(It.Is<IAlphabet>(m => CheckAlphabet(m, alphabet))), Times.Once);
-        _checkerMock.Verify(m => m.CheckAsync(password, default), Times.Once);
+        _serviceMock.Verify(
+            m => m.GeneratePassword(request.Length, It.Is<IAlphabet>(m => CheckAlphabet(m, alphabet))),
+            Times.Once);
+        _serviceMock.Verify(
+            m => m.CheckPasswordAsync(password, It.Is<IAlphabet>(m => CheckAlphabet(m, alphabet)), default),
+            Times.Once);
     }
 
     [Test]
-    public async Task Varify_EmptyPassword_ShouldReturnBadRequest()
+    public async Task CheckPassword_EmptyPassword_ShouldReturnBadRequest()
     {
         // arrange
         var request = new VerifyPasswordRequest()
@@ -123,14 +110,14 @@ public class PasswordsApiControllerTests
         var controller = CreateController();
 
         // act
-        var res = await controller.VerifyPasswordAsync(request, default);
+        var res = await controller.CheckPasswordAsync(request, default);
 
         // assert
         Assert.That(res.Result, Is.TypeOf<BadRequestObjectResult>());
     }
 
     [Test]
-    public async Task Varify_CommonWay_ShouldCheckPassword()
+    public async Task CheckPassword_CommonWay_ShouldCheckPassword()
     {
         // arrange
         var request = new VerifyPasswordRequest()
@@ -139,12 +126,12 @@ public class PasswordsApiControllerTests
         };
         var controller = CreateController();
 
-        _checkerMock
-            .Setup(m => m.CheckAsync(request.Password, default))
+        _serviceMock
+            .Setup(m => m.CheckPasswordAsync(request.Password, Alphabet.Empty, default))
             .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow));
 
         // act
-        var res = await controller.VerifyPasswordAsync(request, default);
+        var res = await controller.CheckPasswordAsync(request, default);
 
         // assert
         Assert.That(res.Value, Is.Not.Null);
@@ -153,13 +140,12 @@ public class PasswordsApiControllerTests
             Assert.That(res.Value.IsCompomised, Is.True);
             Assert.That(res.Value.Strength, Is.EqualTo("very low"));
         });
-        _checkerFactoryMock.Verify(m => m.Create(Alphabet.Empty), Times.Once);
-        _checkerMock.Verify(m => m.CheckAsync(request.Password, default), Times.Once);
+        _serviceMock.Verify(m => m.CheckPasswordAsync(request.Password, Alphabet.Empty, default), Times.Once);
     }
 
     private PasswordsApiController CreateController()
     {
-        return new PasswordsApiController(_generatorFactoryMock.Object, _checkerFactoryMock.Object);
+        return new PasswordsApiController(_serviceMock.Object);
     }
 
     private static bool CheckAlphabet(IAlphabet actual, IAlphabet expected)

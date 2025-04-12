@@ -123,7 +123,8 @@ public static class WebApplicationBuilderExtensions
             .AddSingleton<IKeyStorage, KeyStorage>()
             .AddSingleton<IReadOnlyKeyStorage>(services => services.GetRequiredService<IKeyStorage>())
             .AddScoped<IKeyService, KeyService>()
-            .AddScoped<IAccountService, AccountService>();
+            .AddScoped<IAccountService, AccountService>()
+            .AddScoped<IPasswordService, PasswordService>();
         return builder;
     }
 

@@ -2,9 +2,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PasswordManager.Abstractions.Alphabets;
-using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Models;
+using PasswordManager.Abstractions.Services;
 using PasswordManager.Core.Alphabets;
 using PasswordManager.Web.Filters;
 using PasswordManager.Web.Models.Requests;
@@ -18,16 +17,14 @@ namespace PasswordManager.Web.Controllers.Api;
 [Route("api/password")]
 [ValidateModelState]
 [ValidateAntiForgeryToken]
-public class PasswordsApiController(
-    IPasswordGeneratorFactory passwordGeneratorFactory,
-    IPasswordCheckerFactory passwordCheckerFactory) : Controller
+public class PasswordsApiController(IPasswordService passwordService) : Controller
 {
     /// <summary>
     /// Verify password strength and compomistaion
     /// </summary>
     [HttpPost("verify")]
     [AllowAnonymous]
-    public async Task<ActionResult<PasswordVerifyReponse>> VerifyPasswordAsync(
+    public async Task<ActionResult<PasswordVerifyReponse>> CheckPasswordAsync(
         [FromBody] VerifyPasswordRequest request, CancellationToken token)
     {
         if (!request.Validate(out var error))
@@ -35,7 +32,7 @@ public class PasswordsApiController(
             return BadRequest(error);
         }
 
-        var result = await VerifyPasswordAsync(request.Password, Alphabet.Empty, token);
+        var result = await passwordService.CheckPasswordAsync(request.Password, Alphabet.Empty, token);
         return ToVerifyResponse(result);
     }
 
@@ -52,20 +49,14 @@ public class PasswordsApiController(
         }
 
         var alphabet = SetupAlphabet(request);
-        var password = passwordGeneratorFactory.Create(alphabet).Generate(request.Length);
-        var checkResult = await VerifyPasswordAsync(password, alphabet, token);
+        var password = passwordService.GeneratePassword(request.Length, alphabet);
+        var checkResult = await passwordService.CheckPasswordAsync(password, alphabet, token);
 
         return new PasswordGenerateResponse
         {
             Password = password,
             CheckStatus = ToVerifyResponse(checkResult)
         };
-    }
-
-    private async Task<PasswordCheckStatus> VerifyPasswordAsync(string password, IAlphabet alphabet,
-        CancellationToken token)
-    {
-        return await passwordCheckerFactory.Create(alphabet).CheckAsync(password, token);
     }
 
     private static PasswordVerifyReponse ToVerifyResponse(PasswordCheckStatus checkStatus)
