@@ -157,40 +157,9 @@ public class PasswordsApiControllerTests
         _checkerMock.Verify(m => m.CheckAsync(request.Password, default), Times.Once);
     }
 
-    [Test]
-    public async Task Varify_ShouldCalculateMinOfCheckResult()
-    {
-        // arrange
-        var request = new VerifyPasswordRequest()
-        {
-            Password = "0123456789abcdef",
-        };
-        var controller = new PasswordsApiController(
-            _generatorFactoryMock.Object,
-            [_checkerFactoryMock.Object, _checkerFactoryMock.Object]);
-
-        _checkerMock
-            .SetupSequence(m => m.CheckAsync(request.Password, default))
-            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryHigh))
-            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.NotCompromised, PasswordStrength.VeryLow));
-
-        // act
-        var res = await controller.VerifyPasswordAsync(request, default);
-
-        // assert
-        Assert.That(res.Value, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            Assert.That(res.Value.IsCompomised, Is.True);
-            Assert.That(res.Value.Strength, Is.EqualTo("very low"));
-        });
-        _checkerFactoryMock.Verify(m => m.Create(Alphabet.Empty), Times.Exactly(2));
-        _checkerMock.Verify(m => m.CheckAsync(request.Password, default), Times.Exactly(2));
-    }
-
     private PasswordsApiController CreateController()
     {
-        return new PasswordsApiController(_generatorFactoryMock.Object, [_checkerFactoryMock.Object]);
+        return new PasswordsApiController(_generatorFactoryMock.Object, _checkerFactoryMock.Object);
     }
 
     private static bool CheckAlphabet(IAlphabet actual, IAlphabet expected)

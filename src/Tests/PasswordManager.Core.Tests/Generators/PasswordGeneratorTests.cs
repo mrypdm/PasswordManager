@@ -3,7 +3,7 @@ using System.Linq;
 using PasswordManager.Core.Alphabets;
 using PasswordManager.Core.Generators;
 
-namespace PasswordManager.Core.Tests;
+namespace PasswordManager.Core.Tests.Generators;
 
 /// <summary>
 /// Tests for <see cref="PasswordGenerator"/>

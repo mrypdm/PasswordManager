@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using PasswordManager.Abstractions.Models;
 using PasswordManager.Core.Checkers;
 
-namespace PasswordManager.Core.Tests;
+namespace PasswordManager.Core.Tests.Checkers;
 
 /// <summary>
 /// Tests for <see cref="SeaMonkeyPasswordChecker"/>
@@ -16,7 +16,7 @@ public class SeaMonkeyPasswordCheckerTests
     [TestCase("Rhfcjxyst:erbL;ekbb912", PasswordStrength.High)]
     [TestCase("Shrek", PasswordStrength.VeryLow)]
     [TestCase("ShrekISlon768", PasswordStrength.Medium)]
-    public async Task CheckSeaMonkey(string password, PasswordStrength strength)
+    public async Task Check_ShouldCalculateBySeaMonkey(string password, PasswordStrength strength)
     {
         // arrange
         var checker = new SeaMonkeyPasswordChecker();

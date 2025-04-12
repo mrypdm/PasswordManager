@@ -9,7 +9,7 @@ using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Abstractions.Storages;
 using PasswordManager.Core.Services;
 
-namespace PasswordManager.Core.Tests;
+namespace PasswordManager.Core.Tests.Services;
 
 public class AccountServiceTests
 {

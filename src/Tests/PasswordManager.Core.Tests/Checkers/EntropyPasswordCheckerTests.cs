@@ -3,7 +3,7 @@ using PasswordManager.Abstractions.Models;
 using PasswordManager.Core.Alphabets;
 using PasswordManager.Core.Checkers;
 
-namespace PasswordManager.Core.Tests;
+namespace PasswordManager.Core.Tests.Checkers;
 
 /// <summary>
 /// Tests for <see cref="EntropyPasswordChecker"/>
@@ -14,7 +14,7 @@ public class EntropyPasswordCheckerTests
     [TestCase("qwerty", PasswordStrength.VeryLow)]
     [TestCase("qwertyyyy", PasswordStrength.VeryLow)]
     [TestCase("verylargestriiiiiiiiiiiiiiiing", PasswordStrength.VeryHigh)]
-    public async Task CheckEntropy_OnlyLowerLetters(string password, PasswordStrength strength)
+    public async Task Check_OnlyLowerLetters_ShouldCalculateByEntropy(string password, PasswordStrength strength)
     {
         // arrange
         var alphabet = new Alphabet().WithLowerLetters();
@@ -35,7 +35,7 @@ public class EntropyPasswordCheckerTests
     [TestCase("Rhfcjxyst:erbL;ekbb912", PasswordStrength.VeryHigh)]
     [TestCase("Shrek", PasswordStrength.VeryLow)]
     [TestCase("ShrekISlon768", PasswordStrength.Medium)]
-    public async Task CheckEntropy_FullAlphabet(string password, PasswordStrength strength)
+    public async Task Check_FullAlphabet_ShouldCalculateByEntropy(string password, PasswordStrength strength)
     {
         // arrange
         var alphabet = new Alphabet()
@@ -57,7 +57,7 @@ public class EntropyPasswordCheckerTests
     }
 
     [Test]
-    public async Task CheckEntropy_WrongAlphabet_ShouldReturnUnknown()
+    public async Task Check_WrongAlphabet_ShouldReturnUnknown()
     {
         // arrange
         var alphabet = new Alphabet().WithNumbers();

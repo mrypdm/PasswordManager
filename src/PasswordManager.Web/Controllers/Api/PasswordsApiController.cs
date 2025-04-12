@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -20,7 +19,7 @@ namespace PasswordManager.Web.Controllers.Api;
 [ValidateAntiForgeryToken]
 public class PasswordsApiController(
     IPasswordGeneratorFactory passwordGeneratorFactory,
-    IEnumerable<IPasswordCheckerFactory> passwordCheckerFactories) : Controller
+    IPasswordCheckerFactory passwordCheckerFactory) : Controller
 {
     /// <summary>
     /// Verify password strength and compomistaion
@@ -67,16 +66,7 @@ public class PasswordsApiController(
     private async Task<PasswordCheckStatus> VerifyPasswordAsync(string password, IAlphabet alphabet,
         CancellationToken token)
     {
-        var result = new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Unknown);
-
-        foreach (var factory in passwordCheckerFactories)
-        {
-            var checker = factory.Create(alphabet);
-            var checkResult = await checker.CheckAsync(password, token);
-            result = PasswordCheckStatus.MinOf(result, checkResult);
-        }
-
-        return result;
+        return await passwordCheckerFactory.Create(alphabet).CheckAsync(password, token);
     }
 
     private static PasswordVerifyReponse Map(PasswordCheckStatus checkStatus)

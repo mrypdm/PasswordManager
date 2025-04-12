@@ -87,10 +87,14 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddPasswordCheckers(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddScoped<IPasswordCheckerFactory, EntropyPasswordCheckerFactory>()
-            .AddScoped<IPasswordCheckerFactory, SeaMonkeyPasswordCheckerFactory>()
-            .AddScoped<IPasswordCheckerFactory, ZxcvbnPasswordCheckerFactory>()
-            .AddScoped<IPasswordCheckerFactory, PwnedPasswordCheckerFactory>();
+            .AddSingleton<IPasswordCheckerFactory>(services =>
+            {
+                return new CombinedPasswordCheckerFactory([
+                    new EntropyPasswordCheckerFactory(),
+                    new SeaMonkeyPasswordCheckerFactory(),
+                    new ZxcvbnPasswordCheckerFactory(),
+                    new PwnedPasswordCheckerFactory()]);
+            });
         return builder;
     }
 

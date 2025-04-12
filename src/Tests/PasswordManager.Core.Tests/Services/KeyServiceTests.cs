@@ -14,7 +14,7 @@ using PasswordManager.Abstractions.Validators;
 using PasswordManager.Core.Options;
 using PasswordManager.Core.Services;
 
-namespace PasswordManager.Core.Tests;
+namespace PasswordManager.Core.Tests.Services;
 
 /// <summary>
 /// Tests for <see cref="KeyService"/>

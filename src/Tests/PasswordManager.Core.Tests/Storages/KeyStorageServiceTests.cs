@@ -7,7 +7,7 @@ using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Validators;
 using PasswordManager.Core.Storages;
 
-namespace PasswordManager.Core.Tests;
+namespace PasswordManager.Core.Tests.Storages;
 
 /// <summary>
 /// Tests for <see cref="KeyStorage"/>
