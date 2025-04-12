@@ -71,13 +71,7 @@ public static class WebApplicationBuilderExtensions
             .AddSingleton<IKeyGeneratorFactory, AesKeyGeneratorFactory>()
             .AddSingleton<IKeyValidatorFactory, AesKeyValidatorFactory>()
             .AddSingleton<IKeyValidator, SimpleAesKeyValidator>()
-            .AddSingleton<ICrypto, AesCrypto>()
-            .AddScoped(services =>
-            {
-                var userOptions = services.GetRequiredService<IWritableOptions<UserOptions>>();
-                var factory = services.GetRequiredService<IKeyGeneratorFactory>();
-                return factory.Create(userOptions.Value.SaltBytes, userOptions.Value.Iterations);
-            });
+            .AddSingleton<ICrypto, AesCrypto>();
         return builder;
     }
 

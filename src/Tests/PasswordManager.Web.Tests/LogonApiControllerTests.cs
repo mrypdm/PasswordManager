@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
 using PasswordManager.Abstractions.Exceptions;
+using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Options;
 using PasswordManager.Abstractions.Services;
@@ -22,6 +23,7 @@ namespace PasswordManager.Web.Tests;
 public class LogonApiControllerTests
 {
     private readonly Mock<IKeyService> _keyServiceMock = new();
+    private readonly Mock<IKeyGeneratorFactory> _keyGeneratorFactoryMock = new();
     private readonly Mock<IKeyGenerator> _keyGeneratorMock = new();
     private readonly Mock<ICookieAuthorizationHelper> _cookieHelperMock = new();
     private readonly Mock<IWritableOptions<UserOptions>> _userOptionsMock = new();
@@ -31,10 +33,15 @@ public class LogonApiControllerTests
     public void SetUp()
     {
         _keyServiceMock.Reset();
+        _keyGeneratorFactoryMock.Reset();
         _keyGeneratorMock.Reset();
         _cookieHelperMock.Reset();
         _userOptionsMock.Reset();
         _connectionOptionsMock.Reset();
+
+        _keyGeneratorFactoryMock
+            .Setup(m => m.Create(It.IsAny<byte[]>(), It.IsAny<int>()))
+            .Returns(_keyGeneratorMock.Object);
     }
 
     [Test]
@@ -57,7 +64,7 @@ public class LogonApiControllerTests
         // arrange
         var key = Array.Empty<byte>();
         var request = new LoginRequest() { MasterPassword = "password" };
-        var userOptions = new UserOptions() { SessionTimeout = TimeSpan.FromSeconds(1) };
+        var userOptions = new UserOptions() { Salt = "", SessionTimeout = TimeSpan.FromSeconds(1) };
         var connectionOptions = new ConnectionOptions() { IsProxyUsed = false };
         var controller = CreateController();
 
@@ -76,6 +83,8 @@ public class LogonApiControllerTests
 
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
+        _keyGeneratorFactoryMock.Verify(m => m.Create(userOptions.SaltBytes, userOptions.Iterations), Times.Once);
+        _keyGeneratorMock.Verify(m => m.Generate(request.MasterPassword), Times.Once);
         _keyServiceMock.Verify(
             m => m.InitKeyAsync(key, userOptions.SessionTimeout, default),
             Times.Once);
@@ -164,7 +173,7 @@ public class LogonApiControllerTests
 
     private LogonApiController CreateController()
     {
-        return new LogonApiController(_keyServiceMock.Object, _keyGeneratorMock.Object, _cookieHelperMock.Object,
-            _userOptionsMock.Object, _connectionOptionsMock.Object);
+        return new LogonApiController(_keyServiceMock.Object, _keyGeneratorFactoryMock.Object,
+            _cookieHelperMock.Object, _userOptionsMock.Object, _connectionOptionsMock.Object);
     }
 }

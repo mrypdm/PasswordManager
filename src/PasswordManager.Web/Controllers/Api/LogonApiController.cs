@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using PasswordManager.Abstractions.Exceptions;
-using PasswordManager.Abstractions.Generators;
+using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Options;
 using PasswordManager.Abstractions.Services;
 using PasswordManager.Web.Helpers;
@@ -22,7 +22,7 @@ namespace PasswordManager.Web.Controllers.Api;
 [Route("api/logon")]
 public class LogonApiController(
     IKeyService keyService,
-    IKeyGenerator keyGenerator,
+    IKeyGeneratorFactory keyGeneratorFactory,
     ICookieAuthorizationHelper cookieAuthorizationHelper,
     IWritableOptions<UserOptions> userOptions,
     IOptions<ConnectionOptions> connectionOptions) : Controller
@@ -41,7 +41,9 @@ public class LogonApiController(
 
         try
         {
-            var key = keyGenerator.Generate(request.MasterPassword);
+            var key = keyGeneratorFactory
+                .Create(userOptions.Value.SaltBytes, userOptions.Value.Iterations)
+                .Generate(request.MasterPassword);
             await keyService.InitKeyAsync(key, userOptions.Value.SessionTimeout, token);
         }
         catch (KeyValidationException)
