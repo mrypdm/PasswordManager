@@ -107,7 +107,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services
             .AddScoped<IDataContext, DataContext>()
             .AddDbContext<SecureDbContext>(opt => opt.UseSqlite(builder.Configuration.GetConnectionString("SecureDb")))
-            .AddScoped<ISecureItemsRepository, SecureItemsRepository>()
+            .AddScoped<IEncryptedItemsRepository, EncryptedItemsRepository>()
             .AddScoped<IKeyDataRepository, KeyDataRepository>();
         return builder;
     }

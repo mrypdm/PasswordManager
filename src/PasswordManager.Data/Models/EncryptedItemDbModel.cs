@@ -3,9 +3,9 @@ using PasswordManager.Abstractions.Models;
 namespace PasswordManager.Data.Models;
 
 /// <summary>
-/// Model for secure item
+/// Model for encrypted item
 /// </summary>
-public sealed class SecureItemDbModel : EncryptedDataDbModel, IItem
+public sealed class EncryptedItemDbModel : EncryptedDataDbModel, IItem
 {
     /// <summary>
     /// Name of item

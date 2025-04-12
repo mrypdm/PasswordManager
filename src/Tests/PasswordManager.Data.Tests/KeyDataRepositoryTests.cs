@@ -201,7 +201,7 @@ public class KeyDataRepositoryTests : RepositoryTestsBase
         // assert
         using (var context = CreateDbContext())
         {
-            Assert.That(context.SecureItems.Count(), Is.EqualTo(0));
+            Assert.That(context.EncryptedItems.Count(), Is.EqualTo(0));
         }
     }
 

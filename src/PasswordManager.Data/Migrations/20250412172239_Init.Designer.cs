@@ -10,7 +10,7 @@ using PasswordManager.Data.Contexts;
 namespace PasswordManager.Data.Migrations
 {
     [DbContext(typeof(SecureDbContext))]
-    [Migration("20250410070911_Init")]
+    [Migration("20250412172239_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -19,32 +19,7 @@ namespace PasswordManager.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
 
-            modelBuilder.Entity("PasswordManager.Data.Models.KeyDataDbModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<byte[]>("Data")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
-
-                    b.Property<byte[]>("Salt")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
-
-                    b.Property<long>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0L);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("KeyData");
-                });
-
-            modelBuilder.Entity("PasswordManager.Data.Models.SecureItemDbModel", b =>
+            modelBuilder.Entity("PasswordManager.Data.Models.EncryptedItemDbModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -72,7 +47,32 @@ namespace PasswordManager.Data.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("SecureItems");
+                    b.ToTable("EncryptedItems");
+                });
+
+            modelBuilder.Entity("PasswordManager.Data.Models.KeyDataDbModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<byte[]>("Salt")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<long>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KeyData");
                 });
 #pragma warning restore 612, 618
         }

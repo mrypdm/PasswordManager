@@ -7,7 +7,6 @@ using PasswordManager.Abstractions.Counters;
 using PasswordManager.Abstractions.Crypto;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Factories;
-using PasswordManager.Abstractions.Models;
 using PasswordManager.Abstractions.Repositories;
 using PasswordManager.Abstractions.Services;
 using PasswordManager.Abstractions.Storages;
@@ -18,7 +17,7 @@ namespace PasswordManager.Core.Services;
 /// <inheritdoc />
 public sealed class KeyService(
     IKeyDataRepository keyDataRepository,
-    ISecureItemsRepository secureItemsRepository,
+    IEncryptedItemsRepository secureItemsRepository,
     IDataContext dataContext,
     ICrypto crypto,
     IKeyStorage keyStorage,
@@ -59,12 +58,14 @@ public sealed class KeyService(
         await ValidateKeyAsync(oldKey, token);
         await SetKeyDataAsync(newKey, update: true, token);
 
-        var encryptedItems = await secureItemsRepository.GetDataAsync(token);
+        var encryptedItems = await secureItemsRepository.GetItemsAsync(token);
         foreach (var item in encryptedItems)
         {
-            var decryptedData = crypto.DecryptJson<AccountData>(item, oldKey);
-            var encryptedData = crypto.EncryptJson(decryptedData, newKey);
-            await secureItemsRepository.UpdateDataAsync(item.Id, item.Name, encryptedData, token);
+            var decryptedData = crypto.Decrypt(item, oldKey);
+            var encryptedData = crypto.Encrypt(decryptedData, newKey);
+            item.Data = encryptedData.Data;
+            item.Salt = encryptedData.Salt;
+            await secureItemsRepository.UpdateItemAsync(item, token);
         }
 
         await dataContext.SaveChangesAsync(token);

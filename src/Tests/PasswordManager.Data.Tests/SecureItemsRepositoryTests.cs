@@ -11,7 +11,7 @@ using PasswordManager.Data.Repositories;
 namespace PasswordManager.Data.Tests;
 
 /// <summary>
-/// Tests for <see cref="SecureItemsRepository"/>
+/// Tests for <see cref="EncryptedItemsRepository"/>
 /// </summary>
 public class SecureItemsRepositoryTests : RepositoryTestsBase
 {
@@ -24,14 +24,14 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
 
         // act
         // assert
-        Assert.ThrowsAsync<ArgumentNullException>(() => repo.AddDataAsync(null, null, default));
-        Assert.ThrowsAsync<ArgumentException>(() => repo.AddDataAsync("", null, default));
-        Assert.ThrowsAsync<ArgumentException>(() => repo.AddDataAsync(" ", null, default));
-        Assert.ThrowsAsync<ArgumentNullException>(() => repo.AddDataAsync("test", null, default));
+        Assert.ThrowsAsync<ArgumentNullException>(() => repo.AddItemAsync(null, default));
+        Assert.ThrowsAsync<ArgumentException>(() => repo.AddItemAsync(new() { Name = "" }, default));
+        Assert.ThrowsAsync<ArgumentException>(() => repo.AddItemAsync(new() { Name = " " }, default));
+        Assert.ThrowsAsync<ArgumentNullException>(() => repo.AddItemAsync(new() { Name = "test" }, default));
         Assert.ThrowsAsync<ArgumentNullException>(
-            () => repo.AddDataAsync("test", new EncryptedData { Data = [], Salt = null }, default));
+            () => repo.AddItemAsync(new() { Name = "test", Data = [] }, default));
         Assert.ThrowsAsync<ArgumentNullException>(
-            () => repo.AddDataAsync("test", new EncryptedData { Data = null, Salt = [] }, default));
+            () => repo.AddItemAsync(new() { Name = "test", Salt = [] }, default));
     }
 
     [Test]
@@ -40,28 +40,27 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         // arrange
         var expectedId = 1;
         var expectedVersion = 0;
-        var expectedName = "name";
         var key = RandomNumberGenerator.GetBytes(32);
 
-        var data = new EncryptedData { Data = [11], Salt = [12] };
+        var data = new EncryptedItem { Name = "name", Data = [11], Salt = [12] };
 
         // act
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            await repo.AddDataAsync(expectedName, data, default);
+            await repo.AddItemAsync(data, default);
             context.SaveChanges();
         }
 
         // assert
         using (var context = CreateDbContext())
         {
-            var dbData = context.SecureItems.FirstOrDefault();
+            var dbData = context.EncryptedItems.FirstOrDefault();
             Assert.That(dbData, Is.Not.Null);
             Assert.Multiple(() =>
             {
                 Assert.That(dbData.Id, Is.EqualTo(expectedId));
-                Assert.That(dbData.Name, Is.EqualTo(expectedName));
+                Assert.That(dbData.Name, Is.EqualTo(data.Name));
                 Assert.That(dbData.Version, Is.EqualTo(expectedVersion));
                 Assert.That(dbData.Data.SequenceEqual(data.Data), Is.True, "Data in db and local must be same");
                 Assert.That(dbData.Salt.SequenceEqual(data.Salt), Is.True, "Salt in db and local must be same");
@@ -78,14 +77,14 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
 
         // act
         // assert
-        Assert.ThrowsAsync<ArgumentNullException>(() => repo.UpdateDataAsync(0, null, null, default));
-        Assert.ThrowsAsync<ArgumentException>(() => repo.UpdateDataAsync(0, "", null, default));
-        Assert.ThrowsAsync<ArgumentException>(() => repo.UpdateDataAsync(0, " ", null, default));
-        Assert.ThrowsAsync<ArgumentNullException>(() => repo.UpdateDataAsync(0, "test", null, default));
+        Assert.ThrowsAsync<ArgumentNullException>(() => repo.UpdateItemAsync(null, default));
+        Assert.ThrowsAsync<ArgumentException>(() => repo.UpdateItemAsync(new() { Name = "" }, default));
+        Assert.ThrowsAsync<ArgumentException>(() => repo.UpdateItemAsync(new() { Name = " " }, default));
+        Assert.ThrowsAsync<ArgumentNullException>(() => repo.UpdateItemAsync(new() { Name = "test" }, default));
         Assert.ThrowsAsync<ArgumentNullException>(
-            () => repo.UpdateDataAsync(0, "test", new EncryptedData { Data = [], Salt = null }, default));
+            () => repo.UpdateItemAsync(new() { Name = "test", Data = [] }, default));
         Assert.ThrowsAsync<ArgumentNullException>(
-            () => repo.UpdateDataAsync(0, "test", new EncryptedData { Data = null, Salt = [] }, default));
+            () => repo.UpdateItemAsync(new() { Name = "test", Salt = [] }, default));
     }
 
     [Test]
@@ -98,21 +97,25 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         // act
         // assert
         Assert.ThrowsAsync<ItemNotExistsException>(
-            () => repo.UpdateDataAsync(0, "test", new EncryptedData { Data = [], Salt = [] }, default));
+            () => repo.UpdateItemAsync(new() { Id = 0, Name = "test", Data = [], Salt = [] }, default));
     }
 
     [Test]
     public async Task UpdateData_CommonWay_ShouldUpdateData()
     {
         // arrange
-        var expectedId = 1;
-        var oldItem = new SecureItemDbModel { Name = "test", Data = [11], Salt = [12] };
-        var expecetedName = "name";
-        var expectedData = new EncryptedData { Data = [13], Salt = [14] };
+        var oldItem = new EncryptedItemDbModel { Name = "test", Data = [11], Salt = [12] };
+        var expectedItem = new EncryptedItem
+        {
+            Id = 1,
+            Name = "name",
+            Data = [13],
+            Salt = [14]
+        };
 
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(oldItem);
+            context.EncryptedItems.Add(oldItem);
             context.SaveChanges();
         }
 
@@ -120,27 +123,27 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            await repo.UpdateDataAsync(expectedId, expecetedName, expectedData, default);
+            await repo.UpdateItemAsync(expectedItem, default);
             context.SaveChanges();
         }
 
         // assert
         using (var context = CreateDbContext())
         {
-            var dbItem = context.SecureItems.FirstOrDefault();
+            var dbItem = context.EncryptedItems.FirstOrDefault();
             Assert.That(dbItem, Is.Not.Null);
             Assert.Multiple(() =>
             {
-                Assert.That(dbItem.Id, Is.EqualTo(expectedId));
-                Assert.That(dbItem.Name, Is.EqualTo(expecetedName));
-                Assert.That(dbItem.Data.SequenceEqual(expectedData.Data), Is.True, "Data in db and local must be same");
-                Assert.That(dbItem.Salt.SequenceEqual(expectedData.Salt), Is.True, "Salt in db and local must be same");
+                Assert.That(dbItem.Id, Is.EqualTo(expectedItem.Id));
+                Assert.That(dbItem.Name, Is.EqualTo(expectedItem.Name));
+                Assert.That(dbItem.Data.SequenceEqual(expectedItem.Data), Is.True, "Data in db and local must be same");
+                Assert.That(dbItem.Salt.SequenceEqual(expectedItem.Salt), Is.True, "Salt in db and local must be same");
             });
         }
     }
 
     [Test]
-    public async Task DeleteAccount_AccountNotExists_ShouldNotThrow()
+    public async Task DeleteItem_AccountNotExists_ShouldNotThrow()
     {
         // arrange
         using var context = CreateDbContext();
@@ -148,11 +151,11 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
 
         // act
         // assert
-        await repo.DeleteDataAsync(0, default);
+        await repo.DeleteItemAsync(0, default);
     }
 
     [Test]
-    public async Task DeleteAccount_CommonWay_ShouldDeleteData()
+    public async Task DeleteItem_CommonWay_ShouldDeleteData()
     {
         // arrange
         var idToDelete = 1;
@@ -161,8 +164,8 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
 
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(new() { Name = "", Data = [], Salt = [] });
-            context.SecureItems.Add(new() { Name = "", Data = [], Salt = [] });
+            context.EncryptedItems.Add(new() { Name = "", Data = [], Salt = [] });
+            context.EncryptedItems.Add(new() { Name = "", Data = [], Salt = [] });
             context.SaveChanges();
         }
 
@@ -170,21 +173,21 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            await repo.DeleteDataAsync(idToDelete, default);
+            await repo.DeleteItemAsync(idToDelete, default);
         }
 
         // assert
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            var items = context.SecureItems.ToArray();
+            var items = context.EncryptedItems.ToArray();
             Assert.That(items, Has.Length.EqualTo(expectedLength));
             Assert.That(items[0].Id, Is.EqualTo(expectedId));
         }
     }
 
     [Test]
-    public void GetDataById_InvaliId_ShouldThrow()
+    public void GetItemById_InvaliId_ShouldThrow()
     {
         // arrange
         using var context = CreateDbContext();
@@ -192,17 +195,17 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
 
         // act
         // assert
-        Assert.ThrowsAsync<ItemNotExistsException>(() => repo.GetDataByIdAsync(0, default));
+        Assert.ThrowsAsync<ItemNotExistsException>(() => repo.GetItemByIdAsync(0, default));
     }
 
     [Test]
-    public async Task GetDataById_CommonWay_ShouldReturnData()
+    public async Task GetItemById_CommonWay_ShouldReturnData()
     {
         // arrange
         var expectedId = 3;
         var key = RandomNumberGenerator.GetBytes(32);
         var expectedAccount = new AccountData();
-        var item = new SecureItemDbModel
+        var item = new EncryptedItemDbModel
         {
             Name = "needed",
             Data = [132],
@@ -211,9 +214,9 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
 
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(new() { Name = "", Data = [], Salt = [] });
-            context.SecureItems.Add(new() { Name = "", Data = [], Salt = [] });
-            context.SecureItems.Add(item);
+            context.EncryptedItems.Add(new() { Name = "", Data = [], Salt = [] });
+            context.EncryptedItems.Add(new() { Name = "", Data = [], Salt = [] });
+            context.EncryptedItems.Add(item);
             context.SaveChanges();
         }
 
@@ -222,7 +225,7 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         using (var context = CreateDbContext())
         {
             var repo = CreateRepository(context);
-            var data = await repo.GetDataByIdAsync(expectedId, default);
+            var data = await repo.GetItemByIdAsync(expectedId, default);
             Assert.Multiple(() =>
             {
                 Assert.That(data.Data.SequenceEqual(item.Data), "Data in DB and in etalon must be same");
@@ -232,7 +235,7 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
     }
 
     [Test]
-    public async Task GetNames_ShouldReturnAll()
+    public async Task GetItems_ShouldReturnAll()
     {
         // arrange
         var expectedId0 = 1;
@@ -243,8 +246,8 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
 
         using (var context = CreateDbContext())
         {
-            context.SecureItems.Add(new() { Name = expectedName0, Data = [], Salt = [] });
-            context.SecureItems.Add(new() { Name = expectedName1, Data = [], Salt = [] });
+            context.EncryptedItems.Add(new() { Name = expectedName0, Data = [], Salt = [] });
+            context.EncryptedItems.Add(new() { Name = expectedName1, Data = [], Salt = [] });
             context.SaveChanges();
         }
 
@@ -266,8 +269,8 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         }
     }
 
-    private static SecureItemsRepository CreateRepository(SecureDbContext context)
+    private static EncryptedItemsRepository CreateRepository(SecureDbContext context)
     {
-        return new SecureItemsRepository(context);
+        return new EncryptedItemsRepository(context);
     }
 }

@@ -12,13 +12,29 @@ public partial class Init : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.CreateTable(
+            name: "EncryptedItems",
+            columns: table => new
+            {
+                Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    .Annotation("Sqlite:Autoincrement", true),
+                Name = table.Column<string>(type: "TEXT", nullable: false),
+                Data = table.Column<byte[]>(type: "BLOB", nullable: false),
+                Salt = table.Column<byte[]>(type: "BLOB", nullable: false),
+                Version = table.Column<long>(type: "INTEGER", rowVersion: true, nullable: false, defaultValue: 0L)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_EncryptedItems", x => x.Id);
+            });
+
+        migrationBuilder.CreateTable(
             name: "KeyData",
             columns: table => new
             {
                 Id = table.Column<int>(type: "INTEGER", nullable: false)
                     .Annotation("Sqlite:Autoincrement", true),
-                Salt = table.Column<byte[]>(type: "BLOB", nullable: false),
                 Data = table.Column<byte[]>(type: "BLOB", nullable: false),
+                Salt = table.Column<byte[]>(type: "BLOB", nullable: false),
                 Version = table.Column<long>(type: "INTEGER", rowVersion: true, nullable: false, defaultValue: 0L)
             },
             constraints: table =>
@@ -26,33 +42,17 @@ public partial class Init : Migration
                 table.PrimaryKey("PK_KeyData", x => x.Id);
             });
 
-        migrationBuilder.CreateTable(
-            name: "SecureItems",
-            columns: table => new
-            {
-                Id = table.Column<int>(type: "INTEGER", nullable: false)
-                    .Annotation("Sqlite:Autoincrement", true),
-                Name = table.Column<string>(type: "TEXT", nullable: false),
-                Salt = table.Column<byte[]>(type: "BLOB", nullable: false),
-                Data = table.Column<byte[]>(type: "BLOB", nullable: false),
-                Version = table.Column<long>(type: "INTEGER", rowVersion: true, nullable: false, defaultValue: 0L)
-            },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_SecureItems", x => x.Id);
-            });
-
         migrationBuilder.CreateIndex(
-            name: "IX_SecureItems_Name",
-            table: "SecureItems",
+            name: "IX_EncryptedItems_Name",
+            table: "EncryptedItems",
             column: "Name");
 
         migrationBuilder.AddVersionTrigger(
-            table: "KeyData",
+            table: "EncryptedItems",
             column: "Version");
 
         migrationBuilder.AddVersionTrigger(
-            table: "SecureItems",
+            table: "KeyData",
             column: "Version");
     }
 
@@ -60,9 +60,9 @@ public partial class Init : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropTable(
-            name: "KeyData");
+            name: "EncryptedItems");
 
         migrationBuilder.DropTable(
-            name: "SecureItems");
+            name: "KeyData");
     }
 }

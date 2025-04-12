@@ -14,7 +14,7 @@ namespace PasswordManager.Core.Services;
 
 /// <inheritdoc />
 public class AccountService(
-    ISecureItemsRepository repository,
+    IEncryptedItemsRepository repository,
     IDataContext dataContext,
     ICrypto crypto,
     IReadOnlyKeyStorage keyStorage)
@@ -26,7 +26,13 @@ public class AccountService(
         ArgumentNullException.ThrowIfNull(data);
 
         var encryptedData = crypto.EncryptJson(data, keyStorage.Key);
-        var item = await repository.AddDataAsync(data.Name, encryptedData, token);
+        var encryptedItem = new EncryptedItem
+        {
+            Name = data.Name,
+            Data = encryptedData.Data,
+            Salt = encryptedData.Salt
+        };
+        var item = await repository.AddItemAsync(encryptedItem, token);
         await dataContext.SaveChangesAsync(token);
 
         return item.Id;
@@ -39,7 +45,14 @@ public class AccountService(
         var encryptedData = crypto.EncryptJson(data, keyStorage.Key);
         try
         {
-            await repository.UpdateDataAsync(id, data.Name, encryptedData, token);
+            var item = new EncryptedItem
+            {
+                Id = id,
+                Name = data.Name,
+                Data = encryptedData.Data,
+                Salt = encryptedData.Salt
+            };
+            await repository.UpdateItemAsync(item, token);
             await dataContext.SaveChangesAsync(token);
         }
         catch (ItemNotExistsException)
@@ -51,7 +64,7 @@ public class AccountService(
     /// <inheritdoc />
     public async Task DeleteAccountAsync(int id, CancellationToken token)
     {
-        await repository.DeleteDataAsync(id, token);
+        await repository.DeleteItemAsync(id, token);
     }
 
     /// <inheritdoc />
@@ -59,7 +72,7 @@ public class AccountService(
     {
         try
         {
-            var encryptedData = await repository.GetDataByIdAsync(id, token);
+            var encryptedData = await repository.GetItemByIdAsync(id, token);
             return crypto.DecryptJson<AccountData>(encryptedData, keyStorage.Key);
         }
         catch (ItemNotExistsException)

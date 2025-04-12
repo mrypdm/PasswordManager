@@ -22,7 +22,7 @@ namespace PasswordManager.Core.Tests.Services;
 public class KeyServiceTests
 {
     private readonly Mock<IKeyDataRepository> _keyRepositoryMock = new();
-    private readonly Mock<ISecureItemsRepository> _itemsRepositoryMock = new();
+    private readonly Mock<IEncryptedItemsRepository> _itemsRepositoryMock = new();
     private readonly Mock<IDataContext> _dataContextMock = new();
     private readonly Mock<ICrypto> _cryptoMock = new();
     private readonly Mock<IKeyStorage> _storageMock = new();
@@ -187,7 +187,7 @@ public class KeyServiceTests
         var newKey = new byte[] { 2 };
         var newKeyData = new EncryptedData();
         var itemData = new EncryptedItem() { Id = 12, Name = "name" };
-        var account = new AccountData();
+        var account = new byte[] { 3 };
         var encryptedData = new EncryptedData();
 
         _cryptoMock
@@ -197,13 +197,13 @@ public class KeyServiceTests
             .Setup(m => m.GetKeyDataAsync(default))
             .ReturnsAsync(oldKeyData);
         _itemsRepositoryMock
-            .Setup(m => m.GetDataAsync(default))
+            .Setup(m => m.GetItemsAsync(default))
             .ReturnsAsync([itemData]);
         _cryptoMock
-            .Setup(m => m.DecryptJson<AccountData>(itemData, oldKey))
+            .Setup(m => m.Decrypt(itemData, oldKey))
             .Returns(account);
         _cryptoMock
-            .Setup(m => m.EncryptJson(account, newKey))
+            .Setup(m => m.Encrypt(account, newKey))
             .Returns(encryptedData);
 
         var service = CreateService();
@@ -220,12 +220,10 @@ public class KeyServiceTests
         _validatorMock.Verify(m => m.Validate(newKey), Times.Once);
         _cryptoMock.Verify(m => m.Encrypt(newKey, newKey), Times.Once);
         _keyRepositoryMock.Verify(m => m.UpdateKeyDataAsync(newKeyData, default), Times.Once);
-        _itemsRepositoryMock.Verify(m => m.GetDataAsync(default), Times.Once);
-        _cryptoMock.Verify(m => m.DecryptJson<AccountData>(itemData, oldKey), Times.Once);
-        _cryptoMock.Verify(m => m.EncryptJson(account, newKey), Times.Once);
-        _itemsRepositoryMock.Verify(
-            m => m.UpdateDataAsync(itemData.Id, itemData.Name, encryptedData, default),
-            Times.Once);
+        _itemsRepositoryMock.Verify(m => m.GetItemsAsync(default), Times.Once);
+        _cryptoMock.Verify(m => m.Decrypt(itemData, oldKey), Times.Once);
+        _cryptoMock.Verify(m => m.Encrypt(account, newKey), Times.Once);
+        _itemsRepositoryMock.Verify(m => m.UpdateItemAsync(itemData, default), Times.Once);
         _storageMock.Verify(m => m.ClearKey(), Times.Once);
         _dataContextMock.Verify(m => m.SaveChangesAsync(default), Times.Once);
     }

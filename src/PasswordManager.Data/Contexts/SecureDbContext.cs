@@ -12,7 +12,7 @@ public sealed class SecureDbContext(DbContextOptions options) : DbContext(option
     /// <summary>
     /// Secure items
     /// </summary>
-    public DbSet<SecureItemDbModel> SecureItems { get; set; }
+    public DbSet<EncryptedItemDbModel> EncryptedItems { get; set; }
 
     /// <summary>
     /// Key data
