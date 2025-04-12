@@ -6,8 +6,6 @@
     ViewData["Title"] = "New Item";
 }
 
-@Html.AntiForgeryToken()
-
 <div>
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("account-data-name", "text", "Account name"))
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("account-data-login", "text", "Login") { NeedCopy = true })

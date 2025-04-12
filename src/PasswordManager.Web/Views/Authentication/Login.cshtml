@@ -6,8 +6,6 @@
     ViewData["Title"] = Model.IsKeyDataExist ? "Login" : "Init";
 }
 
-@Html.AntiForgeryToken()
-
 <div>
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("master-password", "password", "Master password")
 {
