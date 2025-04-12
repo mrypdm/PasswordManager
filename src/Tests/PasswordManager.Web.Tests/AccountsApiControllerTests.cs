@@ -64,16 +64,16 @@ public class AccountsApiControllerTests
     public async Task GetAllHeaders_CommonWay_ShouldReturnHeaders()
     {
         // arrange
-        var item0 = new AccountHeader { Id = 0, Name = "name0" };
-        var item1 = new AccountHeader { Id = 1, Name = "name1" };
+        var item0 = new Account { Id = 0, Name = "name0" };
+        var item1 = new Account { Id = 1, Name = "name1" };
         _serviceMock
-            .Setup(m => m.GetAccountHeadersAsync(default))
+            .Setup(m => m.GetAccountsWithoutDataAsync(default))
             .ReturnsAsync([item0, item1]);
 
         var controller = CreateController();
 
         // act
-        var res = await controller.GetAllHeadersAsync(default);
+        var res = await controller.GetAccountsWithoutData(default);
 
         // assert
         Assert.That(res.Value, Is.Not.Null);
@@ -85,7 +85,7 @@ public class AccountsApiControllerTests
             Assert.That(res.Value[1].Id, Is.EqualTo(item1.Id));
             Assert.That(res.Value[1].Name, Is.EqualTo(item1.Name));
         });
-        _serviceMock.Verify(m => m.GetAccountHeadersAsync(default), Times.Once);
+        _serviceMock.Verify(m => m.GetAccountsWithoutDataAsync(default), Times.Once);
     }
 
     [Test]
@@ -156,7 +156,7 @@ public class AccountsApiControllerTests
 
         _serviceMock
             .Setup(m => m.AddAccountAsync(It.Is<Account>(m => CheckAccount(m, default, request)), default))
-            .ReturnsAsync(id);
+            .ReturnsAsync(new Account { Id = id });
 
         var controller = CreateController();
 

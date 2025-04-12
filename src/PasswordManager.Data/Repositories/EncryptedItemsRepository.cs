@@ -19,14 +19,15 @@ public sealed class EncryptedItemsRepository(SecureDbContext context) : IEncrypt
     {
         ArgumentNullException.ThrowIfNull(item);
         ArgumentException.ThrowIfNullOrWhiteSpace(item.Name);
-        ArgumentNullException.ThrowIfNull(item.Data);
-        ArgumentNullException.ThrowIfNull(item.Salt);
+        ArgumentNullException.ThrowIfNull(item.EncryptedData);
+        ArgumentNullException.ThrowIfNull(item.EncryptedData.Data);
+        ArgumentNullException.ThrowIfNull(item.EncryptedData.Salt);
 
         var itemDbModel = new EncryptedItemDbModel
         {
             Name = item.Name,
-            Salt = item.Salt,
-            Data = item.Data,
+            Salt = item.EncryptedData.Salt,
+            Data = item.EncryptedData.Data,
         };
 
         await context.EncryptedItems.AddAsync(itemDbModel, token);
@@ -38,15 +39,16 @@ public sealed class EncryptedItemsRepository(SecureDbContext context) : IEncrypt
     {
         ArgumentNullException.ThrowIfNull(item);
         ArgumentException.ThrowIfNullOrWhiteSpace(item.Name);
-        ArgumentNullException.ThrowIfNull(item.Data);
-        ArgumentNullException.ThrowIfNull(item.Salt);
+        ArgumentNullException.ThrowIfNull(item.EncryptedData);
+        ArgumentNullException.ThrowIfNull(item.EncryptedData.Data);
+        ArgumentNullException.ThrowIfNull(item.EncryptedData.Salt);
 
         var itemDbModel = await context.EncryptedItems.SingleOrDefaultAsync(m => m.Id == item.Id, token)
             ?? throw new ItemNotExistsException($"Item with id={item.Id} not exists");
 
         itemDbModel.Name = item.Name;
-        itemDbModel.Salt = item.Salt;
-        itemDbModel.Data = item.Data;
+        itemDbModel.Salt = item.EncryptedData.Salt;
+        itemDbModel.Data = item.EncryptedData.Data;
 
         context.Update(itemDbModel);
     }
@@ -67,8 +69,11 @@ public sealed class EncryptedItemsRepository(SecureDbContext context) : IEncrypt
         {
             Id = item.Id,
             Name = item.Name,
-            Data = item.Data,
-            Salt = item.Salt
+            EncryptedData = new EncryptedData
+            {
+                Data = item.Data,
+                Salt = item.Salt
+            }
         };
     }
 
@@ -76,7 +81,16 @@ public sealed class EncryptedItemsRepository(SecureDbContext context) : IEncrypt
     public async Task<EncryptedItem[]> GetItemsAsync(CancellationToken token)
     {
         return await context.EncryptedItems.AsNoTracking()
-            .Select(m => new EncryptedItem { Id = m.Id, Name = m.Name, Data = m.Data, Salt = m.Salt })
+            .Select(item => new EncryptedItem
+            {
+                Id = item.Id,
+                Name = item.Name,
+                EncryptedData = new EncryptedData
+                {
+                    Data = item.Data,
+                    Salt = item.Salt
+                }
+            })
             .ToArrayAsync(token);
     }
 }

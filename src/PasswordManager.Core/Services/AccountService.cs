@@ -21,36 +21,33 @@ public class AccountService(
     : IAccountService
 {
     /// <inheritdoc />
-    public async Task<int> AddAccountAsync(Account account, CancellationToken token)
+    public async Task<Account> AddAccountAsync(Account account, CancellationToken token)
     {
         ArgumentNullException.ThrowIfNull(account);
 
-        var encryptedData = crypto.EncryptJson(account.Data, keyStorage.Key);
         var encryptedItem = new EncryptedItem
         {
             Name = account.Name,
-            Data = encryptedData.Data,
-            Salt = encryptedData.Salt
+            EncryptedData = crypto.EncryptJson(account.Data, keyStorage.Key)
         };
         var item = await repository.AddItemAsync(encryptedItem, token);
         await dataContext.SaveChangesAsync(token);
 
-        return item.Id;
+        account.Id = item.Id;
+        return account;
     }
 
     /// <inheritdoc />
     public async Task UpdateAccountAsync(Account account, CancellationToken token)
     {
         ArgumentNullException.ThrowIfNull(account);
-        var encryptedData = crypto.EncryptJson(account.Data, keyStorage.Key);
         try
         {
             var item = new EncryptedItem
             {
                 Id = account.Id,
                 Name = account.Name,
-                Data = encryptedData.Data,
-                Salt = encryptedData.Salt
+                EncryptedData = crypto.EncryptJson(account.Data, keyStorage.Key)
             };
             await repository.UpdateItemAsync(item, token);
             await dataContext.SaveChangesAsync(token);
@@ -72,12 +69,12 @@ public class AccountService(
     {
         try
         {
-            var encryptedData = await repository.GetItemByIdAsync(id, token);
-            var decryptedAccount = crypto.DecryptJson<AccountData>(encryptedData, keyStorage.Key);
+            var item = await repository.GetItemByIdAsync(id, token);
+            var decryptedAccount = crypto.DecryptJson<AccountData>(item.EncryptedData, keyStorage.Key);
             return new Account
             {
                 Id = id,
-                Name = encryptedData.Name,
+                Name = item.Name,
                 Data = decryptedAccount
             };
         }
@@ -88,9 +85,9 @@ public class AccountService(
     }
 
     /// <inheritdoc />
-    public async Task<AccountHeader[]> GetAccountHeadersAsync(CancellationToken token)
+    public async Task<Account[]> GetAccountsWithoutDataAsync(CancellationToken token)
     {
         var items = await repository.GetItemsAsync(token);
-        return [.. items.Select(m => new AccountHeader { Id = m.Id, Name = m.Name })];
+        return [.. items.Select(m => new Account { Id = m.Id, Name = m.Name })];
     }
 }

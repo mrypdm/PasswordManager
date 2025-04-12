@@ -36,12 +36,12 @@ public class AccountsApiController(IAccountService accountService) : Controller
     }
 
     /// <summary>
-    /// Get all items headers in storage
+    /// Get all accounts headers
     /// </summary>
     [HttpGet("headers")]
-    public async Task<ActionResult<AccountHeaderResponse[]>> GetAllHeadersAsync(CancellationToken token)
+    public async Task<ActionResult<AccountHeaderResponse[]>> GetAccountsWithoutDataAsync(CancellationToken token)
     {
-        var names = await accountService.GetAccountHeadersAsync(token);
+        var names = await accountService.GetAccountsWithoutDataAsync(token);
         return names.Select(m => new AccountHeaderResponse { Id = m.Id, Name = m.Name }).ToArray();
     }
 
@@ -66,10 +66,11 @@ public class AccountsApiController(IAccountService accountService) : Controller
                 Password = request.Password
             }
         };
-        var id = await accountService.AddAccountAsync(account, token);
+
+        account = await accountService.AddAccountAsync(account, token);
         return new AddAccountDataResponse
         {
-            Id = id
+            Id = account.Id
         };
     }
 

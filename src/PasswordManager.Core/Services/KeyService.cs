@@ -61,10 +61,8 @@ public sealed class KeyService(
         var encryptedItems = await secureItemsRepository.GetItemsAsync(token);
         foreach (var item in encryptedItems)
         {
-            var decryptedData = crypto.Decrypt(item, oldKey);
-            var encryptedData = crypto.Encrypt(decryptedData, newKey);
-            item.Data = encryptedData.Data;
-            item.Salt = encryptedData.Salt;
+            var decryptedData = crypto.Decrypt(item.EncryptedData, oldKey);
+            item.EncryptedData = crypto.Encrypt(decryptedData, newKey);
             await secureItemsRepository.UpdateItemAsync(item, token);
         }
 

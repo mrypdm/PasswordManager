@@ -186,9 +186,10 @@ public class KeyServiceTests
         var oldKeyData = new EncryptedData();
         var newKey = new byte[] { 2 };
         var newKeyData = new EncryptedData();
-        var itemData = new EncryptedItem() { Id = 12, Name = "name" };
+        var oldItemData = new EncryptedData();
+        var itemData = new EncryptedItem() { Id = 12, Name = "name", EncryptedData = oldItemData };
         var account = new byte[] { 3 };
-        var encryptedData = new EncryptedData();
+        var newItemData = new EncryptedData();
 
         _cryptoMock
             .Setup(m => m.Encrypt(newKey, newKey))
@@ -200,11 +201,11 @@ public class KeyServiceTests
             .Setup(m => m.GetItemsAsync(default))
             .ReturnsAsync([itemData]);
         _cryptoMock
-            .Setup(m => m.Decrypt(itemData, oldKey))
+            .Setup(m => m.Decrypt(oldItemData, oldKey))
             .Returns(account);
         _cryptoMock
             .Setup(m => m.Encrypt(account, newKey))
-            .Returns(encryptedData);
+            .Returns(newItemData);
 
         var service = CreateService();
 
@@ -221,7 +222,7 @@ public class KeyServiceTests
         _cryptoMock.Verify(m => m.Encrypt(newKey, newKey), Times.Once);
         _keyRepositoryMock.Verify(m => m.UpdateKeyDataAsync(newKeyData, default), Times.Once);
         _itemsRepositoryMock.Verify(m => m.GetItemsAsync(default), Times.Once);
-        _cryptoMock.Verify(m => m.Decrypt(itemData, oldKey), Times.Once);
+        _cryptoMock.Verify(m => m.Decrypt(oldItemData, oldKey), Times.Once);
         _cryptoMock.Verify(m => m.Encrypt(account, newKey), Times.Once);
         _itemsRepositoryMock.Verify(m => m.UpdateItemAsync(itemData, default), Times.Once);
         _storageMock.Verify(m => m.ClearKey(), Times.Once);

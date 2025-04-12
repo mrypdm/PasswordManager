@@ -12,10 +12,10 @@ namespace PasswordManager.Abstractions.Services;
 public interface IAccountService
 {
     /// <summary>
-    /// Add new account to repository and return its ID
+    /// Add new account
     /// </summary>
     /// <exception cref="ArgumentNullException">If <paramref name="account"/> is null</exception>
-    Task<int> AddAccountAsync(Account account, CancellationToken token);
+    Task<Account> AddAccountAsync(Account account, CancellationToken token);
 
     /// <summary>
     /// Update account
@@ -30,13 +30,13 @@ public interface IAccountService
     Task DeleteAccountAsync(int id, CancellationToken token);
 
     /// <summary>
-    /// Get account from repository by id
+    /// Get accoun by id
     /// </summary>
     /// <exception cref="AccountNotExistsException">If account with <paramref name="id"/> not exists</exception>
     Task<Account> GetAccountByIdAsync(int id, CancellationToken token);
 
     /// <summary>
-    /// Get account headers from repository
+    /// Get accounts without data
     /// </summary>
-    Task<AccountHeader[]> GetAccountHeadersAsync(CancellationToken token);
+    Task<Account[]> GetAccountsWithoutDataAsync(CancellationToken token);
 }

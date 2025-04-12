@@ -3,7 +3,7 @@ namespace PasswordManager.Abstractions.Models;
 /// <summary>
 /// Encrypted item
 /// </summary>
-public sealed class EncryptedItem : EncryptedData, IItem
+public sealed class EncryptedItem : IItem
 {
     /// <summary>
     /// Id of encrypted item
@@ -14,4 +14,9 @@ public sealed class EncryptedItem : EncryptedData, IItem
     /// Name of encrypted item
     /// </summary>
     public string Name { get; set; }
+
+    /// <summary>
+    /// Encrypted data
+    /// </summary>
+    public EncryptedData EncryptedData { get; set; }
 }

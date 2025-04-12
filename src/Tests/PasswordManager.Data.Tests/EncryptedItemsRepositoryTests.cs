@@ -13,7 +13,7 @@ namespace PasswordManager.Data.Tests;
 /// <summary>
 /// Tests for <see cref="EncryptedItemsRepository"/>
 /// </summary>
-public class SecureItemsRepositoryTests : RepositoryTestsBase
+public class EncryptedItemsRepositoryTests : RepositoryTestsBase
 {
     [Test]
     public void AddData_NullData_ShouldThrow()
@@ -29,9 +29,9 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         Assert.ThrowsAsync<ArgumentException>(() => repo.AddItemAsync(new() { Name = " " }, default));
         Assert.ThrowsAsync<ArgumentNullException>(() => repo.AddItemAsync(new() { Name = "test" }, default));
         Assert.ThrowsAsync<ArgumentNullException>(
-            () => repo.AddItemAsync(new() { Name = "test", Data = [] }, default));
+            () => repo.AddItemAsync(new() { Name = "test", EncryptedData = new() { Data = [] } }, default));
         Assert.ThrowsAsync<ArgumentNullException>(
-            () => repo.AddItemAsync(new() { Name = "test", Salt = [] }, default));
+            () => repo.AddItemAsync(new() { Name = "test", EncryptedData = new() { Salt = [] } }, default));
     }
 
     [Test]
@@ -42,7 +42,7 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         var expectedVersion = 0;
         var key = RandomNumberGenerator.GetBytes(32);
 
-        var data = new EncryptedItem { Name = "name", Data = [11], Salt = [12] };
+        var data = new EncryptedItem { Name = "name", EncryptedData = new() { Data = [11], Salt = [12] } };
 
         // act
         using (var context = CreateDbContext())
@@ -62,8 +62,10 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
                 Assert.That(dbData.Id, Is.EqualTo(expectedId));
                 Assert.That(dbData.Name, Is.EqualTo(data.Name));
                 Assert.That(dbData.Version, Is.EqualTo(expectedVersion));
-                Assert.That(dbData.Data.SequenceEqual(data.Data), Is.True, "Data in db and local must be same");
-                Assert.That(dbData.Salt.SequenceEqual(data.Salt), Is.True, "Salt in db and local must be same");
+                Assert.That(dbData.Data.SequenceEqual(data.EncryptedData.Data), Is.True,
+                    "Data in db and local must be same");
+                Assert.That(dbData.Salt.SequenceEqual(data.EncryptedData.Salt), Is.True,
+                    "Salt in db and local must be same");
             });
         }
     }
@@ -82,9 +84,9 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         Assert.ThrowsAsync<ArgumentException>(() => repo.UpdateItemAsync(new() { Name = " " }, default));
         Assert.ThrowsAsync<ArgumentNullException>(() => repo.UpdateItemAsync(new() { Name = "test" }, default));
         Assert.ThrowsAsync<ArgumentNullException>(
-            () => repo.UpdateItemAsync(new() { Name = "test", Data = [] }, default));
+            () => repo.UpdateItemAsync(new() { Name = "test", EncryptedData = new() { Data = [] } }, default));
         Assert.ThrowsAsync<ArgumentNullException>(
-            () => repo.UpdateItemAsync(new() { Name = "test", Salt = [] }, default));
+            () => repo.UpdateItemAsync(new() { Name = "test", EncryptedData = new() { Salt = [] } }, default));
     }
 
     [Test]
@@ -97,7 +99,9 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         // act
         // assert
         Assert.ThrowsAsync<ItemNotExistsException>(
-            () => repo.UpdateItemAsync(new() { Id = 0, Name = "test", Data = [], Salt = [] }, default));
+            () => repo.UpdateItemAsync(
+                new() { Id = 0, Name = "test", EncryptedData = new() { Data = [], Salt = [] } },
+                default));
     }
 
     [Test]
@@ -109,8 +113,11 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
         {
             Id = 1,
             Name = "name",
-            Data = [13],
-            Salt = [14]
+            EncryptedData = new()
+            {
+                Data = [13],
+                Salt = [14]
+            }
         };
 
         using (var context = CreateDbContext())
@@ -136,8 +143,10 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
             {
                 Assert.That(dbItem.Id, Is.EqualTo(expectedItem.Id));
                 Assert.That(dbItem.Name, Is.EqualTo(expectedItem.Name));
-                Assert.That(dbItem.Data.SequenceEqual(expectedItem.Data), Is.True, "Data in db and local must be same");
-                Assert.That(dbItem.Salt.SequenceEqual(expectedItem.Salt), Is.True, "Salt in db and local must be same");
+                Assert.That(dbItem.Data.SequenceEqual(expectedItem.EncryptedData.Data), Is.True,
+                    "Data in db and local must be same");
+                Assert.That(dbItem.Salt.SequenceEqual(expectedItem.EncryptedData.Salt), Is.True,
+                    "Salt in db and local must be same");
             });
         }
     }
@@ -227,8 +236,8 @@ public class SecureItemsRepositoryTests : RepositoryTestsBase
             var data = await repo.GetItemByIdAsync(expectedId, default);
             Assert.Multiple(() =>
             {
-                Assert.That(data.Data.SequenceEqual(item.Data), "Data in DB and in etalon must be same");
-                Assert.That(data.Salt.SequenceEqual(item.Salt), "Salt in DB and in etalon must be same");
+                Assert.That(data.EncryptedData.Data.SequenceEqual(item.Data), "Data in DB and in etalon must be same");
+                Assert.That(data.EncryptedData.Salt.SequenceEqual(item.Salt), "Salt in DB and in etalon must be same");
             });
         }
     }

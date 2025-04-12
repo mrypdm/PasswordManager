@@ -100,8 +100,8 @@ public class KeyStorageServiceTests
         using var storage = CreateStorage();
 
         // act
-        storage.InitStorage(key, TimeSpan.FromSeconds(2));
-        await Task.Delay(TimeSpan.FromSeconds(3));
+        storage.InitStorage(key, TimeSpan.FromMilliseconds(500));
+        await Task.Delay(TimeSpan.FromSeconds(1));
 
         // assert
         Assert.That(storage.IsInitialized, Is.False);
