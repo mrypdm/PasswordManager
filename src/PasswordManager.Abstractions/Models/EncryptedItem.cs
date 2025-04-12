@@ -18,5 +18,5 @@ public sealed class EncryptedItem : IItem
     /// <summary>
     /// Encrypted data
     /// </summary>
-    public EncryptedData EncryptedData { get; set; }
+    public EncryptedData Data { get; set; }
 }

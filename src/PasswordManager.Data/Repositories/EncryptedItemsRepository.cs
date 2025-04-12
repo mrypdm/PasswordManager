@@ -19,15 +19,15 @@ public sealed class EncryptedItemsRepository(SecureDbContext context) : IEncrypt
     {
         ArgumentNullException.ThrowIfNull(item);
         ArgumentException.ThrowIfNullOrWhiteSpace(item.Name);
-        ArgumentNullException.ThrowIfNull(item.EncryptedData);
-        ArgumentNullException.ThrowIfNull(item.EncryptedData.Data);
-        ArgumentNullException.ThrowIfNull(item.EncryptedData.Salt);
+        ArgumentNullException.ThrowIfNull(item.Data);
+        ArgumentNullException.ThrowIfNull(item.Data.Data);
+        ArgumentNullException.ThrowIfNull(item.Data.Salt);
 
         var itemDbModel = new EncryptedItemDbModel
         {
             Name = item.Name,
-            Salt = item.EncryptedData.Salt,
-            Data = item.EncryptedData.Data,
+            Salt = item.Data.Salt,
+            Data = item.Data.Data,
         };
 
         await context.EncryptedItems.AddAsync(itemDbModel, token);
@@ -39,16 +39,16 @@ public sealed class EncryptedItemsRepository(SecureDbContext context) : IEncrypt
     {
         ArgumentNullException.ThrowIfNull(item);
         ArgumentException.ThrowIfNullOrWhiteSpace(item.Name);
-        ArgumentNullException.ThrowIfNull(item.EncryptedData);
-        ArgumentNullException.ThrowIfNull(item.EncryptedData.Data);
-        ArgumentNullException.ThrowIfNull(item.EncryptedData.Salt);
+        ArgumentNullException.ThrowIfNull(item.Data);
+        ArgumentNullException.ThrowIfNull(item.Data.Data);
+        ArgumentNullException.ThrowIfNull(item.Data.Salt);
 
         var itemDbModel = await context.EncryptedItems.SingleOrDefaultAsync(m => m.Id == item.Id, token)
             ?? throw new ItemNotExistsException($"Item with id={item.Id} not exists");
 
         itemDbModel.Name = item.Name;
-        itemDbModel.Salt = item.EncryptedData.Salt;
-        itemDbModel.Data = item.EncryptedData.Data;
+        itemDbModel.Salt = item.Data.Salt;
+        itemDbModel.Data = item.Data.Data;
 
         context.Update(itemDbModel);
     }
@@ -69,7 +69,7 @@ public sealed class EncryptedItemsRepository(SecureDbContext context) : IEncrypt
         {
             Id = item.Id,
             Name = item.Name,
-            EncryptedData = new EncryptedData
+            Data = new EncryptedData
             {
                 Data = item.Data,
                 Salt = item.Salt
@@ -85,7 +85,7 @@ public sealed class EncryptedItemsRepository(SecureDbContext context) : IEncrypt
             {
                 Id = item.Id,
                 Name = item.Name,
-                EncryptedData = new EncryptedData
+                Data = new EncryptedData
                 {
                     Data = item.Data,
                     Salt = item.Salt

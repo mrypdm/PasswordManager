@@ -28,7 +28,7 @@ public class AccountService(
         var encryptedItem = new EncryptedItem
         {
             Name = account.Name,
-            EncryptedData = crypto.EncryptJson(account.Data, keyStorage.Key)
+            Data = crypto.EncryptJson(account.Data, keyStorage.Key)
         };
         var item = await repository.AddItemAsync(encryptedItem, token);
         await dataContext.SaveChangesAsync(token);
@@ -47,7 +47,7 @@ public class AccountService(
             {
                 Id = account.Id,
                 Name = account.Name,
-                EncryptedData = crypto.EncryptJson(account.Data, keyStorage.Key)
+                Data = crypto.EncryptJson(account.Data, keyStorage.Key)
             };
             await repository.UpdateItemAsync(item, token);
             await dataContext.SaveChangesAsync(token);
@@ -70,7 +70,7 @@ public class AccountService(
         try
         {
             var item = await repository.GetItemByIdAsync(id, token);
-            var decryptedAccount = crypto.DecryptJson<AccountData>(item.EncryptedData, keyStorage.Key);
+            var decryptedAccount = crypto.DecryptJson<AccountData>(item.Data, keyStorage.Key);
             return new Account
             {
                 Id = id,

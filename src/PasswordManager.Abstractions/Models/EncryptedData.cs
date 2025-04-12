@@ -1,7 +1,7 @@
 namespace PasswordManager.Abstractions.Models;
 
 /// <summary>
-/// Secured data
+/// Encrypted data
 /// </summary>
 public class EncryptedData
 {

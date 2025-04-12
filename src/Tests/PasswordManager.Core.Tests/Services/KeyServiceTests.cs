@@ -187,7 +187,7 @@ public class KeyServiceTests
         var newKey = new byte[] { 2 };
         var newKeyData = new EncryptedData();
         var oldItemData = new EncryptedData();
-        var itemData = new EncryptedItem() { Id = 12, Name = "name", EncryptedData = oldItemData };
+        var itemData = new EncryptedItem() { Id = 12, Name = "name", Data = oldItemData };
         var account = new byte[] { 3 };
         var newItemData = new EncryptedData();
 
