@@ -22,15 +22,15 @@ public sealed class EncryptedItemsRepository(SecureDbContext context) : IEncrypt
         ArgumentNullException.ThrowIfNull(item.Data);
         ArgumentNullException.ThrowIfNull(item.Salt);
 
-        var secureItem = new EncryptedItemDbModel
+        var itemDbModel = new EncryptedItemDbModel
         {
             Name = item.Name,
             Salt = item.Salt,
             Data = item.Data,
         };
 
-        await context.EncryptedItems.AddAsync(secureItem, token);
-        return secureItem;
+        await context.EncryptedItems.AddAsync(itemDbModel, token);
+        return itemDbModel;
     }
 
     /// <inheritdoc />
@@ -41,14 +41,14 @@ public sealed class EncryptedItemsRepository(SecureDbContext context) : IEncrypt
         ArgumentNullException.ThrowIfNull(item.Data);
         ArgumentNullException.ThrowIfNull(item.Salt);
 
-        var secureItem = await context.EncryptedItems.SingleOrDefaultAsync(m => m.Id == item.Id, token)
+        var itemDbModel = await context.EncryptedItems.SingleOrDefaultAsync(m => m.Id == item.Id, token)
             ?? throw new ItemNotExistsException($"Item with id={item.Id} not exists");
 
-        secureItem.Name = item.Name;
-        secureItem.Salt = item.Salt;
-        secureItem.Data = item.Data;
+        itemDbModel.Name = item.Name;
+        itemDbModel.Salt = item.Salt;
+        itemDbModel.Data = item.Data;
 
-        context.Update(secureItem);
+        context.Update(itemDbModel);
     }
 
     /// <inheritdoc />
