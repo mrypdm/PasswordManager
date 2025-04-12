@@ -73,7 +73,7 @@ public class AccountsApiControllerTests
         var controller = CreateController();
 
         // act
-        var res = await controller.GetAccountsWithoutData(default);
+        var res = await controller.GetAccountsWithoutDataAsync(default);
 
         // assert
         Assert.That(res.Value, Is.Not.Null);
