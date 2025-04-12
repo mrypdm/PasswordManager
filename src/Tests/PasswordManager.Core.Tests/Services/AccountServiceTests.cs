@@ -83,7 +83,7 @@ public class AccountServiceTests
 
         // act
         // assert
-        Assert.ThrowsAsync<ArgumentNullException>(() => service.UpdateAccountAsync(0, null, default));
+        Assert.ThrowsAsync<ArgumentNullException>(() => service.UpdateAccountAsync(null, default));
     }
 
     [Test]
@@ -101,7 +101,7 @@ public class AccountServiceTests
 
         // act
         // assert
-        Assert.ThrowsAsync<AccountNotExistsException>(() => service.UpdateAccountAsync(0, new(), default));
+        Assert.ThrowsAsync<AccountNotExistsException>(() => service.UpdateAccountAsync(new(), default));
     }
 
     [Test]
@@ -109,12 +109,11 @@ public class AccountServiceTests
     {
         // arrange
         var key = Array.Empty<byte>();
-        var expectedId = 123;
-        var account = new AccountData() { Name = "name" };
+        var account = new AccountData() { Id = 123, Name = "name" };
         var data = new EncryptedData() { Data = [], Salt = [] };
         var expectedItem = new EncryptedItem
         {
-            Id = expectedId,
+            Id = account.Id,
             Name = account.Name,
             Data = data.Data,
             Salt = data.Salt
@@ -129,7 +128,7 @@ public class AccountServiceTests
         var service = CreateService();
 
         // act
-        await service.UpdateAccountAsync(expectedId, account, default);
+        await service.UpdateAccountAsync(account, default);
 
         // assert
         _storageMock.Verify(m => m.Key, Times.Once);
@@ -173,7 +172,7 @@ public class AccountServiceTests
     {
         // arrange
         var key = Array.Empty<byte>();
-        var expectedAccount = new AccountData() { Name = "name" };
+        var expectedAccount = new AccountData();
         var item = new EncryptedItem() { Data = [], Salt = [] };
         var expectedId = 123;
 
@@ -193,6 +192,7 @@ public class AccountServiceTests
 
         // assert
         Assert.That(account, Is.EqualTo(expectedAccount));
+        Assert.That(account.Id, Is.EqualTo(expectedId));
         _storageMock.Verify(m => m.Key, Times.Once);
         _cryptoMock.Verify(m => m.DecryptJson<AccountData>(item, key), Times.Once);
         _repositoryMock.Verify(m => m.GetItemByIdAsync(expectedId, default), Times.Once);

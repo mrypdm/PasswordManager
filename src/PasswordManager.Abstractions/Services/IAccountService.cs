@@ -12,31 +12,31 @@ namespace PasswordManager.Abstractions.Services;
 public interface IAccountService
 {
     /// <summary>
-    /// Add new account data to repository and return its ID
+    /// Add new account to repository and return its ID
     /// </summary>
-    /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null</exception>
-    Task<int> AddAccountAsync(AccountData data, CancellationToken token);
+    /// <exception cref="ArgumentNullException">If <paramref name="account"/> is null</exception>
+    Task<int> AddAccountAsync(AccountData account, CancellationToken token);
 
     /// <summary>
-    /// Updates item with <paramref name="id"/> with new <paramref name="data"/>
+    /// Update account
     /// </summary>
-    /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null</exception>
+    /// <exception cref="ArgumentNullException">If <paramref name="account"/> is null</exception>
     /// <exception cref="AccountNotExistsException">If account with <paramref name="id"/> not exists</exception>
-    Task UpdateAccountAsync(int id, AccountData data, CancellationToken token);
+    Task UpdateAccountAsync(AccountData account, CancellationToken token);
 
     /// <summary>
-    /// Deletes account by <paramref name="id"/>
+    /// Delete account by <paramref name="id"/>
     /// </summary>
     Task DeleteAccountAsync(int id, CancellationToken token);
 
     /// <summary>
-    /// Get account data from repository by id
+    /// Get account from repository by id
     /// </summary>
     /// <exception cref="AccountNotExistsException">If account with <paramref name="id"/> not exists</exception>
     Task<AccountData> GetAccountByIdAsync(int id, CancellationToken token);
 
     /// <summary>
-    /// Get items headers from repository
+    /// Get account headers from repository
     /// </summary>
     Task<AccountHeader[]> GetAccountHeadersAsync(CancellationToken token);
 }

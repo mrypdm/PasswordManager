@@ -21,14 +21,14 @@ public class AccountService(
     : IAccountService
 {
     /// <inheritdoc />
-    public async Task<int> AddAccountAsync(AccountData data, CancellationToken token)
+    public async Task<int> AddAccountAsync(AccountData account, CancellationToken token)
     {
-        ArgumentNullException.ThrowIfNull(data);
+        ArgumentNullException.ThrowIfNull(account);
 
-        var encryptedData = crypto.EncryptJson(data, keyStorage.Key);
+        var encryptedData = crypto.EncryptJson(account, keyStorage.Key);
         var encryptedItem = new EncryptedItem
         {
-            Name = data.Name,
+            Name = account.Name,
             Data = encryptedData.Data,
             Salt = encryptedData.Salt
         };
@@ -39,16 +39,16 @@ public class AccountService(
     }
 
     /// <inheritdoc />
-    public async Task UpdateAccountAsync(int id, AccountData data, CancellationToken token)
+    public async Task UpdateAccountAsync(AccountData account, CancellationToken token)
     {
-        ArgumentNullException.ThrowIfNull(data);
-        var encryptedData = crypto.EncryptJson(data, keyStorage.Key);
+        ArgumentNullException.ThrowIfNull(account);
+        var encryptedData = crypto.EncryptJson(account, keyStorage.Key);
         try
         {
             var item = new EncryptedItem
             {
-                Id = id,
-                Name = data.Name,
+                Id = account.Id,
+                Name = account.Name,
                 Data = encryptedData.Data,
                 Salt = encryptedData.Salt
             };
@@ -57,7 +57,7 @@ public class AccountService(
         }
         catch (ItemNotExistsException)
         {
-            throw new AccountNotExistsException($"Account with id={id} not exists");
+            throw new AccountNotExistsException($"Account with id={account.Id} not exists");
         }
     }
 
@@ -73,7 +73,9 @@ public class AccountService(
         try
         {
             var encryptedData = await repository.GetItemByIdAsync(id, token);
-            return crypto.DecryptJson<AccountData>(encryptedData, keyStorage.Key);
+            var decryptedAccount = crypto.DecryptJson<AccountData>(encryptedData, keyStorage.Key);
+            decryptedAccount.Id = id;
+            return decryptedAccount;
         }
         catch (ItemNotExistsException)
         {

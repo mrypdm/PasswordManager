@@ -155,7 +155,7 @@ public class AccountsApiControllerTests
         };
 
         _serviceMock
-            .Setup(m => m.AddAccountAsync(It.Is<AccountData>(m => CheckAccount(m, request)), default))
+            .Setup(m => m.AddAccountAsync(It.Is<AccountData>(m => CheckAccount(m, default, request)), default))
             .ReturnsAsync(id);
 
         var controller = CreateController();
@@ -167,7 +167,7 @@ public class AccountsApiControllerTests
         Assert.That(res.Value, Is.Not.Null);
         Assert.That(res.Value.Id, Is.EqualTo(id));
         _serviceMock.Verify(
-            m => m.AddAccountAsync(It.Is<AccountData>(m => CheckAccount(m, request)), default),
+            m => m.AddAccountAsync(It.Is<AccountData>(m => CheckAccount(m, default, request)), default),
             Times.Once);
     }
 
@@ -238,7 +238,7 @@ public class AccountsApiControllerTests
         };
 
         _serviceMock
-            .Setup(m => m.UpdateAccountAsync(id, It.Is<AccountData>(m => CheckAccount(m, request)), default))
+            .Setup(m => m.UpdateAccountAsync(It.Is<AccountData>(m => CheckAccount(m, id, request)), default))
             .ThrowsAsync(new ItemNotExistsException(null));
 
         var controller = CreateController();
@@ -249,7 +249,7 @@ public class AccountsApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<NotFoundObjectResult>());
         _serviceMock.Verify(
-            m => m.UpdateAccountAsync(id, It.Is<AccountData>(m => CheckAccount(m, request)), default),
+            m => m.UpdateAccountAsync(It.Is<AccountData>(m => CheckAccount(m, id, request)), default),
             Times.Once);
     }
 
@@ -273,7 +273,7 @@ public class AccountsApiControllerTests
         // assert
         Assert.That(res, Is.TypeOf<OkResult>());
         _serviceMock.Verify(
-            m => m.UpdateAccountAsync(id, It.Is<AccountData>(m => CheckAccount(m, request)), default),
+            m => m.UpdateAccountAsync(It.Is<AccountData>(m => CheckAccount(m, id, request)), default),
             Times.Once);
     }
 
@@ -299,8 +299,11 @@ public class AccountsApiControllerTests
         return new AccountsApiController(_serviceMock.Object);
     }
 
-    private static bool CheckAccount(AccountData actual, UploadAccountRequest expected)
+    private static bool CheckAccount(AccountData actual, int id, UploadAccountRequest expected)
     {
-        return actual.Name == expected.Name && actual.Login == expected.Login && actual.Password == expected.Password;
+        return actual.Id == id
+            && actual.Name == expected.Name
+            && actual.Login == expected.Login
+            && actual.Password == expected.Password;
     }
 }

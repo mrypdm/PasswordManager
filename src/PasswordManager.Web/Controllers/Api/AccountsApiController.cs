@@ -84,6 +84,7 @@ public class AccountsApiController(IAccountService accountService) : Controller
 
         var account = new AccountData
         {
+            Id = accountId,
             Name = request.Name,
             Login = request.Login,
             Password = request.Password
@@ -91,7 +92,7 @@ public class AccountsApiController(IAccountService accountService) : Controller
 
         try
         {
-            await accountService.UpdateAccountAsync(accountId, account, token);
+            await accountService.UpdateAccountAsync(account, token);
             return Ok();
         }
         catch (ItemNotExistsException)
