@@ -16,7 +16,7 @@ public class AccountServiceTests
     private readonly Mock<ISecureItemsRepository> _repositoryMock = new();
     private readonly Mock<IDataContext> _dataContextMock = new();
     private readonly Mock<ICrypto> _cryptoMock = new();
-    private readonly Mock<IKeyStorage> _storageMock = new();
+    private readonly Mock<IReadOnlyKeyStorage> _storageMock = new();
 
     [SetUp]
     public void SetUp()
