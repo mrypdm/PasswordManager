@@ -13,7 +13,7 @@ namespace PasswordManager.Web.Helpers;
 
 /// <inheritdoc />
 public class CookieAuthorizationHelper(
-    IKeyStorage keyStorage,
+    IReadOnlyKeyStorage keyStorage,
     IOptions<ConnectionOptions> connectionOptions) : ICookieAuthorizationHelper
 {
     private const string IpAddressClaim = "IpAddress";

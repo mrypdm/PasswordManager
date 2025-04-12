@@ -17,7 +17,7 @@ public class AccountService(
     ISecureItemsRepository repository,
     IDataContext dataContext,
     ICrypto crypto,
-    IKeyStorage keyStorage)
+    IReadOnlyKeyStorage keyStorage)
     : IAccountService
 {
     /// <inheritdoc />

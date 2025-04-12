@@ -6,20 +6,8 @@ namespace PasswordManager.Abstractions.Storages;
 /// <summary>
 /// Storage for key
 /// </summary>
-public interface IKeyStorage
+public interface IKeyStorage : IReadOnlyKeyStorage
 {
-    /// <summary>
-    /// Current key
-    /// </summary>
-    /// <exception cref="StorageNotInitializedException">If storage not initialzied</exception>
-    /// <exception cref="StorageBlockedException">If storage is blocked</exception>
-    byte[] Key { get; }
-
-    /// <summary>
-    /// Check if storage is initialized
-    /// </summary>
-    bool IsInitialized { get; }
-
     /// <summary>
     /// Init storage with key and key timeout
     /// </summary>
@@ -46,10 +34,4 @@ public interface IKeyStorage
     /// Blocks storage for <paramref name="timeout"/>
     /// </summary>
     void Block(TimeSpan timeout);
-
-    /// <summary>
-    /// Throws if blocked
-    /// </summary>
-    /// <exception cref="StorageBlockedException">If storage is blocked</exception>
-    void ThrowIfBlocked();
 }

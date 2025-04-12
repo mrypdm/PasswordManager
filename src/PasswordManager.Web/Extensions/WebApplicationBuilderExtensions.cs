@@ -121,6 +121,7 @@ public static class WebApplicationBuilderExtensions
             .Configure<KeyServiceOptions>(builder.Configuration.GetSection(nameof(KeyServiceOptions)))
             .AddSingleton<ICounter, Counter>()
             .AddSingleton<IKeyStorage, KeyStorage>()
+            .AddSingleton<IReadOnlyKeyStorage>(services => services.GetRequiredService<IKeyStorage>())
             .AddScoped<IKeyService, KeyService>()
             .AddScoped<IAccountService, AccountService>();
         return builder;

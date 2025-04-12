@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -87,10 +86,7 @@ public class UserSettingsApiControllerTests
 
         _userOptionsMock
             .Setup(m => m.Update(It.IsAny<Action<UserOptions>>()))
-            .Callback((Action<UserOptions> act, CancellationToken _) =>
-            {
-                act(options);
-            });
+            .Callback((Action<UserOptions> act) => act(options));
 
         var request = new ChangeSessionTimeoutRequest
         {
@@ -242,10 +238,7 @@ public class UserSettingsApiControllerTests
             .Returns(options);
         _userOptionsMock
             .Setup(m => m.Update(It.IsAny<Action<UserOptions>>()))
-            .Callback((Action<UserOptions> act, CancellationToken _) =>
-            {
-                act(options);
-            });
+            .Callback((Action<UserOptions> act) => act(options));
         _generatorMock
             .SetupSequence(m => m.Generate(It.IsAny<string>()))
             .Returns(oldKey)
@@ -291,10 +284,7 @@ public class UserSettingsApiControllerTests
         var options = new UserOptions() { Salt = salt };
         _userOptionsMock
             .Setup(m => m.Update(It.IsAny<Action<UserOptions>>()))
-            .Callback((Action<UserOptions> act, CancellationToken _) =>
-            {
-                act(options);
-            });
+            .Callback((Action<UserOptions> act) => act(options));
 
         var controller = CreateController();
 
