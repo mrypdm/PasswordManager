@@ -30,7 +30,7 @@ public sealed class SeaMonkeyPasswordChecker : IPasswordChecker
             _ => PasswordStrength.VeryHigh
         };
 
-        return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, strength, rating));
+        return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, strength));
     }
 
     private static int CountOfUppers(string password)

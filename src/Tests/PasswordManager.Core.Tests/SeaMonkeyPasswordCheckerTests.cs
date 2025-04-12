@@ -10,13 +10,13 @@ namespace PasswordManager.Core.Tests;
 public class SeaMonkeyPasswordCheckerTests
 {
     [Test]
-    [TestCase("qwerty", PasswordStrength.VeryLow, 30)]
-    [TestCase("qwertyyyy", PasswordStrength.VeryLow, 30)]
-    [TestCase("verylargestriiiiiiiiiiiiiiiing", PasswordStrength.VeryLow, 30)]
-    [TestCase("Rhfcjxyst:erbL;ekbb912", PasswordStrength.High, 110)]
-    [TestCase("Shrek", PasswordStrength.VeryLow, 40)]
-    [TestCase("ShrekISlon768", PasswordStrength.Medium, 90)]
-    public async Task CheckSeaMonkey(string password, PasswordStrength strength, double score)
+    [TestCase("qwerty", PasswordStrength.VeryLow)]
+    [TestCase("qwertyyyy", PasswordStrength.VeryLow)]
+    [TestCase("verylargestriiiiiiiiiiiiiiiing", PasswordStrength.VeryLow)]
+    [TestCase("Rhfcjxyst:erbL;ekbb912", PasswordStrength.High)]
+    [TestCase("Shrek", PasswordStrength.VeryLow)]
+    [TestCase("ShrekISlon768", PasswordStrength.Medium)]
+    public async Task CheckSeaMonkey(string password, PasswordStrength strength)
     {
         // arrange
         var checker = new SeaMonkeyPasswordChecker();
@@ -29,7 +29,6 @@ public class SeaMonkeyPasswordCheckerTests
         {
             Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
             Assert.That(result.Strength, Is.EqualTo(strength));
-            Assert.That(result.Score, Is.EqualTo(score).Within(0.1));
         });
     }
 }

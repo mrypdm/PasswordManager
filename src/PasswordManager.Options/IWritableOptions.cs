@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PasswordManager.UserSettings;
+namespace PasswordManager.Options;
 
 /// <summary>
 /// Writable options

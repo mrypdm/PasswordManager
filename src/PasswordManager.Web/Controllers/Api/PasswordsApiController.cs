@@ -67,7 +67,7 @@ public class PasswordsApiController(
     private async Task<PasswordCheckStatus> VerifyPasswordAsync(string password, IAlphabet alphabet,
         CancellationToken token)
     {
-        var result = new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Unknown, double.MaxValue);
+        var result = new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Unknown);
 
         foreach (var factory in passwordCheckerFactories)
         {

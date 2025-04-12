@@ -8,7 +8,7 @@ using Moq;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Services;
-using PasswordManager.UserSettings;
+using PasswordManager.Options;
 using PasswordManager.Web.Controllers.Api;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Models.Requests;

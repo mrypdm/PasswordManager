@@ -18,7 +18,7 @@ public class AesSaltGeneratorTests
         var salt = generator.Generate();
 
         // assert
-        Assert.That(salt.Length, Is.EqualTo(AesConstants.BlockSize));
+        Assert.That(salt, Has.Length.EqualTo(AesConstants.BlockSize));
     }
 
     [Test]

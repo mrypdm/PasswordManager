@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using PasswordManager.Abstractions.Exceptions;
 using PasswordManager.Abstractions.Generators;
 using PasswordManager.Abstractions.Services;
-using PasswordManager.UserSettings;
+using PasswordManager.Options;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Options;

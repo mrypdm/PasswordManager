@@ -91,7 +91,7 @@ public class PasswordsApiControllerTests
             .Returns(password);
         _checkerMock
             .Setup(m => m.CheckAsync(password, default))
-            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow, 0));
+            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow));
 
         var controller = CreateController();
 
@@ -141,7 +141,7 @@ public class PasswordsApiControllerTests
 
         _checkerMock
             .Setup(m => m.CheckAsync(request.Password, default))
-            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow, 0));
+            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow));
 
         // act
         var res = await controller.VerifyPasswordAsync(request, default);
@@ -171,8 +171,8 @@ public class PasswordsApiControllerTests
 
         _checkerMock
             .SetupSequence(m => m.CheckAsync(request.Password, default))
-            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryHigh, 0))
-            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.NotCompromised, PasswordStrength.VeryLow, 15));
+            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryHigh))
+            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.NotCompromised, PasswordStrength.VeryLow));
 
         // act
         var res = await controller.VerifyPasswordAsync(request, default);

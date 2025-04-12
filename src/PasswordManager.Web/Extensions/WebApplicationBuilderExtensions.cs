@@ -29,7 +29,6 @@ using PasswordManager.Data.Contexts;
 using PasswordManager.Data.Repositories;
 using PasswordManager.External.Factories;
 using PasswordManager.Options;
-using PasswordManager.UserSettings;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Options;
 

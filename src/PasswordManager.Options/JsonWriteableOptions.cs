@@ -3,7 +3,6 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using PasswordManager.UserSettings;
 
 namespace PasswordManager.Options;
 

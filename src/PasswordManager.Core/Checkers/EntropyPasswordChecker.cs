@@ -19,7 +19,7 @@ public sealed class EntropyPasswordChecker(IAlphabet alphabet) : IPasswordChecke
         if (ValidatePasswordCharacters(password))
         {
             return Task.FromResult(
-                new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Unknown, -1));
+                new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Unknown));
         }
 
         var entropy = Math.Log2(alphabet.GetCharacters().Count) * password.Length;
@@ -32,7 +32,7 @@ public sealed class EntropyPasswordChecker(IAlphabet alphabet) : IPasswordChecke
             _ => PasswordStrength.VeryHigh,
         };
 
-        return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, strength, entropy));
+        return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, strength));
     }
 
     private bool ValidatePasswordCharacters(string password)

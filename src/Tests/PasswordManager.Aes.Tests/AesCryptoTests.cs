@@ -13,7 +13,7 @@ namespace PasswordManager.Aes.Tests;
 public class AesCryptoTests
 {
     [Test]
-    public void EncryptWithDecrypt_ShouldBeEqualToEtalon()
+    public void EncryptAndDecrypt_ShouldBeEqualToEtalon()
     {
         // arrange
         var data = RandomNumberGenerator.GetBytes(100);
@@ -29,7 +29,7 @@ public class AesCryptoTests
 
         // assert
         CollectionAssert.AreEqual(data, decrypted1, "Decrypted value should be equal to etalon");
-        Assert.That(decrypted1.SequenceEqual(decrypted1), Is.True, "Decrypted values should be equal");
+        Assert.That(decrypted1.SequenceEqual(decrypted2), Is.True, "Decrypted values should be equal");
     }
 
     [Test]
@@ -48,8 +48,11 @@ public class AesCryptoTests
         var decrypted2 = crypto.DecryptJson<string>(encrypted2, key);
 
         // assert
-        Assert.That(decrypted1, Is.EqualTo(data));
-        Assert.That(decrypted2, Is.EqualTo(data));
+        Assert.Multiple(() =>
+        {
+            Assert.That(decrypted1, Is.EqualTo(data));
+            Assert.That(decrypted2, Is.EqualTo(data));
+        });
     }
 
     [Test]

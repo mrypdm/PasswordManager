@@ -46,7 +46,6 @@ public class PwnedPasswordCheckerTests
         {
             Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
             Assert.That(result.Strength, Is.EqualTo(PasswordStrength.Unknown));
-            Assert.That(result.Score, Is.EqualTo(-1));
         });
     }
 
@@ -80,7 +79,6 @@ public class PwnedPasswordCheckerTests
         {
             Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Compromised));
             Assert.That(result.Strength, Is.EqualTo(PasswordStrength.VeryLow));
-            Assert.That(result.Score, Is.EqualTo(0));
         });
     }
 }

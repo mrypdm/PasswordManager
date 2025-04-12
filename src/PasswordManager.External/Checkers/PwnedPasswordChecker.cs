@@ -29,15 +29,15 @@ public sealed class PwnedPasswordChecker : IPasswordChecker
             var result = await GetCompomisedHashes(hash[..5], token);
 
             return result.Contains(hash[5..], StringComparison.OrdinalIgnoreCase)
-                ? new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow, 0)
-                : new PasswordCheckStatus(PasswordCompromisation.NotCompromised, PasswordStrength.Unknown, -1);
+                ? new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow)
+                : new PasswordCheckStatus(PasswordCompromisation.NotCompromised, PasswordStrength.Unknown);
         }
         catch (FlurlHttpException e)
         {
             if (e.StatusCode >= (int)HttpStatusCode.InternalServerError)
             {
                 // Server side error. We can't do anything about it.
-                return new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Unknown, -1);
+                return new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.Unknown);
             }
 
             throw new PwnedRequestException($"Error occured in HTTP request to {e.Call.Request.Url}", e);

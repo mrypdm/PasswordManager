@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Abstractions.Factories;
 using PasswordManager.Abstractions.Services;
-using PasswordManager.UserSettings;
+using PasswordManager.Options;
 using PasswordManager.Web.Helpers;
 using PasswordManager.Web.Models.Requests;
 using PasswordManager.Web.Options;

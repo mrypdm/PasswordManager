@@ -13,7 +13,7 @@ public sealed class ZxcvbnPasswordChecker : IPasswordChecker
     /// <inheritdoc/>
     public Task<PasswordCheckStatus> CheckAsync(string password, CancellationToken token)
     {
-        var strength = Zxcvbn.Core.EvaluatePassword(password).Score;
-        return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, (PasswordStrength)strength, strength));
+        var strength = (PasswordStrength)Zxcvbn.Core.EvaluatePassword(password).Score;
+        return Task.FromResult(new PasswordCheckStatus(PasswordCompromisation.Unknown, strength));
     }
 }

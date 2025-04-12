@@ -11,10 +11,10 @@ namespace PasswordManager.Core.Tests;
 public class EntropyPasswordCheckerTests
 {
     [Test]
-    [TestCase("qwerty", PasswordStrength.VeryLow, 28.2)]
-    [TestCase("qwertyyyy", PasswordStrength.VeryLow, 42.3)]
-    [TestCase("verylargestriiiiiiiiiiiiiiiing", PasswordStrength.VeryHigh, 141.0)]
-    public async Task CheckEntropy_OnlyLowerLetters(string password, PasswordStrength strength, double score)
+    [TestCase("qwerty", PasswordStrength.VeryLow)]
+    [TestCase("qwertyyyy", PasswordStrength.VeryLow)]
+    [TestCase("verylargestriiiiiiiiiiiiiiiing", PasswordStrength.VeryHigh)]
+    public async Task CheckEntropy_OnlyLowerLetters(string password, PasswordStrength strength)
     {
         // arrange
         var alphabet = new Alphabet().WithLowerLetters();
@@ -28,15 +28,14 @@ public class EntropyPasswordCheckerTests
         {
             Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
             Assert.That(result.Strength, Is.EqualTo(strength));
-            Assert.That(result.Score, Is.EqualTo(score).Within(0.1));
         });
     }
 
     [Test]
-    [TestCase("Rhfcjxyst:erbL;ekbb912", PasswordStrength.VeryHigh, 143.5)]
-    [TestCase("Shrek", PasswordStrength.VeryLow, 32.6)]
-    [TestCase("ShrekISlon768", PasswordStrength.Medium, 84.8)]
-    public async Task CheckEntropy_FullAlphabet(string password, PasswordStrength strength, double score)
+    [TestCase("Rhfcjxyst:erbL;ekbb912", PasswordStrength.VeryHigh)]
+    [TestCase("Shrek", PasswordStrength.VeryLow)]
+    [TestCase("ShrekISlon768", PasswordStrength.Medium)]
+    public async Task CheckEntropy_FullAlphabet(string password, PasswordStrength strength)
     {
         // arrange
         var alphabet = new Alphabet()
@@ -54,7 +53,6 @@ public class EntropyPasswordCheckerTests
         {
             Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
             Assert.That(result.Strength, Is.EqualTo(strength));
-            Assert.That(score, Is.EqualTo(result.Score).Within(0.1));
         });
     }
 
