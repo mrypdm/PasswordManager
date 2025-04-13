@@ -17,13 +17,13 @@ using PasswordManager.Web.Options;
 namespace PasswordManager.Web.Controllers.Api;
 
 /// <summary>
-/// Controller for logon
+/// Controller for authentication
 /// </summary>
 [AllowAnonymous]
-[Route("api/logon")]
+[Route("api/auth")]
 [ValidateModelState]
 [ValidateAntiForgeryToken]
-public class LogonApiController(
+public class AuthenticationApiController(
     IKeyService keyService,
     IKeyGeneratorFactory keyGeneratorFactory,
     ICookieAuthorizationHelper cookieAuthorizationHelper,

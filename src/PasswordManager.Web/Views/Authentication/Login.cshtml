@@ -13,5 +13,5 @@
         NeedVerify = !Model.IsKeyDataExist
     })
 
-    <input type="button" value="@(Model.IsKeyDataExist ? "Login" : "Init")" onclick="logon('@(Model.ReturnUrl)')" />
+    <input type="button" value="@(Model.IsKeyDataExist ? "Login" : "Init")" onclick="login('@(Model.ReturnUrl)')" />
 </div>

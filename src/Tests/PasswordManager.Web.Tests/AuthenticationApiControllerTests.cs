@@ -19,9 +19,9 @@ using PasswordManager.Web.Options;
 namespace PasswordManager.Web.Tests;
 
 /// <summary>
-/// Tests for <see cref="LogonApiController"/>
+/// Tests for <see cref="AuthenticationApiController"/>
 /// </summary>
-public class LogonApiControllerTests
+public class AuthenticationApiControllerTests
 {
     private readonly Mock<IKeyService> _keyServiceMock = new();
     private readonly Mock<IKeyGeneratorFactory> _keyGeneratorFactoryMock = new();
@@ -172,9 +172,9 @@ public class LogonApiControllerTests
             Times.Once);
     }
 
-    private LogonApiController CreateController()
+    private AuthenticationApiController CreateController()
     {
-        return new LogonApiController(_keyServiceMock.Object, _keyGeneratorFactoryMock.Object,
+        return new AuthenticationApiController(_keyServiceMock.Object, _keyGeneratorFactoryMock.Object,
             _cookieHelperMock.Object, _userOptionsMock.Object, _connectionOptionsMock.Object);
     }
 }
