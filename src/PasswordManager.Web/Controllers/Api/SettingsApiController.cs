@@ -18,7 +18,7 @@ namespace PasswordManager.Web.Controllers.Api;
 [Route("api/settings")]
 [ValidateModelState]
 [ValidateAntiForgeryToken]
-public class UserSettingsApiController(
+public class SettingsApiController(
     IWritableOptions<UserOptions> userOptions,
     ICookieAuthorizationHelper cookieAuthorizationHelper,
     IKeyGeneratorFactory keyGeneratorFactory,

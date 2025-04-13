@@ -18,7 +18,7 @@ namespace PasswordManager.Web.Tests;
 /// <summary>
 /// Tests for <see cref=""/>
 /// </summary>
-public class UserSettingsApiControllerTests
+public class SettingsApiControllerTests
 {
     private readonly Mock<IWritableOptions<UserOptions>> _userOptionsMock = new();
     private readonly Mock<ICookieAuthorizationHelper> _cookieHelperMock = new();
@@ -301,9 +301,9 @@ public class UserSettingsApiControllerTests
         Assert.That(options.Salt, Is.Not.EqualTo(salt));
     }
 
-    private UserSettingsApiController CreateController()
+    private SettingsApiController CreateController()
     {
-        return new UserSettingsApiController(_userOptionsMock.Object, _cookieHelperMock.Object, _generatorFactoryMock.Object,
+        return new SettingsApiController(_userOptionsMock.Object, _cookieHelperMock.Object, _generatorFactoryMock.Object,
             _keyServiceMock.Object);
     }
 
