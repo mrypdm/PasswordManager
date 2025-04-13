@@ -1,9 +1,9 @@
 namespace PasswordManager.Web.Models.Responses;
 
 /// <summary>
-/// Request for add/update account data
+/// Response for add account
 /// </summary>
-public class AddAccountDataResponse
+public class AddAccountResponse
 {
     /// <summary>
     /// Id of account

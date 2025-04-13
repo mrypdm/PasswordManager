@@ -3,7 +3,7 @@ namespace PasswordManager.Web.Models.Responses;
 /// <summary>
 /// Response for generating password
 /// </summary>
-public class PasswordGenerateResponse
+public class GeneratePasswordResponse
 {
     /// <summary>
     /// Generated password
@@ -13,5 +13,5 @@ public class PasswordGenerateResponse
     /// <summary>
     /// Check status of password
     /// </summary>
-    public PasswordVerifyReponse CheckStatus { get; set; }
+    public VerifyPasswordReponse CheckStatus { get; set; }
 }

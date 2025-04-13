@@ -3,7 +3,7 @@ namespace PasswordManager.Web.Models.Responses;
 /// <summary>
 /// Request to verify password
 /// </summary>
-public class PasswordVerifyReponse
+public class VerifyPasswordReponse
 {
     /// <summary>
     /// Strength of password

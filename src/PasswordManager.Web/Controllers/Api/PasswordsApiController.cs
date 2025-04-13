@@ -24,7 +24,7 @@ public class PasswordsApiController(IPasswordService passwordService) : Controll
     /// </summary>
     [HttpPost("verify")]
     [AllowAnonymous]
-    public async Task<ActionResult<PasswordVerifyReponse>> CheckPasswordAsync(
+    public async Task<ActionResult<VerifyPasswordReponse>> CheckPasswordAsync(
         [FromBody] VerifyPasswordRequest request, CancellationToken token)
     {
         if (!request.Validate(out var error))
@@ -40,7 +40,7 @@ public class PasswordsApiController(IPasswordService passwordService) : Controll
     /// Generate password
     /// </summary>
     [HttpPost("generate")]
-    public async Task<ActionResult<PasswordGenerateResponse>> GeneratePasswordAsync(
+    public async Task<ActionResult<GeneratePasswordResponse>> GeneratePasswordAsync(
         [FromBody] GeneratePasswordRequest request, CancellationToken token)
     {
         if (!request.Validate(out var error))
@@ -52,16 +52,16 @@ public class PasswordsApiController(IPasswordService passwordService) : Controll
         var password = passwordService.GeneratePassword(request.Length, alphabet);
         var checkResult = await passwordService.CheckPasswordAsync(password, alphabet, token);
 
-        return new PasswordGenerateResponse
+        return new GeneratePasswordResponse
         {
             Password = password,
             CheckStatus = ToVerifyResponse(checkResult)
         };
     }
 
-    private static PasswordVerifyReponse ToVerifyResponse(PasswordCheckStatus checkStatus)
+    private static VerifyPasswordReponse ToVerifyResponse(PasswordCheckStatus checkStatus)
     {
-        return new PasswordVerifyReponse
+        return new VerifyPasswordReponse
         {
             IsCompomised = checkStatus.IsCompromised == PasswordCompromisation.Compromised,
             Strength = checkStatus.Strength switch

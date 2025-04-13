@@ -49,7 +49,7 @@ public class AccountsApiController(IAccountService accountService) : Controller
     /// Add new account
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult<AddAccountDataResponse>> AddAccountAsync([FromBody] UploadAccountRequest request,
+    public async Task<ActionResult<AddAccountResponse>> AddAccountAsync([FromBody] UploadAccountRequest request,
         CancellationToken token)
     {
         if (!request.Validate(out var error))
@@ -68,7 +68,7 @@ public class AccountsApiController(IAccountService accountService) : Controller
         };
 
         account = await accountService.AddAccountAsync(account, token);
-        return new AddAccountDataResponse
+        return new AddAccountResponse
         {
             Id = account.Id
         };
