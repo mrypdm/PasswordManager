@@ -13,7 +13,7 @@ using PasswordManager.Web.Models.Requests;
 namespace PasswordManager.Web.Controllers.Api;
 
 /// <summary>
-/// Controller for use settings
+/// Controller for settings
 /// </summary>
 [Route("api/settings")]
 [ValidateModelState]
