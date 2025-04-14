@@ -76,7 +76,7 @@ public class PasswordsApiControllerTests
             .Returns(password);
         _serviceMock
             .Setup(m => m.CheckPasswordAsync(password, It.Is<IAlphabet>(m => CheckAlphabet(m, alphabet)), default))
-            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Compromised, PasswordStrength.VeryLow));
+            .ReturnsAsync(new PasswordCheckStatus(PasswordCompromisation.Unknown, PasswordStrength.VeryLow));
 
         var controller = CreateController();
 
@@ -88,7 +88,7 @@ public class PasswordsApiControllerTests
         Assert.Multiple(() =>
         {
             Assert.That(res.Value.Password, Is.EqualTo(password));
-            Assert.That(res.Value.CheckStatus.IsCompomised, Is.True);
+            Assert.That(res.Value.CheckStatus.Compromisation, Is.EqualTo("unknown"));
             Assert.That(res.Value.CheckStatus.Strength, Is.EqualTo("very low"));
         });
         _serviceMock.Verify(
@@ -137,7 +137,7 @@ public class PasswordsApiControllerTests
         Assert.That(res.Value, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(res.Value.IsCompomised, Is.True);
+            Assert.That(res.Value.Compromisation, Is.EqualTo("compromised"));
             Assert.That(res.Value.Strength, Is.EqualTo("very low"));
         });
         _serviceMock.Verify(m => m.CheckPasswordAsync(request.Password, Alphabet.Empty, default), Times.Once);

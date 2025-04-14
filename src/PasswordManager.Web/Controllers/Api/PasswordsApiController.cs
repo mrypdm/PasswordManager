@@ -63,7 +63,11 @@ public class PasswordsApiController(IPasswordService passwordService) : Controll
     {
         return new VerifyPasswordReponse
         {
-            IsCompomised = checkStatus.IsCompromised == PasswordCompromisation.Compromised,
+            Compromisation = checkStatus.Compomisation switch
+            {
+                PasswordCompromisation.NotCompromised => "not compomised",
+                _ => checkStatus.Compomisation.ToString().ToLower()
+            },
             Strength = checkStatus.Strength switch
             {
                 PasswordStrength.VeryLow => "very low",

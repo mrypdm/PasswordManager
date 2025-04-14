@@ -29,7 +29,7 @@ public class PwnedPasswordCheckerTests
     }
 
     [Test]
-    public async Task CheckPwned_ShouldHandleServerError()
+    public async Task CheckPwned_ShouldReturnUnknownWhenServerError()
     {
         // arrange
         var httpTest = new HttpTest();
@@ -44,7 +44,7 @@ public class PwnedPasswordCheckerTests
         httpTest.ShouldHaveCalled("https://api.pwnedpasswords.com/range/5CEC1").Times(1);
         Assert.Multiple(() =>
         {
-            Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
+            Assert.That(result.Compomisation, Is.EqualTo(PasswordCompromisation.Unknown));
             Assert.That(result.Strength, Is.EqualTo(PasswordStrength.Unknown));
         });
     }
@@ -77,7 +77,7 @@ public class PwnedPasswordCheckerTests
         // assert
         Assert.Multiple(() =>
         {
-            Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Compromised));
+            Assert.That(result.Compomisation, Is.EqualTo(PasswordCompromisation.Compromised));
             Assert.That(result.Strength, Is.EqualTo(PasswordStrength.VeryLow));
         });
     }

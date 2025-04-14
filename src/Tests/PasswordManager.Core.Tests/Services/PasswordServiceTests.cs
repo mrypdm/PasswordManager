@@ -76,7 +76,7 @@ public class PasswordServiceTests
         // assert
         Assert.Multiple(() =>
         {
-            Assert.That(res.IsCompromised, Is.EqualTo(PasswordCompromisation.Compromised));
+            Assert.That(res.Compomisation, Is.EqualTo(PasswordCompromisation.Compromised));
             Assert.That(res.Strength, Is.EqualTo(PasswordStrength.VeryLow));
         });
         _checkerFactoryMock.Verify(m => m.Create(Alphabet.Empty), Times.Once);

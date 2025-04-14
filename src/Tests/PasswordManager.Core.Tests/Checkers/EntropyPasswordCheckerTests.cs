@@ -26,7 +26,7 @@ public class EntropyPasswordCheckerTests
         // assert
         Assert.Multiple(() =>
         {
-            Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
+            Assert.That(result.Compomisation, Is.EqualTo(PasswordCompromisation.Unknown));
             Assert.That(result.Strength, Is.EqualTo(strength));
         });
     }
@@ -51,7 +51,7 @@ public class EntropyPasswordCheckerTests
         // assert
         Assert.Multiple(() =>
         {
-            Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
+            Assert.That(result.Compomisation, Is.EqualTo(PasswordCompromisation.Unknown));
             Assert.That(result.Strength, Is.EqualTo(strength));
         });
     }
@@ -69,7 +69,7 @@ public class EntropyPasswordCheckerTests
         // assert
         Assert.Multiple(() =>
         {
-            Assert.That(res.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
+            Assert.That(res.Compomisation, Is.EqualTo(PasswordCompromisation.Unknown));
             Assert.That(res.Strength, Is.EqualTo(PasswordStrength.Unknown));
         });
     }

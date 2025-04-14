@@ -15,8 +15,7 @@ function copyToClipboard(boxId) {
 }
 
 function buildCheckStatus(checkStatus) {
-    let isCompomised = checkStatus.isCompomised ? "" : " not";
-    return `Password is${isCompomised} compomised and password strength is ${checkStatus.strength}`
+    return `Password compromisation status is ${checkStatus.compromisation}. Password strength is ${checkStatus.strength}`
 }
 
 function getCsrfTokenHeader() {

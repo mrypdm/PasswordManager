@@ -11,7 +11,7 @@ public class VerifyPasswordReponse
     public string Strength { get; set; }
 
     /// <summary>
-    /// Is password compomised
+    /// Password compromisation status
     /// </summary>
-    public bool IsCompomised { get; set; }
+    public string Compromisation { get; set; }
 }

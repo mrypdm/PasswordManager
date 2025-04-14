@@ -6,9 +6,9 @@ namespace PasswordManager.Abstractions.Models;
 public class PasswordCheckStatus(PasswordCompromisation isCompromised, PasswordStrength strength)
 {
     /// <summary>
-    /// If password has been compromised
+    /// Password compromisation status
     /// </summary>
-    public PasswordCompromisation IsCompromised { get; private set; } = isCompromised;
+    public PasswordCompromisation Compomisation { get; private set; } = isCompromised;
 
     /// <summary>
     /// Strength of password
@@ -21,7 +21,7 @@ public class PasswordCheckStatus(PasswordCompromisation isCompromised, PasswordS
     public static PasswordCheckStatus MinOf(PasswordCheckStatus left, PasswordCheckStatus right)
     {
         return new PasswordCheckStatus(
-            left.IsCompromised > right.IsCompromised ? right.IsCompromised : left.IsCompromised,
+            left.Compomisation > right.Compomisation ? right.Compomisation : left.Compomisation,
             left.Strength > right.Strength ? right.Strength : left.Strength
         );
     }

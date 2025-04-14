@@ -27,7 +27,7 @@ public class SeaMonkeyPasswordCheckerTests
         // assert
         Assert.Multiple(() =>
         {
-            Assert.That(result.IsCompromised, Is.EqualTo(PasswordCompromisation.Unknown));
+            Assert.That(result.Compomisation, Is.EqualTo(PasswordCompromisation.Unknown));
             Assert.That(result.Strength, Is.EqualTo(strength));
         });
     }

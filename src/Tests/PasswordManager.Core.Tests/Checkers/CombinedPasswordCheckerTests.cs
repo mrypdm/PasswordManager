@@ -37,7 +37,7 @@ public class CombinedPasswordCheckerTests
         _checkerMock.Verify(m => m.CheckAsync(password, default), Times.Exactly(2));
         Assert.Multiple(() =>
         {
-            Assert.That(res.IsCompromised, Is.EqualTo(PasswordCompromisation.Compromised));
+            Assert.That(res.Compomisation, Is.EqualTo(PasswordCompromisation.Compromised));
             Assert.That(res.Strength, Is.EqualTo(PasswordStrength.VeryLow));
         });
     }
