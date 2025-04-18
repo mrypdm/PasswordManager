@@ -10,7 +10,7 @@
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("account-data-name", "text", "Account name"))
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("account-data-login", "text", "Login") { NeedCopy = true })
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("account-data-password", "password", "Password")
-{
+    {
         NeedShow = true,
         NeedCopy = true,
         NeedVerify = true
