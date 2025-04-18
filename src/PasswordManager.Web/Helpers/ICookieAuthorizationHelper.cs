@@ -18,8 +18,6 @@ public interface ICookieAuthorizationHelper
     /// <summary>
     /// Sign out with cookie
     /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
     Task SignOutAsync(HttpContext context);
 
     /// <summary>
