@@ -73,9 +73,9 @@ public static class WebApplicationBuilderExtensions
     }
 
     /// <summary>
-    /// Add password checkers to web application
+    /// Add password checker factory to web application
     /// </summary>
-    public static WebApplicationBuilder AddPasswordCheckers(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddPasswordCheckerFactory(this WebApplicationBuilder builder)
     {
         builder.Services
             .AddSingleton<IPasswordCheckerFactory>(services =>
