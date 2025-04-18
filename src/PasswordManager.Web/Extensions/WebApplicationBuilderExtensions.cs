@@ -95,7 +95,7 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddPasswordGeneratorFactory(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddScoped<IPasswordGeneratorFactory, PasswordGeneratorFactory>();
+            .AddSingleton<IPasswordGeneratorFactory, PasswordGeneratorFactory>();
         return builder;
     }
 
