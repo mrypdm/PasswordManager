@@ -18,7 +18,7 @@
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("key-salt", "text", "Salt"))
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("key-iterations", "number", "Iterations"))
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("new-master-password", "password", "New master password")
-{
+    {
         NeedShow = true,
         NeedVerify = true
     })
