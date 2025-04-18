@@ -57,14 +57,4 @@ public class ChangeKeySettingsRequest : IRequest
 
         return errorMessage is null;
     }
-
-    /// <summary>
-    /// If request can change something
-    /// </summary>
-    public bool HasSense()
-    {
-        return Salt is not null
-            || Iterations is not null
-            || (NewMasterPassword is not null && NewMasterPassword != MasterPassword);
-    }
 }
