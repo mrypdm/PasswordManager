@@ -9,7 +9,7 @@ var builder = WebApplication
     .AddConnectionOptions()
     .AddCore()
     .AddAesCrypto()
-    .AddPasswordCheckers()
+    .AddPasswordCheckerFactory()
     .AddPasswordGeneratorFactory()
     .AddSecureDb()
     .AddCookieAuthentication()
