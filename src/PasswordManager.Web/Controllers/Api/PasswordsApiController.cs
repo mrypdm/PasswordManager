@@ -22,8 +22,8 @@ public class PasswordsApiController(IPasswordService passwordService) : Controll
     /// <summary>
     /// Verify password strength and compomistaion
     /// </summary>
-    [HttpPost("verify")]
     [AllowAnonymous]
+    [HttpPost("verify")]
     public async Task<ActionResult<VerifyPasswordReponse>> CheckPasswordAsync(
         [FromBody] VerifyPasswordRequest request, CancellationToken token)
     {
