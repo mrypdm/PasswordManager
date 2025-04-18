@@ -8,7 +8,7 @@
 
 <div>
     @await Html.PartialAsync("/Views/Shared/InputForm.cshtml", new InputFormModel("master-password", "password", "Master password")
-{
+    {
         NeedShow = true,
         NeedVerify = !Model.IsKeyDataExist
     })
