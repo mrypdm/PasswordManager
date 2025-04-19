@@ -1,5 +1,5 @@
 async function getAccountDataRaw(accountId) {
-    let response = await send(`/api/account/${accountId}`, "POST", null, getCsrfTokenHeader());
+    let response = await send(`/api/account/${accountId}`, "GET", null, getCsrfTokenHeader());
     return await response.json();
 }
 

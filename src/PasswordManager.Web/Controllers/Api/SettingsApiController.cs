@@ -18,6 +18,7 @@ namespace PasswordManager.Web.Controllers.Api;
 [Route("api/settings")]
 [ValidateModelState]
 [ValidateAntiForgeryToken]
+[ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
 public class SettingsApiController(
     IWritableOptions<UserOptions> userOptions,
     ICookieAuthorizationHelper cookieAuthorizationHelper,

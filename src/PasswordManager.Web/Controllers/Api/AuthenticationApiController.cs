@@ -23,6 +23,7 @@ namespace PasswordManager.Web.Controllers.Api;
 [Route("api/auth")]
 [ValidateModelState]
 [ValidateAntiForgeryToken]
+[ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
 public class AuthenticationApiController(
     IKeyService keyService,
     IKeyGeneratorFactory keyGeneratorFactory,

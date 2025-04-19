@@ -17,12 +17,13 @@ namespace PasswordManager.Web.Controllers.Api;
 [Route("api/account")]
 [ValidateModelState]
 [ValidateAntiForgeryToken]
+[ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
 public class AccountsApiController(IAccountService accountService) : Controller
 {
     /// <summary>
     /// Get account by id
     /// </summary>
-    [HttpPost("{accountId}")]
+    [HttpGet("{accountId}")]
     public async Task<ActionResult<Account>> GetAccountByIdAsync(int accountId, CancellationToken token)
     {
         try

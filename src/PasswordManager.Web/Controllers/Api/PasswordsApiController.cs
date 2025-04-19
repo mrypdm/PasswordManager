@@ -17,6 +17,7 @@ namespace PasswordManager.Web.Controllers.Api;
 [Route("api/password")]
 [ValidateModelState]
 [ValidateAntiForgeryToken]
+[ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
 public class PasswordsApiController(IPasswordService passwordService) : Controller
 {
     /// <summary>
